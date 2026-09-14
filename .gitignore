@@ -1,0 +1,14 @@
+# Local and browser-related sensitive data
+*.log
+*.cookie
+*.cookies
+*.token
+*.tokens
+*.session
+.env
+.env.*
+
+# Downloaded content and generated archives
+downloads/
+output/
+*.zip

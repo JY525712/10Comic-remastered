@@ -38,6 +38,7 @@
 | Webtoons | https://www.webtoons.com/ | 内置规则 |
 | 哔哩哔哩漫画 | https://manga.bilibili.com/ | 仅免费或当前账号已授权章节 |
 | 如漫画 | https://www.rumanhua2.com/ | 动态章节列表可能需要重新加载 |
+| 嬉皮漫畫（HipMH） | https://m.hipmh.com/ | 免费章节；批量下载会复用一个阅读标签页 |
 
 ## 哔哩哔哩漫画声明
 

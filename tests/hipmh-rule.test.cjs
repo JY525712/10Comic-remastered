@@ -78,7 +78,7 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, con
       comicName: "测试漫画",
       chapterName: "第2話",
       chapterNumStr: "",
-      url: "https://m.hipmh.com/chapter/go?hid=chapter-2",
+      url: "https://reader.hipmh.top/chapter/chapter-2",
       readtype: 1,
       isPay: false,
       isSelect: false,
@@ -87,7 +87,7 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, con
       comicName: "测试漫画",
       chapterName: "第1話",
       chapterNumStr: "",
-      url: "https://m.hipmh.com/chapter/go?hid=chapter-1",
+      url: "https://reader.hipmh.top/chapter/chapter-1",
       readtype: 1,
       isPay: false,
       isSelect: false,
@@ -99,5 +99,4 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, con
   console.error(error);
   process.exitCode = 1;
 });
-
 

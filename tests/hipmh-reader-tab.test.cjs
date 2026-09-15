@@ -132,14 +132,14 @@ function createStorage(initial = {}) {
   };
   const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, ruleContext);
   const result = await rule.getImgs.call(rule, "", {
-    url: "https://m.hipmh.com/chapter/go?hid=demo",
+    url: "https://reader.hipmh.top/chapter/demo",
     signal: { aborted: false },
   });
   assert.deepEqual(JSON.parse(JSON.stringify(result)), [
     "https://img.example/a.webp",
     "https://img.example/b.webp",
   ]);
-  assert.match(openedUrl, /^https:\/\/m\.hipmh\.com\/chapter\/go\?hid=demo#tencomic-task=/);
+  assert.match(openedUrl, /^https:\/\/reader\.hipmh\.top\/chapter\/demo#tencomic-task=/);
   assert.deepEqual(JSON.parse(JSON.stringify(openedOptions)), { active: false, insert: true, setParent: true });
   assert.equal(tabClosed, true, "主页面完成后应清理工作标签页句柄");
   assert.equal([...storage.values.keys()].some((keyName) => keyName.startsWith("tenComicHipmhWorker:")), false);

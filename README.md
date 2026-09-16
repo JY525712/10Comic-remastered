@@ -41,7 +41,7 @@
 | 如漫画 | https://www.rumanhua2.com/ | 动态章节列表可能需要重新加载 |
 | 嬉皮漫畫（HipMH） | https://m.hipmh.com/ | 内置站点 |
 | KakaoPage | https://page.kakao.com/ | 仅免费或当前账号已购买/有权访问章节 |
-| RidiBooks | https://ridibooks.com/webtoon/recommendation | 当前仅支持阅读器页的当前免费或已授权章节 |
+| RidiBooks | https://ridibooks.com/webtoon/recommendation | 免费或已授权章节 |
 
 ## 哔哩哔哩漫画声明
 

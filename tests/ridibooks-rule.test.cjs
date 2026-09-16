@@ -17,6 +17,7 @@ let openedUrl = "";
 let openedOptions = null;
 let tabClosed = false;
 const ruleContext = {
+  URL,
   Date,
   Math,
   location: { origin: "https://ridibooks.com" },
@@ -46,6 +47,77 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, rul
   assert.equal(rule.readerTabMode, "ridi");
   assert.equal(rule.hasSpend, true);
   assert.equal(rule.useFrame, false);
+
+  function chapterRow({ id, title, price, adult = "0" }) {
+    return {
+      getAttribute(name) {
+        if (name === "data-price") return price;
+        if (name === "data-is-adult-only") return adult;
+        return null;
+      },
+      querySelector(selector) {
+        assert.equal(selector, ".js_book_title");
+        return { textContent: title };
+      },
+    };
+  }
+  const catalogLinks = [
+    { href: "/books/6305000001/view", row: chapterRow({ id: "6305000001", title: "테스트 작품 1화", price: "0" }) },
+    { href: "/books/6305000002/view", row: chapterRow({ id: "6305000002", title: "테스트 작품 2화", price: "300" }) },
+    { href: "/books/6305000003/view", row: chapterRow({ id: "6305000003", title: "테스트 작품 성인화", price: "0", adult: "1" }) },
+  ].map(({ href, row }) => ({
+    getAttribute(name) { return name === "href" ? href : null; },
+    closest(selector) { assert.equal(selector, "li.js_series_book_list"); return row; },
+  }));
+  const catalogContext = {
+    ...ruleContext,
+    document: {
+      querySelector(selector) {
+        assert.equal(selector, "h1");
+        return { textContent: "테스트 작품" };
+      },
+      querySelectorAll(selector) {
+        assert.equal(selector, 'li.js_series_book_list a[href*="/view"]');
+        return catalogLinks;
+      },
+    },
+  };
+  const catalogRule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, catalogContext);
+  assert.deepEqual(JSON.parse(JSON.stringify(await catalogRule.getComicInfo.call(catalogRule))), [
+    {
+      comicName: "테스트 작품",
+      chapterName: "테스트 작품 1화",
+      chapterNumStr: "",
+      url: "https://ridibooks.com/books/6305000001/view",
+      readtype: 1,
+      isPay: false,
+      isUnavailable: false,
+      unavailableReason: "",
+      isSelect: false,
+    },
+    {
+      comicName: "테스트 작품",
+      chapterName: "테스트 작품 2화",
+      chapterNumStr: "",
+      url: "https://ridibooks.com/books/6305000002/view",
+      readtype: 1,
+      isPay: true,
+      isUnavailable: false,
+      unavailableReason: "需要当前账号已有访问权限",
+      isSelect: false,
+    },
+    {
+      comicName: "테스트 작품",
+      chapterName: "테스트 작품 성인화",
+      chapterNumStr: "",
+      url: "https://ridibooks.com/books/6305000003/view",
+      readtype: 1,
+      isPay: true,
+      isUnavailable: true,
+      unavailableReason: "年龄限制章节需要在网页端完成官方验证",
+      isSelect: false,
+    },
+  ]);
 
   await assert.rejects(
     () => rule.getImgs.call(rule, "", { url: "https://ridibooks.com/webtoon/recommendation", signal: { aborted: false } }),

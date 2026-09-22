@@ -42,6 +42,7 @@
 | 嬉皮漫畫（HipMH） | https://m.hipmh.com/ | 内置站点 |
 | KakaoPage | https://page.kakao.com/ | 仅免费或当前账号已购买/有权访问章节 |
 | RidiBooks | https://ridibooks.com/webtoon/recommendation | 免费或已授权章节 |
+| 拷贝漫画 | https://www.mangacopy.com/ | 仅下载页面正常加载的漫画图片 |
 
 ## 哔哩哔哩漫画声明
 

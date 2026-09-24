@@ -27,7 +27,9 @@
 
 | 站点 | 主页 | 备注 |
 | --- | --- | --- |
-| Mangabz | https://mangabz.com/ | 内置规则 |
+| Mangabz | https://mangabz.com/ | 已更新内置规则 |
+| 看漫画 | https://www.manhuagui.com/ | 通过阅读页获取翻页图片 |
+| Zero搬运网 | https://www.zerobyw33.com/pc/pc/ | 作品页读取章节与漫画名称 |
 | 再漫画 | https://manhua.zaimanhua.com/ | 内置规则 |
 | comic.naver | https://comic.naver.com/ | 内置规则 |
 | 腾讯漫画 | https://ac.qq.com/ | 内置规则；以当前账号和页面可访问性为准 |

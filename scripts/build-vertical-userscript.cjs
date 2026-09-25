@@ -62,7 +62,9 @@ async function main() {
   if (roundTrip.code !== compactCore) {
     throw new Error('Vertical formatting changed the userscript core')
   }
-  const vertical = Buffer.concat([prefix, Buffer.from(verticalCore + '\n', 'utf8')])
+  // Tampermonkey's editor may display mixed CRLF/LF input as a few giant lines.
+  // Match the LF-only layout of normally formatted userscripts.
+  const vertical = Buffer.from((prefix.toString('utf8') + verticalCore + '\n').replace(/\r\n?/g, '\n'), 'utf8')
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
   fs.writeFileSync(outputPath, vertical)
   const lines = vertical.toString('utf8').split(/\r?\n/)

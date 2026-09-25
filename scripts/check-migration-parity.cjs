@@ -6,6 +6,9 @@ const terser = require('terser')
 const { buildReadableUserscript } = require('./build-readable-userscript.cjs')
 
 const bundleStart = '(()=>{var __webpack_modules__='
+// Baseline: git show 9da5837b46988896f049fe327d2037aafe63a596:10漫画—重制版.user.js
+// Prefix hash covers metadata and workers. Core hash follows normalizeBindings()
+// and Terser with compress/mangle disabled, as in main().
 const publishedPrefixHash = 'a3168dfb0ba91b9d96e4d04eed9b5fb791b1be66705fad064a544386b189cba1'
 const publishedBindingNormalizedCoreHash = '8fff4548899d96d534f31c4544193c79e65bd3ac2b4e7ae017b463bb67760653'
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex')

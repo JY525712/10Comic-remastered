@@ -1,0 +1,24 @@
+// ==UserScript==
+// @name         10漫画—重制版
+// @namespace    urn:10comic:remastered
+// @version      2.0.10
+// @description  漫画章节下载、搜索与自定义规则工具（液体玻璃 UI 重制版）
+// @run-at       document-start
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_deleteValue
+// @grant        GM_setClipboard
+// @grant        GM_info
+// @grant        GM_xmlhttpRequest
+// @grant        GM_addStyle
+// @grant        GM_download
+// @grant        GM_openInTab
+// @grant        GM_registerMenuCommand
+// @grant        GM_notification
+// @grant        unsafeWindow
+// @license      GPLv3
+// @match        *://*/*
+// @connect      *
+// @noframes
+// ==/UserScript==
+

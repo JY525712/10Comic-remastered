@@ -5,7 +5,6 @@ const vm = require("node:vm");
 
 const userscriptPath = process.env.USERSCRIPT_PATH || path.resolve(__dirname, "../10漫画—重制版.user.js");
 const source = fs.readFileSync(userscriptPath, "utf8");
-assert.match(source, /^\/\/ @version\s+2\.0\.8$/m, "元数据版本必须保持 2.0.8");
 
 const ruleStart = source.indexOf('{domain:"m.hipmh.com"');
 assert.notEqual(ruleStart, -1, "HipMH 内置规则不存在");

@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node scripts/build-readable-userscript.cjs",
     "check:build": "node scripts/build-readable-userscript.cjs --check",
+    "verify:migration": "node scripts/check-migration-parity.cjs",
     "test": "node scripts/run-tests.cjs"
   },
   "devDependencies": {

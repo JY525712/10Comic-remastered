@@ -13,20 +13,18 @@ const prefixFiles = [
   'workers/kakaopage.js',
   'workers/ridibooks.js'
 ]
-const coreFiles = [
-  'core/vendor.source.js',
-  'core/config.source.js',
-  'core/comics-prefix.source.js',
-  'sites/edge-sites.source.js',
-  'core/comics-suffix.source.js',
-  'core/downloads.source.js',
-  'core/ui-runtime.source.js'
-]
+const siteMarker = '/*__EDGE_SITE_RULES__*/'
 
 async function buildReadableUserscript() {
   const prefix = Buffer.concat(prefixFiles.map(name => fs.readFileSync(path.join(source, name))))
-  const core = coreFiles.map(name => fs.readFileSync(path.join(source, name), 'utf8')).join('')
-  const result = await terser.minify(core, {
+  const core = fs.readFileSync(path.join(source, 'core.source.js'), 'utf8')
+  const sites = fs.readFileSync(path.join(source, 'sites', 'edge-sites.source.js'), 'utf8')
+  const first = core.indexOf(siteMarker)
+  if (first < 0 || core.indexOf(siteMarker, first + siteMarker.length) >= 0) {
+    throw new Error('Expected exactly one site rule marker')
+  }
+  const assembled = core.slice(0, first) + sites + core.slice(first + siteMarker.length)
+  const result = await terser.minify(assembled, {
     compress: false,
     mangle: false,
     format: { beautify: false, comments: 'all', max_line_len: 500 }

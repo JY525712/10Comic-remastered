@@ -15,16 +15,39 @@ const prefixFiles = [
 ]
 const siteMarker = '/*__EDGE_SITE_RULES__*/'
 
+function replaceOne(sourceText, marker, replacement) {
+  const index = sourceText.indexOf(marker)
+  if (index < 0 || sourceText.indexOf(marker, index + marker.length) >= 0) {
+    throw new Error(`Expected exactly one ${marker}`)
+  }
+  return sourceText.slice(0, index) + replacement + sourceText.slice(index + marker.length)
+}
+
+function moduleSource(name) {
+  const text = fs.readFileSync(path.join(source, 'modules', `${name}.js`), 'utf8').trim()
+  const prefix = 'module.exports = '
+  if (!text.startsWith(prefix) || !text.endsWith(';')) {
+    throw new Error(`Invalid source module wrapper: ${name}`)
+  }
+  return text.slice(prefix.length, -1).trim()
+}
+
 async function buildReadableUserscript() {
   const prefix = Buffer.concat(prefixFiles.map(name => fs.readFileSync(path.join(source, name))))
-  const core = fs.readFileSync(path.join(source, 'core.source.js'), 'utf8')
+  let core = fs.readFileSync(path.join(source, 'runtime.source.js'), 'utf8')
   const sites = fs.readFileSync(path.join(source, 'sites', 'edge-sites.source.js'), 'utf8')
-  const first = core.indexOf(siteMarker)
-  if (first < 0 || core.indexOf(siteMarker, first + siteMarker.length) >= 0) {
-    throw new Error('Expected exactly one site rule marker')
+  const modules = {
+    733: moduleSource('vendor'),
+    390: moduleSource('config'),
+    872: replaceOne(moduleSource('comics'), siteMarker, sites),
+    624: moduleSource('downloads')
   }
-  const assembled = core.slice(0, first) + sites + core.slice(first + siteMarker.length)
-  const result = await terser.minify(assembled, {
+  for (const [id, body] of Object.entries(modules)) {
+    core = replaceOne(core, `/*__MODULE_${id}__*/(()=>{})`, `(${body})`)
+  }
+  const ui = replaceOne(moduleSource('ui'), '/*__QUEUE_CLASS__*/class o {}', moduleSource('queue'))
+  core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${ui})()`)
+  const result = await terser.minify(core, {
     compress: false,
     mangle: false,
     format: { beautify: false, comments: 'all', max_line_len: 500 }

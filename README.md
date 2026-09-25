@@ -25,7 +25,7 @@
 
 ## 本地构建
 
-仓库根目录的用户脚本由 `src/userscript/` 中的可读源码和阅读页 worker 生成。构建使用固定版本的 Terser，仅排版代码，不启用压缩或变量改名。生成文件的字节与已发布 2.0.10 不同；独立的 `npm run verify:migration` 会检查元数据和 worker 未变、核心代码经相同规则规范化后与已发布版本一致。
+仓库根目录的用户脚本由 `src/userscript/` 中的可读源码和阅读页 worker 生成。构建使用固定版本的 Terser，仅排版代码，不启用压缩或变量改名。生成文件的字节与已发布 2.0.10 不同；独立的 `npm run verify:migration` 会检查元数据和 worker 未变，并在统一局部变量名后比较核心代码与已发布版本。
 
 ```sh
 npm ci               # 安装固定版本的构建依赖
@@ -35,7 +35,7 @@ npm run build        # 根据源码重新生成用户脚本
 npm run verify:migration # 本次迁移专用：核对与已发布 2.0.10 的核心等价性
 ```
 
-阅读页 worker 和站点规则单独维护；[核心源码](./src/userscript/core.source.js) 是可独立解析、正常排版的完整 JavaScript 文件。核心中的 webpack 模块 `733` 是第三方 ZIP 库、`390` 是设置存储、`872` 是内置站点规则、`624` 是下载与路径工具，后半部分是队列和界面。原脚本的部分局部变量名仍保留压缩后的短名称，因此这是一套可编辑的发布源码，还不是旧 Vue 工程的逐文件恢复。修改源码后应重建、运行测试并复查生成脚本。`verify:migration` 只用于证明本次零行为迁移；以后有意修改功能时不要求该命令继续通过。元数据版本为 2.0.10，核心默认配置中仍写有 2.0.8；本次迁移没有改动这两个值。
+阅读页 worker、[站点规则](./src/userscript/sites/edge-sites.source.js)、[配置](./src/userscript/modules/config.js)、[下载工具](./src/userscript/modules/downloads.js)、[队列](./src/userscript/modules/queue.js)和[界面](./src/userscript/modules/ui.js)分别维护；[运行时组装文件](./src/userscript/runtime.source.js)及各模块可独立解析。第三方 ZIP 库保留为 vendor 模块。现有界面由原生 JavaScript 实现，不再以旧 Vue 组件为构建入口。部分局部变量名仍待恢复；修改源码后应重建、运行测试并复查生成脚本。`verify:migration` 用于核对本次重构的行为等价性；以后有意修改功能时需重新评估基线。元数据版本为 2.0.10，核心默认配置中仍写有 2.0.8，本次没有改动这两个值。
 
 ## 内置站点
 

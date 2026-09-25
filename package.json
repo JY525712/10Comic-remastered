@@ -9,6 +9,9 @@
     "test": "node scripts/run-tests.cjs"
   },
   "devDependencies": {
+    "@babel/generator": "7.29.8",
+    "@babel/parser": "7.29.8",
+    "@babel/traverse": "7.29.8",
     "terser": "5.44.0"
   }
 }

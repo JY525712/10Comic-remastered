@@ -3,22 +3,18 @@ const fs=require("node:fs");
 const path=require("node:path");
 const vm=require("node:vm");
 
-const source=fs.readFileSync(process.env.USERSCRIPT_PATH||path.resolve(__dirname,"../10漫画—重制版.user.js"),"utf8");
-const start=source.indexOf("async makeZip(e){");
-const end=source.indexOf("}async combineImages(e){",start);
-assert.notEqual(start,-1,"ZIP 输出方法不存在");
-assert.notEqual(end,-1,"无法定位 ZIP 输出方法结尾");
-const makeZipSource=source.slice(start,end+1);
+const source=fs.readFileSync(path.resolve(__dirname,"../src/userscript/modules/queue.js"),"utf8");
 
 let streamAvailable=true;
 let activeEntry=null;
-const Queue=vm.runInNewContext(`(class Queue{${makeZipSource}})`,{
+const Queue=vm.runInNewContext(`${source};module.exports`,{
+  module:{exports:{}},
   n:{pN:value=>String(value).trim(),zM:async(name,entries,digits,onProgress)=>{assert.equal(name,"漫画\\章节.zip");assert.equal(entries[0],activeEntry);assert.equal(digits,3);if(!streamAvailable)return false;activeEntry.blob=null;onProgress(1,1);return true}},
   i:async()=>{},Blob
 });
 
 (async()=>{
-  const queue=new Queue();
+  const queue=new Queue(1,1,3,null);
   const stages=[];
   queue.imgIndexBitNum=3;
   queue.worker=[{comicName:"漫画",downChapterName:"章节",stage:""}];
@@ -31,7 +27,7 @@ const Queue=vm.runInNewContext(`(class Queue{${makeZipSource}})`,{
   await queue.makeZip(0);
   assert.ok(stages.includes("正在打包 1/1"));
   streamAvailable=false;
-  const noDirectoryQueue=new Queue();
+  const noDirectoryQueue=new Queue(1,1,3,null);
   noDirectoryQueue.imgIndexBitNum=3;
   noDirectoryQueue.worker=[{comicName:"漫画",downChapterName:"章节",stage:""}];
   activeEntry={imgIndex:1,suffix:"webp",blob:new Blob(["image"],{type:"image/webp"}),imgurl:"https://img.test/1.webp"};

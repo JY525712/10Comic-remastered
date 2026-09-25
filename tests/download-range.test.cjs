@@ -1,20 +1,19 @@
 const assert = require('node:assert/strict')
 const { test } = require('node:test')
+const fs = require('node:fs')
+const path = require('node:path')
 const vm = require('node:vm')
-const { buildReadableUserscript } = require('../scripts/build-readable-userscript.cjs')
 
 const images = [1, 2, 3].map(number => `https://img.example/${number}.webp`)
+const queueSource = fs.readFileSync(path.resolve(__dirname, '../src/userscript/modules/queue.js'), 'utf8')
 
 async function runQueue(range) {
-  const source = (await buildReadableUserscript()).toString('utf8')
-  const start = source.indexOf('async exeDown(e){')
-  const end = source.indexOf('}async down(e){', start)
-  assert.ok(start >= 0 && end > start)
-  const Queue = vm.runInNewContext(`(class Queue{${source.slice(start, end + 1)}})`, {
+  const Queue = vm.runInNewContext(`${queueSource};module.exports`, {
+    module: { exports: {} },
     n: { gJ: async () => images },
     r: { cF: () => range }
   })
-  const queue = new Queue()
+  const queue = new Queue(1, 1, 3, null)
   const worker = { url: 'https://comic.example/chapter', readtype: 1, abortController: { signal: {} } }
   queue.worker = [worker]
   queue.waitUntilRunnable = async () => {}

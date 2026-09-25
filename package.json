@@ -3,9 +3,9 @@
   "private": true,
   "version": "2.0.10",
   "scripts": {
-    "build": "node scripts/build-readable-userscript.cjs",
-    "build:vertical": "node scripts/build-vertical-userscript.cjs",
-    "check:build": "node scripts/build-readable-userscript.cjs --check",
+    "build": "node scripts/build-vertical-userscript.cjs",
+    "build:vertical": "node scripts/build-vertical-userscript.cjs --dist",
+    "check:build": "node scripts/build-vertical-userscript.cjs --check",
     "verify:migration": "node scripts/check-migration-parity.cjs",
     "test": "node scripts/run-tests.cjs"
   },

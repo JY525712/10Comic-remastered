@@ -6,7 +6,8 @@ const terser = require('terser')
 const { buildReadableUserscript } = require('./build-readable-userscript.cjs')
 
 const root = path.resolve(__dirname, '..')
-const outputPath = path.join(root, 'dist', '10漫画—重制版.vertical.user.js')
+const outputPath = path.join(root, '10漫画—重制版.user.js')
+const previewPath = path.join(root, 'dist', '10漫画—重制版.vertical.user.js')
 const bundleStart = '(()=>{var __webpack_modules__='
 
 function wrapLongLiterals(source) {
@@ -42,7 +43,7 @@ function wrapLongLiterals(source) {
   return source
 }
 
-async function main() {
+async function buildVerticalUserscript() {
   const built = await buildReadableUserscript()
   const start = built.indexOf(bundleStart)
   if (start < 0) throw new Error('Userscript core was not found')
@@ -65,11 +66,26 @@ async function main() {
   // Tampermonkey's editor may display mixed CRLF/LF input as a few giant lines.
   // Match the LF-only layout of normally formatted userscripts.
   const vertical = Buffer.from((prefix.toString('utf8') + verticalCore + '\n').replace(/\r\n?/g, '\n'), 'utf8')
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true })
-  fs.writeFileSync(outputPath, vertical)
+  return vertical
+}
+
+async function main() {
+  const vertical = await buildVerticalUserscript()
+  if (process.argv.includes('--check')) {
+    if (!fs.existsSync(outputPath) || !vertical.equals(fs.readFileSync(outputPath))) {
+      throw new Error('Root userscript differs from vertical source build. Run npm run build.')
+    }
+    console.log(`Root userscript matches vertical source build: ${vertical.length} bytes`)
+    return
+  }
+  const target = process.argv.includes('--dist') ? previewPath : outputPath
+  fs.mkdirSync(path.dirname(target), { recursive: true })
+  fs.writeFileSync(target, vertical)
   const lines = vertical.toString('utf8').split(/\r?\n/)
-  console.log(`Built vertical userscript: ${outputPath} (${vertical.length} bytes, ${lines.length} lines)`)
+  console.log(`Built vertical userscript: ${target} (${vertical.length} bytes, ${lines.length} lines)`)
   console.log(`Longest line: ${Math.max(...lines.map(line => line.length))} characters`)
 }
 
-main().catch(error => { console.error(error); process.exitCode = 1 })
+if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1 })
+
+module.exports = { buildVerticalUserscript }

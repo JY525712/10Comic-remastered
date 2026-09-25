@@ -25,13 +25,13 @@
 
 ## 本地构建
 
-仓库根目录的用户脚本由 `src/userscript/` 中的可读源码和阅读页 worker 生成。构建使用固定版本的 Terser，仅排版代码，不启用压缩或变量改名。生成文件的字节与已发布 2.0.10 不同；独立的 `npm run verify:migration` 会检查元数据和 worker 未变，并在统一局部变量名后比较核心代码与已发布版本。
+仓库根目录的用户脚本由 `src/userscript/` 中的可读源码和阅读页 worker 生成，发布文件采用统一 LF 换行的纵向排版。构建使用固定版本的 Terser，仅排版代码，不启用压缩或变量改名；纵向文件重新紧凑化后须与构建中的紧凑代码逐字一致。生成文件的字节与已发布 2.0.10 不同；独立的 `npm run verify:migration` 会以构建中的紧凑代码检查元数据和 worker 未变，并在统一局部变量名后比较核心代码与已发布版本。
 
 ```sh
 npm ci               # 安装固定版本的构建依赖
 npm run check:build  # 核对源码与仓库中的用户脚本是否一致
 npm test             # 运行现有规则测试和构建一致性测试
-npm run build        # 根据源码重新生成用户脚本
+npm run build        # 根据源码重新生成仓库根目录的纵向排版用户脚本
 npm run build:vertical # 在 dist/ 生成纵向排版的本地安装文件，并核对紧凑化后的代码完全一致
 npm run verify:migration # 本次迁移专用：核对与已发布 2.0.10 的核心等价性
 ```

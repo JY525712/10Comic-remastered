@@ -4,7 +4,7 @@ const terser = require('terser')
 
 const root = path.resolve(__dirname, '..')
 const source = path.join(root, 'src', 'userscript')
-const outputPath = path.join(root, '10漫画—重制版.user.js')
+const outputPath = path.join(root, 'dist', '10漫画—重制版.compact.user.js')
 
 const prefixFiles = [
   'metadata.part',

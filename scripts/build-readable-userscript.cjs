@@ -45,7 +45,8 @@ async function buildReadableUserscript() {
   for (const [id, body] of Object.entries(modules)) {
     core = replaceOne(core, `/*__MODULE_${id}__*/(()=>{})`, `(${body})`)
   }
-  const ui = replaceOne(moduleSource('ui'), '/*__QUEUE_CLASS__*/class o {}', moduleSource('queue'))
+  // Queue is kept in a separate source file but runs in the UI module scope.
+  const ui = replaceOne(moduleSource('ui'), '/*__QUEUE_CLASS__*/\n  class DownloadQueue {}', moduleSource('queue'))
   core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${ui})()`)
   const result = await terser.minify(core, {
     compress: false,

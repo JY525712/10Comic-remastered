@@ -10,8 +10,8 @@ const queueSource = fs.readFileSync(path.resolve(__dirname, '../src/userscript/m
 async function runQueue(range) {
   const Queue = vm.runInNewContext(`${queueSource};module.exports`, {
     module: { exports: {} },
-    n: { gJ: async () => images },
-    r: { cF: () => range }
+    downloadUtils: { gJ: async () => images },
+    configModule: { cF: () => range }
   })
   const queue = new Queue(1, 1, 3, null)
   const worker = { url: 'https://comic.example/chapter', readtype: 1, abortController: { signal: {} } }

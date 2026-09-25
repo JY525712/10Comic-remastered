@@ -9,8 +9,8 @@ let streamAvailable=true;
 let activeEntry=null;
 const Queue=vm.runInNewContext(`${source};module.exports`,{
   module:{exports:{}},
-  n:{pN:value=>String(value).trim(),zM:async(name,entries,digits,onProgress)=>{assert.equal(name,"漫画\\章节.zip");assert.equal(entries[0],activeEntry);assert.equal(digits,3);if(!streamAvailable)return false;activeEntry.blob=null;onProgress(1,1);return true}},
-  i:async()=>{},Blob
+  downloadUtils:{pN:value=>String(value).trim(),zM:async(name,entries,digits,onProgress)=>{assert.equal(name,"漫画\\章节.zip");assert.equal(entries[0],activeEntry);assert.equal(digits,3);if(!streamAvailable)return false;activeEntry.blob=null;onProgress(1,1);return true}},
+  yieldToBrowser:async()=>{},Blob
 });
 
 (async()=>{

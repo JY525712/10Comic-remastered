@@ -35,7 +35,7 @@ npm run build        # 根据源码重新生成用户脚本
 npm run verify:migration # 本次迁移专用：核对与已发布 2.0.10 的核心等价性
 ```
 
-阅读页 worker、[站点规则](./src/userscript/sites/edge-sites.source.js)、[配置](./src/userscript/modules/config.js)、[下载工具](./src/userscript/modules/downloads.js)、[队列](./src/userscript/modules/queue.js)和[界面](./src/userscript/modules/ui.js)分别维护；[运行时组装文件](./src/userscript/runtime.source.js)及各模块可独立解析。第三方 ZIP 库保留为 vendor 模块。现有界面由原生 JavaScript 实现，不再以旧 Vue 组件为构建入口。部分局部变量名仍待恢复；修改源码后应重建、运行测试并复查生成脚本。`verify:migration` 用于核对本次重构的行为等价性；以后有意修改功能时需重新评估基线。元数据版本为 2.0.10，核心默认配置中仍写有 2.0.8，本次没有改动这两个值。
+阅读页 worker、[站点规则](./src/userscript/sites/edge-sites.source.js)、[配置](./src/userscript/modules/config.js)、[下载工具](./src/userscript/modules/downloads.js)、[队列](./src/userscript/modules/queue.js)和[界面](./src/userscript/modules/ui.js)分别维护；[运行时组装文件](./src/userscript/runtime.source.js)及各模块可独立解析。第三方 ZIP 库保留为 vendor 模块。现有界面由原生 JavaScript 实现，不再以旧 Vue 组件为构建入口。界面状态、主要函数、模块依赖和队列类已恢复语义名；函数内的部分临时变量仍沿用原打包代码。队列源码在构建时插入界面模块作用域，依赖该模块的下载工具、设置、任务取消异常和异步让出函数。修改源码后应重建、运行测试并复查生成脚本。`verify:migration` 用于核对本次重构的行为等价性；以后有意修改功能时需重新评估基线。元数据版本为 2.0.10，核心默认配置中仍写有 2.0.8，本次没有改动这两个值。
 
 ## 内置站点
 

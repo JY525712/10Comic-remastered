@@ -53,7 +53,7 @@ const context = {
       assert.fail(`未预期的选择器: ${selector}`);
     },
   },
-  _utils_index__WEBPACK_IMPORTED_MODULE_0__: {
+  downloadUtils: {
     async gw(seconds) {
       assert.equal(seconds, 0.25);
       waitCalls += 1;

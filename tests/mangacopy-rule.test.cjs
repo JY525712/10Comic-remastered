@@ -33,7 +33,7 @@ const ctx={
   URL,Date,Math,
   location:{origin:"https://www.mangacopy.com"},
   document:{querySelector:s=>(assert.equal(s,"h6"),{textContent:"测试漫画"}),querySelectorAll:s=>(assert.equal(s,'a[href*="/chapter/"]'),chapters),getElementById:id=>(assert.equal(id,"frame-1"),frame)},
-  _utils_index__WEBPACK_IMPORTED_MODULE_0__:{gw:async()=>{}},
+  downloadUtils:{gw:async()=>{}},
   setTimeout,clearTimeout
 };
 const rule=vm.runInNewContext(`(${source.slice(start,end+1)})`,ctx);

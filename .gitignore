@@ -11,4 +11,6 @@
 # Downloaded content and generated archives
 downloads/
 output/
+node_modules/
+dist/
 *.zip

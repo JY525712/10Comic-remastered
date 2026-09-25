@@ -32,6 +32,7 @@ npm ci               # 安装固定版本的构建依赖
 npm run check:build  # 核对源码与仓库中的用户脚本是否一致
 npm test             # 运行现有规则测试和构建一致性测试
 npm run build        # 根据源码重新生成用户脚本
+npm run build:vertical # 在 dist/ 生成纵向排版的本地安装文件，并核对紧凑化后的代码完全一致
 npm run verify:migration # 本次迁移专用：核对与已发布 2.0.10 的核心等价性
 ```
 

@@ -194,7 +194,7 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
         try {
           n(a.contentDocument.body.outerHTML);
         } catch (e) {
-          a.remove(), r(e);
+          a.remove(), r(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
         }
       }, a.onerror = function () {
         clearTimeout(i), a.remove(), r(new Error("iframe 加载失败"));

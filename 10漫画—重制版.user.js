@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         10漫画—重制版
 // @namespace    urn:10comic:remastered
-// @version      2.0.10
+// @version      2.0.11
 // @description  漫画章节下载、搜索与自定义规则工具（液体玻璃 UI 重制版）
 // @run-at       document-start
 // @grant        GM_getValue
@@ -4509,7 +4509,128 @@
                     }
                 }
             });
-            /* FOUR_SITE_ADDITIONS_END */            comicsWebInfo.forEach(e => {
+            /* FOUR_SITE_ADDITIONS_END */
+            // SF 菠萝包：参考用户提供的下载脚本确认 picAy 数据形态；复用本站正常阅读流程。
+                        comicsWebInfo.push({
+                domain: "manhua.sfacg.com",
+                homepage: "https://manhua.sfacg.com/",
+                webName: "SF菠萝包漫画",
+                webDesc: "在作品页加载章节；仅下载当前账号可正常阅读的章节。",
+                comicNameCss: 'h1, .Reduction_left a[href^="/mh/"]',
+                chapterCss: ".comic_Serial_list",
+                readtype: 1,
+                useFrame: true,
+                hasSpend: true,
+                payKey: "VIP",
+                downHeaders: {
+                    referer: "https://manhua.sfacg.com/"
+                },
+                getComicInfo: async function() {
+                    const pageUrl = new URL(location.href);
+                    const match = pageUrl.pathname.match(/^\/mh\/([^/]+)\/(?:\d+\/)?$/i);
+                    if (!match) throw new Error("请在 SF 漫画作品页或章节阅读页加载目录");
+                    let root = document;
+                    const directoryUrl = new URL("/mh/" + match[1] + "/", pageUrl).href;
+                    if (/^\/mh\/[^/]+\/\d+\/$/i.test(pageUrl.pathname)) {
+                        const response = await (0, downloadUtils.WY)({
+                            method: "get",
+                            url: directoryUrl,
+                            useCookie: true,
+                            headers: {
+                                referer: pageUrl.href
+                            }
+                        });
+                        if (!response || response.status !== 200) throw new Error("SF 漫画目录请求失败");
+                        root = (0, downloadUtils.U3)(response.responseText || response.response || "");
+                    }
+                    const comicName = String(root.querySelector(this.comicNameCss)?.textContent || "").trim();
+                    if (!comicName) throw new Error("SF 漫画目录中未找到作品名称");
+                    const chapters = new Map;
+                    for (const list of root.querySelectorAll(this.chapterCss)) {
+                        // 本站每个目录分组均以最新章节在前显示。
+                        for (const link of [ ...list.querySelectorAll("a[href]") ].reverse()) {
+                            const href = link.getAttribute("href");
+                            if (!href) continue;
+                            let url;
+                            try {
+                                url = new URL(href, directoryUrl);
+                            } catch (error) {
+                                continue;
+                            }
+                            if (!/^https?:$/.test(url.protocol) || url.hostname !== "manhua.sfacg.com") continue;
+                            url.protocol = pageUrl.protocol;
+                            const chapter = url.pathname.match(/^\/mh\/([^/]+)\/\d+\/$/i);
+                            if (url.origin !== pageUrl.origin || !chapter || chapter[1].toLowerCase() !== match[1].toLowerCase()) continue;
+                            url.search = "";
+                            url.hash = "";
+                            const isPay = /^VIP$/i.test(String(link.querySelector("b")?.textContent || "").trim());
+                            let chapterName = String(link.textContent || "").trim();
+                            if (isPay) chapterName = chapterName.replace(/^VIP\s*/i, "").trim();
+                            if (!chapterName || chapters.has(url.href)) continue;
+                            chapters.set(url.href, {
+                                comicName: comicName,
+                                chapterName: chapterName,
+                                chapterNumStr: "",
+                                url: url.href,
+                                readtype: this.readtype,
+                                isPay: isPay,
+                                isSelect: false
+                            });
+                        }
+                    }
+                    if (!chapters.size) throw new Error("SF 漫画目录中未找到章节");
+                    return [ ...chapters.values() ];
+                },
+                getImgs: async function(html, task) {
+                    const frame = document.getElementById(task?.frameId);
+                    if (!frame) throw new Error("SF 漫画阅读页未加载");
+                    try {
+                        const readerUrl = new URL(task.url);
+                        if (readerUrl.origin !== new URL(location.href).origin || !/^\/mh\/[^/]+\/\d+\/$/i.test(readerUrl.pathname)) {
+                            throw new Error("无法识别 SF 漫画章节地址，请打开章节阅读页");
+                        }
+                        for (let attempt = 0; attempt < 150; attempt++) {
+                            if (task.signal?.aborted) throw new Error("下载已取消");
+                            const doc = frame.contentDocument;
+                            // 页面全局变量不属于 DOM；隔离环境应使用已声明授权的页面窗口。
+                                                        const pageFrame = typeof unsafeWindow !== "undefined" ? unsafeWindow.document?.getElementById(task.frameId) : null;
+                            const win = frame.contentWindow?.wrappedJSObject || pageFrame?.contentWindow || frame.contentWindow;
+                            if (!doc || !win) throw new Error("SF 漫画阅读页不可读取，请先在网站正常登录并打开章节");
+                            if (new URL(win.location.href).pathname !== readerUrl.pathname) {
+                                throw new Error("SF 漫画阅读页已跳转，请先确认该章节可正常阅读");
+                            }
+                            const pictures = win.picAy;
+                            if (Array.isArray(pictures) && pictures.length) {
+                                // 不按图片 URL 去重：相同图片也可能占据两个不同的阅读页。
+                                return Array.from(pictures, picture => {
+                                    if (typeof picture !== "string" || !picture.trim()) throw new Error("SF 漫画图片地址不完整");
+                                    const clean = picture.trim().replace(/\\\//g, "/");
+                                    let url;
+                                    try {
+                                        url = new URL(clean, "https://coldpic.sfacg.com/");
+                                    } catch (error) {
+                                        throw new Error("SF 漫画图片地址格式错误");
+                                    }
+                                    if (!/^https?:$/.test(url.protocol)) throw new Error("SF 漫画图片地址格式错误");
+                                    return url.href;
+                                });
+                            }
+                            const tips = doc.querySelector("#Tips");
+                            if (tips && tips.style.display !== "none" && String(tips.textContent || "").trim()) {
+                                throw new Error("SF 漫画阅读页：" + String(tips.textContent).trim());
+                            }
+                            await new Promise(resolve => setTimeout(resolve, 200));
+                        }
+                        throw new Error("SF 漫画图片加载超时，请确认已登录且当前账号可正常阅读该章节");
+                    } catch (error) {
+                        if (error?.name === "SecurityError") throw new Error("SF 漫画阅读页已跳转到登录或授权页面，请先在网站正常打开章节");
+                        throw error;
+                    } finally {
+                        frame.remove();
+                    }
+                }
+            });
+            comicsWebInfo.forEach(e => {
                 void 0 === e.batchDelay && (e.batchDelay = 200);
             });
             const getWebList = () => {
@@ -4727,7 +4848,7 @@
                     try {
                         n(a.contentDocument.body.outerHTML);
                     } catch (e) {
-                        a.remove(), r(e);
+                        a.remove(), r(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
                     }
                 }, a.onerror = function() {
                     clearTimeout(i), a.remove(), r(new Error("iframe 加载失败"));

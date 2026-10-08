@@ -57,6 +57,7 @@ npm test
 | KakaoPage | https://page.kakao.com/ | 仅免费或当前账号已购买/有权访问章节 |
 | RidiBooks | https://ridibooks.com/webtoon/recommendation | 免费或已授权章节 |
 | 拷贝漫画 | https://www.mangacopy.com/ | 仅下载页面正常加载的漫画图片 |
+| SF菠萝包漫画 | https://manhua.sfacg.com/ | 作品页或阅读页加载目录；免费或当前账号可正常阅读的章节 |
 
 ## 哔哩哔哩漫画声明
 

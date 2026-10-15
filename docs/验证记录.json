@@ -37,5 +37,13 @@
       "totalNodesAdded": 0
     }
   ],
-  "scope": "Offline Chromium fixtures, unchanged adapter/download/queue/config AST, no live account or site availability claim"
+  "scope": "Offline Chromium fixtures, unchanged adapter/download/queue/config AST, no live account or site availability claim",
+  "sourcePackage": {
+    "file": "10Comic-2.0.12-source.zip",
+    "files": 60,
+    "crcVerified": true,
+    "isolatedInstall": "npm ci --ignore-scripts --no-audit --no-fund (27 packages)",
+    "sourceBuild": "npm run check:build: reproduced identical 422771-byte artifact",
+    "compatibility": "npm run verify:compat: 2/2 passed"
+  }
 }

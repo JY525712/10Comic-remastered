@@ -1,6 +1,6 @@
 # 10漫画保持功能的优化计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 按用户认可的方案优化代码、UI、交互与运行开销，完整保留现有功能和数据兼容。
 
@@ -31,40 +31,40 @@
 ## Task 1: 基线和浏览器回归工具
 
 Files: baseline/*, tests/helpers/browser.cjs, scripts/verify-browser.cjs。
-- [ ] 留存原件及哈希，运行现有 npm test（Expected: 25 pass）。
-- [ ] 建立真实 Chromium 本地站点/GM API 夹具，能够操作四主入口及现有设置、规则和队列。
+- [x] 留存原件及哈希，运行现有 npm test（Expected: 25 pass）。
+- [x] 建立真实 Chromium 本地站点/GM API 夹具，能够操作四主入口及现有设置、规则和队列。
 
 ## Task 2: 章节列表增量更新
 
 Files: src/userscript/modules/ui.js（随后分离至 ui/chapters.js）, tests/ui-browser.test.cjs。
 Interfaces: 继续使用 state.chapters、renderChapters()、canSelectChapter()。
-- [ ] 测试选择保留 DOM 节点、焦点、滚动；记录原版失败。
-- [ ] 容器事件委托、按章节对象复用行、只更新变化的控件；保持编辑与 Shift 语义。
-- [ ] 单测与浏览器回归通过。
+- [x] 测试选择保留 DOM 节点、焦点、滚动；记录原版失败。
+- [x] 容器事件委托、按章节对象复用行、只更新变化的控件；保持编辑与 Shift 语义。
+- [x] 单测与浏览器回归通过。
 
 ## Task 3: 可维护 UI 源码和依赖减负
 
 Files: src/userscript/ui/*, scripts/compose-ui.cjs, scripts/build-readable-userscript.cjs, src/userscript/runtime.source.js。
 Interfaces: 构建时替换 UI 插槽，保留同一词法作用域和原函数接口。
-- [ ] 在内存验证提取样式/模板/功能片段前后语义与产物一致。
-- [ ] 分离 CSS、壳模板、章节、任务、规则交互；样式选择器限定在根容器。
-- [ ] 核查并移除无调用无副作用的 ZIP vendor 执行依赖；保留原有 ZIP 输出路径。
-- [ ] 构建一致性、原有全部测试和浏览器回归通过。
+- [x] 在内存验证提取样式/模板/功能片段前后语义与产物一致。
+- [x] 分离 CSS、壳模板、章节、任务、规则交互；样式选择器限定在根容器。
+- [x] 核查并移除无调用无副作用的 ZIP vendor 执行依赖；保留原有 ZIP 输出路径。
+- [x] 构建一致性、原有全部测试和浏览器回归通过。
 
 ## Task 4: 界面与交互打磨
 
 Files: src/userscript/ui/styles.css, accessibility.js, shell.js, modules/ui.js。
 Interfaces: 保留现有控件 ID、主题、存储键和入口；焦点控制仅限打开的模态层。
-- [ ] 先验证键盘焦点逃逸和关闭后丢失焦点的原版失败。
-- [ ] 实现模态焦点约束/恢复、统一 Escape；提高文字/按钮层次和可见焦点。
-- [ ] 改善选中行、长标题、设置分组、触摸目标、动态视口、安全区与短屏滚动。
-- [ ] 合并可证明重复的样式规则，保留主题差异与显式动效选择。
-- [ ] 运行桌面/窄屏/六主题/减弱动态效果矩阵并检查截图。
+- [x] 先验证键盘焦点逃逸和关闭后丢失焦点的原版失败。
+- [x] 实现模态焦点约束/恢复、统一 Escape；提高文字/按钮层次和可见焦点。
+- [x] 改善选中行、长标题、设置分组、触摸目标、动态视口、安全区与短屏滚动。
+- [x] 合并可证明重复的样式规则，保留主题差异与显式动效选择。
+- [x] 运行桌面/窄屏/六主题/减弱动态效果矩阵并检查截图。
 
 ## Task 5: 资源、兼容和交付
 
 Files: src/userscript/modules/ui.js, metadata.part, package.json, README.md, docs/优化说明.md。
-- [ ] 按测量优化隐藏 UI 的装饰动画，验证菜单、自定义规则及下载不中断。
-- [ ] 核查下载取消、存储竞争，仅对可复现问题修复；无证据则保留原语义并记录。
-- [ ] 升级至 2.0.12，生成安装脚本、源码包、功能对照与验证记录。
-- [ ] npm test、check:build、node --check、浏览器验证全部通过后独立复核。
+- [x] 按测量优化隐藏 UI 的装饰动画，验证菜单、自定义规则及下载不中断。
+- [x] 核查下载取消、存储竞争，仅对可复现问题修复；无证据则保留原语义并记录。
+- [x] 升级至 2.0.12，生成安装脚本、源码包、功能对照与验证记录。
+- [x] npm test、check:build、node --check、浏览器验证全部通过后独立复核。

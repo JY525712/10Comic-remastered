@@ -1,6 +1,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const terser = require('terser')
+const { composeUI } = require('./compose-ui.cjs')
 
 const root = path.resolve(__dirname, '..')
 const source = path.join(root, 'src', 'userscript')
@@ -37,7 +38,6 @@ async function buildReadableUserscript() {
   let core = fs.readFileSync(path.join(source, 'runtime.source.js'), 'utf8')
   const sites = fs.readFileSync(path.join(source, 'sites', 'edge-sites.source.js'), 'utf8')
   const modules = {
-    733: moduleSource('vendor'),
     390: moduleSource('config'),
     872: replaceOne(moduleSource('comics'), siteMarker, sites),
     624: moduleSource('downloads')
@@ -46,7 +46,10 @@ async function buildReadableUserscript() {
     core = replaceOne(core, `/*__MODULE_${id}__*/(()=>{})`, `(${body})`)
   }
   // Queue is kept in a separate source file but runs in the UI module scope.
-  const ui = replaceOne(moduleSource('ui'), '/*__QUEUE_CLASS__*/\n  class DownloadQueue {}', moduleSource('queue'))
+  const uiSource = composeUI(moduleSource('ui'), source)
+  const queueSlot = uiSource.match(/\/\*__QUEUE_CLASS__\*\/\s*class DownloadQueue\s*\{\s*\}/)
+  if (!queueSlot) throw new Error('Missing UI queue slot')
+  const ui = replaceOne(uiSource, queueSlot[0], moduleSource('queue'))
   core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${ui})()`)
   const result = await terser.minify(core, {
     compress: false,

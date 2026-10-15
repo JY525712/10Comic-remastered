@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         10漫画—重制版
 // @namespace    urn:10comic:remastered
-// @version      2.0.11
+// @version      2.0.12
 // @description  漫画章节下载、搜索与自定义规则工具（液体玻璃 UI 重制版）
 // @run-at       document-start
 // @grant        GM_getValue
@@ -249,3216 +249,6 @@
 
 (() => {
     var __webpack_modules__ = {
-        733: (e, t, n) => {
-            e.exports = function e(t, n, r) {
-                function a(o, s) {
-                    if (!n[o]) {
-                        if (!t[o]) {
-                            if (i) return i(o, !0);
-                            var c = new Error("Cannot find module '" + o + "'");
-                            throw c.code = "MODULE_NOT_FOUND", c;
-                        }
-                        var d = n[o] = {
-                            exports: {}
-                        };
-                        t[o][0].call(d.exports, function(e) {
-                            return a(t[o][1][e] || e);
-                        }, d, d.exports, e, t, n, r);
-                    }
-                    return n[o].exports;
-                }
-                for (var i = void 0, o = 0; o < r.length; o++) a(r[o]);
-                return a;
-            }({
-                1: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./utils"), a = e("./support"), i = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-                    n.encode = function(e) {
-                        for (var t, n, a, o, s, c, d, l = [], u = 0, p = e.length, h = p, m = "string" !== r.getTypeOf(e); u < e.length; ) h = p - u, 
-                        a = m ? (t = e[u++], n = u < p ? e[u++] : 0, u < p ? e[u++] : 0) : (t = e.charCodeAt(u++), 
-                        n = u < p ? e.charCodeAt(u++) : 0, u < p ? e.charCodeAt(u++) : 0), o = t >> 2, s = (3 & t) << 4 | n >> 4, 
-                        c = 1 < h ? (15 & n) << 2 | a >> 6 : 64, d = 2 < h ? 63 & a : 64, l.push(i.charAt(o) + i.charAt(s) + i.charAt(c) + i.charAt(d));
-                        return l.join("");
-                    }, n.decode = function(e) {
-                        var t, n, r, o, s, c, d = 0, l = 0, u = "data:";
-                        if (e.substr(0, 5) === u) throw new Error("Invalid base64 input, it looks like a data url.");
-                        var p, h = 3 * (e = e.replace(/[^A-Za-z0-9\+\/\=]/g, "")).length / 4;
-                        if (e.charAt(e.length - 1) === i.charAt(64) && h--, e.charAt(e.length - 2) === i.charAt(64) && h--, 
-                        h % 1 != 0) throw new Error("Invalid base64 input, bad content length.");
-                        for (p = a.uint8array ? new Uint8Array(0 | h) : new Array(0 | h); d < e.length; ) t = i.indexOf(e.charAt(d++)) << 2 | (o = i.indexOf(e.charAt(d++))) >> 4, 
-                        n = (15 & o) << 4 | (s = i.indexOf(e.charAt(d++))) >> 2, r = (3 & s) << 6 | (c = i.indexOf(e.charAt(d++))), 
-                        p[l++] = t, 64 !== s && (p[l++] = n), 64 !== c && (p[l++] = r);
-                        return p;
-                    };
-                }, {
-                    "./support": 30,
-                    "./utils": 32
-                } ],
-                2: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./external"), a = e("./stream/DataWorker"), i = e("./stream/Crc32Probe"), o = e("./stream/DataLengthProbe");
-                    function s(e, t, n, r, a) {
-                        this.compressedSize = e, this.uncompressedSize = t, this.crc32 = n, this.compression = r, 
-                        this.compressedContent = a;
-                    }
-                    s.prototype = {
-                        getContentWorker: function() {
-                            var e = new a(r.Promise.resolve(this.compressedContent)).pipe(this.compression.uncompressWorker()).pipe(new o("data_length")), t = this;
-                            return e.on("end", function() {
-                                if (this.streamInfo.data_length !== t.uncompressedSize) throw new Error("Bug : uncompressed data size mismatch");
-                            }), e;
-                        },
-                        getCompressedWorker: function() {
-                            return new a(r.Promise.resolve(this.compressedContent)).withStreamInfo("compressedSize", this.compressedSize).withStreamInfo("uncompressedSize", this.uncompressedSize).withStreamInfo("crc32", this.crc32).withStreamInfo("compression", this.compression);
-                        }
-                    }, s.createWorkerFrom = function(e, t, n) {
-                        return e.pipe(new i).pipe(new o("uncompressedSize")).pipe(t.compressWorker(n)).pipe(new o("compressedSize")).withStreamInfo("compression", t);
-                    }, t.exports = s;
-                }, {
-                    "./external": 6,
-                    "./stream/Crc32Probe": 25,
-                    "./stream/DataLengthProbe": 26,
-                    "./stream/DataWorker": 27
-                } ],
-                3: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./stream/GenericWorker");
-                    n.STORE = {
-                        magic: "\0\0",
-                        compressWorker: function(e) {
-                            return new r("STORE compression");
-                        },
-                        uncompressWorker: function() {
-                            return new r("STORE decompression");
-                        }
-                    }, n.DEFLATE = e("./flate");
-                }, {
-                    "./flate": 7,
-                    "./stream/GenericWorker": 28
-                } ],
-                4: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./utils"), a = function() {
-                        for (var e, t = [], n = 0; n < 256; n++) {
-                            e = n;
-                            for (var r = 0; r < 8; r++) e = 1 & e ? 3988292384 ^ e >>> 1 : e >>> 1;
-                            t[n] = e;
-                        }
-                        return t;
-                    }();
-                    t.exports = function(e, t) {
-                        return void 0 !== e && e.length ? "string" !== r.getTypeOf(e) ? function(e, t, n) {
-                            var r = a, i = 0 + n;
-                            e ^= -1;
-                            for (var o = 0; o < i; o++) e = e >>> 8 ^ r[255 & (e ^ t[o])];
-                            return -1 ^ e;
-                        }(0 | t, e, e.length) : function(e, t, n) {
-                            var r = a, i = 0 + n;
-                            e ^= -1;
-                            for (var o = 0; o < i; o++) e = e >>> 8 ^ r[255 & (e ^ t.charCodeAt(o))];
-                            return -1 ^ e;
-                        }(0 | t, e, e.length) : 0;
-                    };
-                }, {
-                    "./utils": 32
-                } ],
-                5: [ function(e, t, n) {
-                    "use strict";
-                    n.base64 = !1, n.binary = !1, n.dir = !1, n.createFolders = !0, n.date = null, n.compression = null, 
-                    n.compressionOptions = null, n.comment = null, n.unixPermissions = null, n.dosPermissions = null;
-                }, {} ],
-                6: [ function(e, t, n) {
-                    "use strict";
-                    var r;
-                    r = "undefined" != typeof Promise ? Promise : e("lie"), t.exports = {
-                        Promise: r
-                    };
-                }, {
-                    lie: 37
-                } ],
-                7: [ function(e, t, n) {
-                    "use strict";
-                    var r = "undefined" != typeof Uint8Array && "undefined" != typeof Uint16Array && "undefined" != typeof Uint32Array, a = e("pako"), i = e("./utils"), o = e("./stream/GenericWorker"), s = r ? "uint8array" : "array";
-                    function c(e, t) {
-                        o.call(this, "FlateWorker/" + e), this._pako = null, this._pakoAction = e, this._pakoOptions = t, 
-                        this.meta = {};
-                    }
-                    n.magic = "\b\0", i.inherits(c, o), c.prototype.processChunk = function(e) {
-                        this.meta = e.meta, null === this._pako && this._createPako(), this._pako.push(i.transformTo(s, e.data), !1);
-                    }, c.prototype.flush = function() {
-                        o.prototype.flush.call(this), null === this._pako && this._createPako(), this._pako.push([], !0);
-                    }, c.prototype.cleanUp = function() {
-                        o.prototype.cleanUp.call(this), this._pako = null;
-                    }, c.prototype._createPako = function() {
-                        this._pako = new a[this._pakoAction]({
-                            raw: !0,
-                            level: this._pakoOptions.level || -1
-                        });
-                        var e = this;
-                        this._pako.onData = function(t) {
-                            e.push({
-                                data: t,
-                                meta: e.meta
-                            });
-                        };
-                    }, n.compressWorker = function(e) {
-                        return new c("Deflate", e);
-                    }, n.uncompressWorker = function() {
-                        return new c("Inflate", {});
-                    };
-                }, {
-                    "./stream/GenericWorker": 28,
-                    "./utils": 32,
-                    pako: 38
-                } ],
-                8: [ function(e, t, n) {
-                    "use strict";
-                    function r(e, t) {
-                        var n, r = "";
-                        for (n = 0; n < t; n++) r += String.fromCharCode(255 & e), e >>>= 8;
-                        return r;
-                    }
-                    function a(e, t, n, a, o, l) {
-                        var u, p, h = e.file, m = e.compression, g = l !== s.utf8encode, b = i.transformTo("string", l(h.name)), f = i.transformTo("string", s.utf8encode(h.name)), x = h.comment, v = i.transformTo("string", l(x)), y = i.transformTo("string", s.utf8encode(x)), w = f.length !== h.name.length, k = y.length !== x.length, _ = "", E = "", C = "", S = h.dir, A = h.date, I = {
-                            crc32: 0,
-                            compressedSize: 0,
-                            uncompressedSize: 0
-                        };
-                        t && !n || (I.crc32 = e.crc32, I.compressedSize = e.compressedSize, I.uncompressedSize = e.uncompressedSize);
-                        var N = 0;
-                        t && (N |= 8), g || !w && !k || (N |= 2048);
-                        var L = 0, T = 0;
-                        S && (L |= 16), "UNIX" === o ? (T = 798, L |= function(e, t) {
-                            var n = e;
-                            return e || (n = t ? 16893 : 33204), (65535 & n) << 16;
-                        }(h.unixPermissions, S)) : (T = 20, L |= function(e) {
-                            return 63 & (e || 0);
-                        }(h.dosPermissions)), u = A.getUTCHours(), u <<= 6, u |= A.getUTCMinutes(), u <<= 5, 
-                        u |= A.getUTCSeconds() / 2, p = A.getUTCFullYear() - 1980, p <<= 4, p |= A.getUTCMonth() + 1, 
-                        p <<= 5, p |= A.getUTCDate(), w && (E = r(1, 1) + r(c(b), 4) + f, _ += "up" + r(E.length, 2) + E), 
-                        k && (C = r(1, 1) + r(c(v), 4) + y, _ += "uc" + r(C.length, 2) + C);
-                        var z = "";
-                        return z += "\n\0", z += r(N, 2), z += m.magic, z += r(u, 2), z += r(p, 2), z += r(I.crc32, 4), 
-                        z += r(I.compressedSize, 4), z += r(I.uncompressedSize, 4), z += r(b.length, 2), 
-                        z += r(_.length, 2), {
-                            fileRecord: d.LOCAL_FILE_HEADER + z + b + _,
-                            dirRecord: d.CENTRAL_FILE_HEADER + r(T, 2) + z + r(v.length, 2) + "\0\0\0\0" + r(L, 4) + r(a, 4) + b + _ + v
-                        };
-                    }
-                    var i = e("../utils"), o = e("../stream/GenericWorker"), s = e("../utf8"), c = e("../crc32"), d = e("../signature");
-                    function l(e, t, n, r) {
-                        o.call(this, "ZipFileWorker"), this.bytesWritten = 0, this.zipComment = t, this.zipPlatform = n, 
-                        this.encodeFileName = r, this.streamFiles = e, this.accumulate = !1, this.contentBuffer = [], 
-                        this.dirRecords = [], this.currentSourceOffset = 0, this.entriesCount = 0, this.currentFile = null, 
-                        this._sources = [];
-                    }
-                    i.inherits(l, o), l.prototype.push = function(e) {
-                        var t = e.meta.percent || 0, n = this.entriesCount, r = this._sources.length;
-                        this.accumulate ? this.contentBuffer.push(e) : (this.bytesWritten += e.data.length, 
-                        o.prototype.push.call(this, {
-                            data: e.data,
-                            meta: {
-                                currentFile: this.currentFile,
-                                percent: n ? (t + 100 * (n - r - 1)) / n : 100
-                            }
-                        }));
-                    }, l.prototype.openedSource = function(e) {
-                        this.currentSourceOffset = this.bytesWritten, this.currentFile = e.file.name;
-                        var t = this.streamFiles && !e.file.dir;
-                        if (t) {
-                            var n = a(e, t, !1, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
-                            this.push({
-                                data: n.fileRecord,
-                                meta: {
-                                    percent: 0
-                                }
-                            });
-                        } else this.accumulate = !0;
-                    }, l.prototype.closedSource = function(e) {
-                        this.accumulate = !1;
-                        var t = this.streamFiles && !e.file.dir, n = a(e, t, !0, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
-                        if (this.dirRecords.push(n.dirRecord), t) this.push({
-                            data: function(e) {
-                                return d.DATA_DESCRIPTOR + r(e.crc32, 4) + r(e.compressedSize, 4) + r(e.uncompressedSize, 4);
-                            }(e),
-                            meta: {
-                                percent: 100
-                            }
-                        }); else for (this.push({
-                            data: n.fileRecord,
-                            meta: {
-                                percent: 0
-                            }
-                        }); this.contentBuffer.length; ) this.push(this.contentBuffer.shift());
-                        this.currentFile = null;
-                    }, l.prototype.flush = function() {
-                        for (var e = this.bytesWritten, t = 0; t < this.dirRecords.length; t++) this.push({
-                            data: this.dirRecords[t],
-                            meta: {
-                                percent: 100
-                            }
-                        });
-                        var n = this.bytesWritten - e, a = function(e, t, n, a, o) {
-                            var s = i.transformTo("string", o(a));
-                            return d.CENTRAL_DIRECTORY_END + "\0\0\0\0" + r(e, 2) + r(e, 2) + r(t, 4) + r(n, 4) + r(s.length, 2) + s;
-                        }(this.dirRecords.length, n, e, this.zipComment, this.encodeFileName);
-                        this.push({
-                            data: a,
-                            meta: {
-                                percent: 100
-                            }
-                        });
-                    }, l.prototype.prepareNextSource = function() {
-                        this.previous = this._sources.shift(), this.openedSource(this.previous.streamInfo), 
-                        this.isPaused ? this.previous.pause() : this.previous.resume();
-                    }, l.prototype.registerPrevious = function(e) {
-                        this._sources.push(e);
-                        var t = this;
-                        return e.on("data", function(e) {
-                            t.processChunk(e);
-                        }), e.on("end", function() {
-                            t.closedSource(t.previous.streamInfo), t._sources.length ? t.prepareNextSource() : t.end();
-                        }), e.on("error", function(e) {
-                            t.error(e);
-                        }), this;
-                    }, l.prototype.resume = function() {
-                        return !!o.prototype.resume.call(this) && (!this.previous && this._sources.length ? (this.prepareNextSource(), 
-                        !0) : this.previous || this._sources.length || this.generatedError ? void 0 : (this.end(), 
-                        !0));
-                    }, l.prototype.error = function(e) {
-                        var t = this._sources;
-                        if (!o.prototype.error.call(this, e)) return !1;
-                        for (var n = 0; n < t.length; n++) try {
-                            t[n].error(e);
-                        } catch (e) {}
-                        return !0;
-                    }, l.prototype.lock = function() {
-                        o.prototype.lock.call(this);
-                        for (var e = this._sources, t = 0; t < e.length; t++) e[t].lock();
-                    }, t.exports = l;
-                }, {
-                    "../crc32": 4,
-                    "../signature": 23,
-                    "../stream/GenericWorker": 28,
-                    "../utf8": 31,
-                    "../utils": 32
-                } ],
-                9: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../compressions"), a = e("./ZipFileWorker");
-                    n.generateWorker = function(e, t, n) {
-                        var i = new a(t.streamFiles, n, t.platform, t.encodeFileName), o = 0;
-                        try {
-                            e.forEach(function(e, n) {
-                                o++;
-                                var a = function(e, t) {
-                                    var n = e || t, a = r[n];
-                                    if (!a) throw new Error(n + " is not a valid compression method !");
-                                    return a;
-                                }(n.options.compression, t.compression), s = n.options.compressionOptions || t.compressionOptions || {}, c = n.dir, d = n.date;
-                                n._compressWorker(a, s).withStreamInfo("file", {
-                                    name: e,
-                                    dir: c,
-                                    date: d,
-                                    comment: n.comment || "",
-                                    unixPermissions: n.unixPermissions,
-                                    dosPermissions: n.dosPermissions
-                                }).pipe(i);
-                            }), i.entriesCount = o;
-                        } catch (e) {
-                            i.error(e);
-                        }
-                        return i;
-                    };
-                }, {
-                    "../compressions": 3,
-                    "./ZipFileWorker": 8
-                } ],
-                10: [ function(e, t, n) {
-                    "use strict";
-                    function r() {
-                        if (!(this instanceof r)) return new r;
-                        if (arguments.length) throw new Error("The constructor with parameters has been removed in JSZip 3.0, please check the upgrade guide.");
-                        this.files = Object.create(null), this.comment = null, this.root = "", this.clone = function() {
-                            var e = new r;
-                            for (var t in this) "function" != typeof this[t] && (e[t] = this[t]);
-                            return e;
-                        };
-                    }
-                    (r.prototype = e("./object")).loadAsync = e("./load"), r.support = e("./support"), 
-                    r.defaults = e("./defaults"), r.version = "3.10.0", r.loadAsync = function(e, t) {
-                        return (new r).loadAsync(e, t);
-                    }, r.external = e("./external"), t.exports = r;
-                }, {
-                    "./defaults": 5,
-                    "./external": 6,
-                    "./load": 11,
-                    "./object": 15,
-                    "./support": 30
-                } ],
-                11: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./utils"), a = e("./external"), i = e("./utf8"), o = e("./zipEntries"), s = e("./stream/Crc32Probe"), c = e("./nodejsUtils");
-                    function d(e) {
-                        return new a.Promise(function(t, n) {
-                            var r = e.decompressed.getContentWorker().pipe(new s);
-                            r.on("error", function(e) {
-                                n(e);
-                            }).on("end", function() {
-                                r.streamInfo.crc32 !== e.decompressed.crc32 ? n(new Error("Corrupted zip : CRC32 mismatch")) : t();
-                            }).resume();
-                        });
-                    }
-                    t.exports = function(e, t) {
-                        var n = this;
-                        return t = r.extend(t || {}, {
-                            base64: !1,
-                            checkCRC32: !1,
-                            optimizedBinaryString: !1,
-                            createFolders: !1,
-                            decodeFileName: i.utf8decode
-                        }), c.isNode && c.isStream(e) ? a.Promise.reject(new Error("JSZip can't accept a stream when loading a zip file.")) : r.prepareContent("the loaded zip file", e, !0, t.optimizedBinaryString, t.base64).then(function(e) {
-                            var n = new o(t);
-                            return n.load(e), n;
-                        }).then(function(e) {
-                            var n = [ a.Promise.resolve(e) ], r = e.files;
-                            if (t.checkCRC32) for (var i = 0; i < r.length; i++) n.push(d(r[i]));
-                            return a.Promise.all(n);
-                        }).then(function(e) {
-                            for (var a = e.shift(), i = a.files, o = 0; o < i.length; o++) {
-                                var s = i[o], c = s.fileNameStr, d = r.resolve(s.fileNameStr);
-                                n.file(d, s.decompressed, {
-                                    binary: !0,
-                                    optimizedBinaryString: !0,
-                                    date: s.date,
-                                    dir: s.dir,
-                                    comment: s.fileCommentStr.length ? s.fileCommentStr : null,
-                                    unixPermissions: s.unixPermissions,
-                                    dosPermissions: s.dosPermissions,
-                                    createFolders: t.createFolders
-                                }), s.dir || (n.file(d).unsafeOriginalName = c);
-                            }
-                            return a.zipComment.length && (n.comment = a.zipComment), n;
-                        });
-                    };
-                }, {
-                    "./external": 6,
-                    "./nodejsUtils": 14,
-                    "./stream/Crc32Probe": 25,
-                    "./utf8": 31,
-                    "./utils": 32,
-                    "./zipEntries": 33
-                } ],
-                12: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils"), a = e("../stream/GenericWorker");
-                    function i(e, t) {
-                        a.call(this, "Nodejs stream input adapter for " + e), this._upstreamEnded = !1, 
-                        this._bindStream(t);
-                    }
-                    r.inherits(i, a), i.prototype._bindStream = function(e) {
-                        var t = this;
-                        (this._stream = e).pause(), e.on("data", function(e) {
-                            t.push({
-                                data: e,
-                                meta: {
-                                    percent: 0
-                                }
-                            });
-                        }).on("error", function(e) {
-                            t.isPaused ? this.generatedError = e : t.error(e);
-                        }).on("end", function() {
-                            t.isPaused ? t._upstreamEnded = !0 : t.end();
-                        });
-                    }, i.prototype.pause = function() {
-                        return !!a.prototype.pause.call(this) && (this._stream.pause(), !0);
-                    }, i.prototype.resume = function() {
-                        return !!a.prototype.resume.call(this) && (this._upstreamEnded ? this.end() : this._stream.resume(), 
-                        !0);
-                    }, t.exports = i;
-                }, {
-                    "../stream/GenericWorker": 28,
-                    "../utils": 32
-                } ],
-                13: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("readable-stream").Readable;
-                    function a(e, t, n) {
-                        r.call(this, t), this._helper = e;
-                        var a = this;
-                        e.on("data", function(e, t) {
-                            a.push(e) || a._helper.pause(), n && n(t);
-                        }).on("error", function(e) {
-                            a.emit("error", e);
-                        }).on("end", function() {
-                            a.push(null);
-                        });
-                    }
-                    e("../utils").inherits(a, r), a.prototype._read = function() {
-                        this._helper.resume();
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32,
-                    "readable-stream": 16
-                } ],
-                14: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = {
-                        isNode: "undefined" != typeof Buffer,
-                        newBufferFrom: function(e, t) {
-                            if (Buffer.from && Buffer.from !== Uint8Array.from) return Buffer.from(e, t);
-                            if ("number" == typeof e) throw new Error('The "data" argument must not be a number');
-                            return new Buffer(e, t);
-                        },
-                        allocBuffer: function(e) {
-                            if (Buffer.alloc) return Buffer.alloc(e);
-                            var t = new Buffer(e);
-                            return t.fill(0), t;
-                        },
-                        isBuffer: function(e) {
-                            return Buffer.isBuffer(e);
-                        },
-                        isStream: function(e) {
-                            return e && "function" == typeof e.on && "function" == typeof e.pause && "function" == typeof e.resume;
-                        }
-                    };
-                }, {} ],
-                15: [ function(e, t, n) {
-                    "use strict";
-                    function r(e, t, n) {
-                        var r, a = i.getTypeOf(t), s = i.extend(n || {}, c);
-                        s.date = s.date || new Date, null !== s.compression && (s.compression = s.compression.toUpperCase()), 
-                        "string" == typeof s.unixPermissions && (s.unixPermissions = parseInt(s.unixPermissions, 8)), 
-                        s.unixPermissions && 16384 & s.unixPermissions && (s.dir = !0), s.dosPermissions && 16 & s.dosPermissions && (s.dir = !0), 
-                        s.dir && (e = g(e)), s.createFolders && (r = m(e)) && b.call(this, r, !0);
-                        var u = "string" === a && !1 === s.binary && !1 === s.base64;
-                        n && void 0 !== n.binary || (s.binary = !u), (t instanceof d && 0 === t.uncompressedSize || s.dir || !t || 0 === t.length) && (s.base64 = !1, 
-                        s.binary = !0, t = "", s.compression = "STORE", a = "string");
-                        var f;
-                        f = t instanceof d || t instanceof o ? t : p.isNode && p.isStream(t) ? new h(e, t) : i.prepareContent(e, t, s.binary, s.optimizedBinaryString, s.base64);
-                        var x = new l(e, f, s);
-                        this.files[e] = x;
-                    }
-                    var a = e("./utf8"), i = e("./utils"), o = e("./stream/GenericWorker"), s = e("./stream/StreamHelper"), c = e("./defaults"), d = e("./compressedObject"), l = e("./zipObject"), u = e("./generate"), p = e("./nodejsUtils"), h = e("./nodejs/NodejsStreamInputAdapter"), m = function(e) {
-                        "/" === e.slice(-1) && (e = e.substring(0, e.length - 1));
-                        var t = e.lastIndexOf("/");
-                        return 0 < t ? e.substring(0, t) : "";
-                    }, g = function(e) {
-                        return "/" !== e.slice(-1) && (e += "/"), e;
-                    }, b = function(e, t) {
-                        return t = void 0 !== t ? t : c.createFolders, e = g(e), this.files[e] || r.call(this, e, null, {
-                            dir: !0,
-                            createFolders: t
-                        }), this.files[e];
-                    };
-                    function f(e) {
-                        return "[object RegExp]" === Object.prototype.toString.call(e);
-                    }
-                    var x = {
-                        load: function() {
-                            throw new Error("This method has been removed in JSZip 3.0, please check the upgrade guide.");
-                        },
-                        forEach: function(e) {
-                            var t, n, r;
-                            for (t in this.files) r = this.files[t], (n = t.slice(this.root.length, t.length)) && t.slice(0, this.root.length) === this.root && e(n, r);
-                        },
-                        filter: function(e) {
-                            var t = [];
-                            return this.forEach(function(n, r) {
-                                e(n, r) && t.push(r);
-                            }), t;
-                        },
-                        file: function(e, t, n) {
-                            if (1 !== arguments.length) return e = this.root + e, r.call(this, e, t, n), this;
-                            if (f(e)) {
-                                var a = e;
-                                return this.filter(function(e, t) {
-                                    return !t.dir && a.test(e);
-                                });
-                            }
-                            var i = this.files[this.root + e];
-                            return i && !i.dir ? i : null;
-                        },
-                        folder: function(e) {
-                            if (!e) return this;
-                            if (f(e)) return this.filter(function(t, n) {
-                                return n.dir && e.test(t);
-                            });
-                            var t = this.root + e, n = b.call(this, t), r = this.clone();
-                            return r.root = n.name, r;
-                        },
-                        remove: function(e) {
-                            e = this.root + e;
-                            var t = this.files[e];
-                            if (t || ("/" !== e.slice(-1) && (e += "/"), t = this.files[e]), t && !t.dir) delete this.files[e]; else for (var n = this.filter(function(t, n) {
-                                return n.name.slice(0, e.length) === e;
-                            }), r = 0; r < n.length; r++) delete this.files[n[r].name];
-                            return this;
-                        },
-                        generate: function(e) {
-                            throw new Error("This method has been removed in JSZip 3.0, please check the upgrade guide.");
-                        },
-                        generateInternalStream: function(e) {
-                            var t, n = {};
-                            try {
-                                if ((n = i.extend(e || {}, {
-                                    streamFiles: !1,
-                                    compression: "STORE",
-                                    compressionOptions: null,
-                                    type: "",
-                                    platform: "DOS",
-                                    comment: null,
-                                    mimeType: "application/zip",
-                                    encodeFileName: a.utf8encode
-                                })).type = n.type.toLowerCase(), n.compression = n.compression.toUpperCase(), "binarystring" === n.type && (n.type = "string"), 
-                                !n.type) throw new Error("No output type specified.");
-                                i.checkSupport(n.type), "darwin" !== n.platform && "freebsd" !== n.platform && "linux" !== n.platform && "sunos" !== n.platform || (n.platform = "UNIX"), 
-                                "win32" === n.platform && (n.platform = "DOS");
-                                var r = n.comment || this.comment || "";
-                                t = u.generateWorker(this, n, r);
-                            } catch (e) {
-                                (t = new o("error")).error(e);
-                            }
-                            return new s(t, n.type || "string", n.mimeType);
-                        },
-                        generateAsync: function(e, t) {
-                            return this.generateInternalStream(e).accumulate(t);
-                        },
-                        generateNodeStream: function(e, t) {
-                            return (e = e || {}).type || (e.type = "nodebuffer"), this.generateInternalStream(e).toNodejsStream(t);
-                        }
-                    };
-                    t.exports = x;
-                }, {
-                    "./compressedObject": 2,
-                    "./defaults": 5,
-                    "./generate": 9,
-                    "./nodejs/NodejsStreamInputAdapter": 12,
-                    "./nodejsUtils": 14,
-                    "./stream/GenericWorker": 28,
-                    "./stream/StreamHelper": 29,
-                    "./utf8": 31,
-                    "./utils": 32,
-                    "./zipObject": 35
-                } ],
-                16: [ function(e, t, n) {
-                    t.exports = e("stream");
-                }, {
-                    stream: void 0
-                } ],
-                17: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./DataReader");
-                    function a(e) {
-                        r.call(this, e);
-                        for (var t = 0; t < this.data.length; t++) e[t] = 255 & e[t];
-                    }
-                    e("../utils").inherits(a, r), a.prototype.byteAt = function(e) {
-                        return this.data[this.zero + e];
-                    }, a.prototype.lastIndexOfSignature = function(e) {
-                        for (var t = e.charCodeAt(0), n = e.charCodeAt(1), r = e.charCodeAt(2), a = e.charCodeAt(3), i = this.length - 4; 0 <= i; --i) if (this.data[i] === t && this.data[i + 1] === n && this.data[i + 2] === r && this.data[i + 3] === a) return i - this.zero;
-                        return -1;
-                    }, a.prototype.readAndCheckSignature = function(e) {
-                        var t = e.charCodeAt(0), n = e.charCodeAt(1), r = e.charCodeAt(2), a = e.charCodeAt(3), i = this.readData(4);
-                        return t === i[0] && n === i[1] && r === i[2] && a === i[3];
-                    }, a.prototype.readData = function(e) {
-                        if (this.checkOffset(e), 0 === e) return [];
-                        var t = this.data.slice(this.zero + this.index, this.zero + this.index + e);
-                        return this.index += e, t;
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32,
-                    "./DataReader": 18
-                } ],
-                18: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils");
-                    function a(e) {
-                        this.data = e, this.length = e.length, this.index = 0, this.zero = 0;
-                    }
-                    a.prototype = {
-                        checkOffset: function(e) {
-                            this.checkIndex(this.index + e);
-                        },
-                        checkIndex: function(e) {
-                            if (this.length < this.zero + e || e < 0) throw new Error("End of data reached (data length = " + this.length + ", asked index = " + e + "). Corrupted zip ?");
-                        },
-                        setIndex: function(e) {
-                            this.checkIndex(e), this.index = e;
-                        },
-                        skip: function(e) {
-                            this.setIndex(this.index + e);
-                        },
-                        byteAt: function(e) {},
-                        readInt: function(e) {
-                            var t, n = 0;
-                            for (this.checkOffset(e), t = this.index + e - 1; t >= this.index; t--) n = (n << 8) + this.byteAt(t);
-                            return this.index += e, n;
-                        },
-                        readString: function(e) {
-                            return r.transformTo("string", this.readData(e));
-                        },
-                        readData: function(e) {},
-                        lastIndexOfSignature: function(e) {},
-                        readAndCheckSignature: function(e) {},
-                        readDate: function() {
-                            var e = this.readInt(4);
-                            return new Date(Date.UTC(1980 + (e >> 25 & 127), (e >> 21 & 15) - 1, e >> 16 & 31, e >> 11 & 31, e >> 5 & 63, (31 & e) << 1));
-                        }
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32
-                } ],
-                19: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./Uint8ArrayReader");
-                    function a(e) {
-                        r.call(this, e);
-                    }
-                    e("../utils").inherits(a, r), a.prototype.readData = function(e) {
-                        this.checkOffset(e);
-                        var t = this.data.slice(this.zero + this.index, this.zero + this.index + e);
-                        return this.index += e, t;
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32,
-                    "./Uint8ArrayReader": 21
-                } ],
-                20: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./DataReader");
-                    function a(e) {
-                        r.call(this, e);
-                    }
-                    e("../utils").inherits(a, r), a.prototype.byteAt = function(e) {
-                        return this.data.charCodeAt(this.zero + e);
-                    }, a.prototype.lastIndexOfSignature = function(e) {
-                        return this.data.lastIndexOf(e) - this.zero;
-                    }, a.prototype.readAndCheckSignature = function(e) {
-                        return e === this.readData(4);
-                    }, a.prototype.readData = function(e) {
-                        this.checkOffset(e);
-                        var t = this.data.slice(this.zero + this.index, this.zero + this.index + e);
-                        return this.index += e, t;
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32,
-                    "./DataReader": 18
-                } ],
-                21: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./ArrayReader");
-                    function a(e) {
-                        r.call(this, e);
-                    }
-                    e("../utils").inherits(a, r), a.prototype.readData = function(e) {
-                        if (this.checkOffset(e), 0 === e) return new Uint8Array(0);
-                        var t = this.data.subarray(this.zero + this.index, this.zero + this.index + e);
-                        return this.index += e, t;
-                    }, t.exports = a;
-                }, {
-                    "../utils": 32,
-                    "./ArrayReader": 17
-                } ],
-                22: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils"), a = e("../support"), i = e("./ArrayReader"), o = e("./StringReader"), s = e("./NodeBufferReader"), c = e("./Uint8ArrayReader");
-                    t.exports = function(e) {
-                        var t = r.getTypeOf(e);
-                        return r.checkSupport(t), "string" !== t || a.uint8array ? "nodebuffer" === t ? new s(e) : a.uint8array ? new c(r.transformTo("uint8array", e)) : new i(r.transformTo("array", e)) : new o(e);
-                    };
-                }, {
-                    "../support": 30,
-                    "../utils": 32,
-                    "./ArrayReader": 17,
-                    "./NodeBufferReader": 19,
-                    "./StringReader": 20,
-                    "./Uint8ArrayReader": 21
-                } ],
-                23: [ function(e, t, n) {
-                    "use strict";
-                    n.LOCAL_FILE_HEADER = "PK", n.CENTRAL_FILE_HEADER = "PK", n.CENTRAL_DIRECTORY_END = "PK", 
-                    n.ZIP64_CENTRAL_DIRECTORY_LOCATOR = "PK", n.ZIP64_CENTRAL_DIRECTORY_END = "PK", 
-                    n.DATA_DESCRIPTOR = "PK\b";
-                }, {} ],
-                24: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./GenericWorker"), a = e("../utils");
-                    function i(e) {
-                        r.call(this, "ConvertWorker to " + e), this.destType = e;
-                    }
-                    a.inherits(i, r), i.prototype.processChunk = function(e) {
-                        this.push({
-                            data: a.transformTo(this.destType, e.data),
-                            meta: e.meta
-                        });
-                    }, t.exports = i;
-                }, {
-                    "../utils": 32,
-                    "./GenericWorker": 28
-                } ],
-                25: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./GenericWorker"), a = e("../crc32");
-                    function i() {
-                        r.call(this, "Crc32Probe"), this.withStreamInfo("crc32", 0);
-                    }
-                    e("../utils").inherits(i, r), i.prototype.processChunk = function(e) {
-                        this.streamInfo.crc32 = a(e.data, this.streamInfo.crc32 || 0), this.push(e);
-                    }, t.exports = i;
-                }, {
-                    "../crc32": 4,
-                    "../utils": 32,
-                    "./GenericWorker": 28
-                } ],
-                26: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils"), a = e("./GenericWorker");
-                    function i(e) {
-                        a.call(this, "DataLengthProbe for " + e), this.propName = e, this.withStreamInfo(e, 0);
-                    }
-                    r.inherits(i, a), i.prototype.processChunk = function(e) {
-                        if (e) {
-                            var t = this.streamInfo[this.propName] || 0;
-                            this.streamInfo[this.propName] = t + e.data.length;
-                        }
-                        a.prototype.processChunk.call(this, e);
-                    }, t.exports = i;
-                }, {
-                    "../utils": 32,
-                    "./GenericWorker": 28
-                } ],
-                27: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils"), a = e("./GenericWorker");
-                    function i(e) {
-                        a.call(this, "DataWorker");
-                        var t = this;
-                        this.dataIsReady = !1, this.index = 0, this.max = 0, this.data = null, this.type = "", 
-                        this._tickScheduled = !1, e.then(function(e) {
-                            t.dataIsReady = !0, t.data = e, t.max = e && e.length || 0, t.type = r.getTypeOf(e), 
-                            t.isPaused || t._tickAndRepeat();
-                        }, function(e) {
-                            t.error(e);
-                        });
-                    }
-                    r.inherits(i, a), i.prototype.cleanUp = function() {
-                        a.prototype.cleanUp.call(this), this.data = null;
-                    }, i.prototype.resume = function() {
-                        return !!a.prototype.resume.call(this) && (!this._tickScheduled && this.dataIsReady && (this._tickScheduled = !0, 
-                        r.delay(this._tickAndRepeat, [], this)), !0);
-                    }, i.prototype._tickAndRepeat = function() {
-                        this._tickScheduled = !1, this.isPaused || this.isFinished || (this._tick(), this.isFinished || (r.delay(this._tickAndRepeat, [], this), 
-                        this._tickScheduled = !0));
-                    }, i.prototype._tick = function() {
-                        if (this.isPaused || this.isFinished) return !1;
-                        var e = null, t = Math.min(this.max, this.index + 16384);
-                        if (this.index >= this.max) return this.end();
-                        switch (this.type) {
-                          case "string":
-                            e = this.data.substring(this.index, t);
-                            break;
-
-                          case "uint8array":
-                            e = this.data.subarray(this.index, t);
-                            break;
-
-                          case "array":
-                          case "nodebuffer":
-                            e = this.data.slice(this.index, t);
-                        }
-                        return this.index = t, this.push({
-                            data: e,
-                            meta: {
-                                percent: this.max ? this.index / this.max * 100 : 0
-                            }
-                        });
-                    }, t.exports = i;
-                }, {
-                    "../utils": 32,
-                    "./GenericWorker": 28
-                } ],
-                28: [ function(e, t, n) {
-                    "use strict";
-                    function r(e) {
-                        this.name = e || "default", this.streamInfo = {}, this.generatedError = null, this.extraStreamInfo = {}, 
-                        this.isPaused = !0, this.isFinished = !1, this.isLocked = !1, this._listeners = {
-                            data: [],
-                            end: [],
-                            error: []
-                        }, this.previous = null;
-                    }
-                    r.prototype = {
-                        push: function(e) {
-                            this.emit("data", e);
-                        },
-                        end: function() {
-                            if (this.isFinished) return !1;
-                            this.flush();
-                            try {
-                                this.emit("end"), this.cleanUp(), this.isFinished = !0;
-                            } catch (e) {
-                                this.emit("error", e);
-                            }
-                            return !0;
-                        },
-                        error: function(e) {
-                            return !this.isFinished && (this.isPaused ? this.generatedError = e : (this.isFinished = !0, 
-                            this.emit("error", e), this.previous && this.previous.error(e), this.cleanUp()), 
-                            !0);
-                        },
-                        on: function(e, t) {
-                            return this._listeners[e].push(t), this;
-                        },
-                        cleanUp: function() {
-                            this.streamInfo = this.generatedError = this.extraStreamInfo = null, this._listeners = [];
-                        },
-                        emit: function(e, t) {
-                            if (this._listeners[e]) for (var n = 0; n < this._listeners[e].length; n++) this._listeners[e][n].call(this, t);
-                        },
-                        pipe: function(e) {
-                            return e.registerPrevious(this);
-                        },
-                        registerPrevious: function(e) {
-                            if (this.isLocked) throw new Error("The stream '" + this + "' has already been used.");
-                            this.streamInfo = e.streamInfo, this.mergeStreamInfo(), this.previous = e;
-                            var t = this;
-                            return e.on("data", function(e) {
-                                t.processChunk(e);
-                            }), e.on("end", function() {
-                                t.end();
-                            }), e.on("error", function(e) {
-                                t.error(e);
-                            }), this;
-                        },
-                        pause: function() {
-                            return !this.isPaused && !this.isFinished && (this.isPaused = !0, this.previous && this.previous.pause(), 
-                            !0);
-                        },
-                        resume: function() {
-                            if (!this.isPaused || this.isFinished) return !1;
-                            var e = this.isPaused = !1;
-                            return this.generatedError && (this.error(this.generatedError), e = !0), this.previous && this.previous.resume(), 
-                            !e;
-                        },
-                        flush: function() {},
-                        processChunk: function(e) {
-                            this.push(e);
-                        },
-                        withStreamInfo: function(e, t) {
-                            return this.extraStreamInfo[e] = t, this.mergeStreamInfo(), this;
-                        },
-                        mergeStreamInfo: function() {
-                            for (var e in this.extraStreamInfo) this.extraStreamInfo.hasOwnProperty(e) && (this.streamInfo[e] = this.extraStreamInfo[e]);
-                        },
-                        lock: function() {
-                            if (this.isLocked) throw new Error("The stream '" + this + "' has already been used.");
-                            this.isLocked = !0, this.previous && this.previous.lock();
-                        },
-                        toString: function() {
-                            var e = "Worker " + this.name;
-                            return this.previous ? this.previous + " -> " + e : e;
-                        }
-                    }, t.exports = r;
-                }, {} ],
-                29: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils"), a = e("./ConvertWorker"), i = e("./GenericWorker"), o = e("../base64"), s = e("../support"), c = e("../external"), d = null;
-                    if (s.nodestream) try {
-                        d = e("../nodejs/NodejsStreamOutputAdapter");
-                    } catch (e) {}
-                    function l(e, t, n) {
-                        var o = t;
-                        switch (t) {
-                          case "blob":
-                          case "arraybuffer":
-                            o = "uint8array";
-                            break;
-
-                          case "base64":
-                            o = "string";
-                        }
-                        try {
-                            this._internalType = o, this._outputType = t, this._mimeType = n, r.checkSupport(o), 
-                            this._worker = e.pipe(new a(o)), e.lock();
-                        } catch (e) {
-                            this._worker = new i("error"), this._worker.error(e);
-                        }
-                    }
-                    l.prototype = {
-                        accumulate: function(e) {
-                            return function(e, t) {
-                                return new c.Promise(function(n, a) {
-                                    var i = [], s = e._internalType, c = e._outputType, d = e._mimeType;
-                                    e.on("data", function(e, n) {
-                                        i.push(e), t && t(n);
-                                    }).on("error", function(e) {
-                                        i = [], a(e);
-                                    }).on("end", function() {
-                                        try {
-                                            var e = function(e, t, n) {
-                                                switch (e) {
-                                                  case "blob":
-                                                    return r.newBlob(r.transformTo("arraybuffer", t), n);
-
-                                                  case "base64":
-                                                    return o.encode(t);
-
-                                                  default:
-                                                    return r.transformTo(e, t);
-                                                }
-                                            }(c, function(e, t) {
-                                                var n, r = 0, a = null, i = 0;
-                                                for (n = 0; n < t.length; n++) i += t[n].length;
-                                                switch (e) {
-                                                  case "string":
-                                                    return t.join("");
-
-                                                  case "array":
-                                                    return Array.prototype.concat.apply([], t);
-
-                                                  case "uint8array":
-                                                    for (a = new Uint8Array(i), n = 0; n < t.length; n++) a.set(t[n], r), r += t[n].length;
-                                                    return a;
-
-                                                  case "nodebuffer":
-                                                    return Buffer.concat(t);
-
-                                                  default:
-                                                    throw new Error("concat : unsupported type '" + e + "'");
-                                                }
-                                            }(s, i), d);
-                                            n(e);
-                                        } catch (e) {
-                                            a(e);
-                                        }
-                                        i = [];
-                                    }).resume();
-                                });
-                            }(this, e);
-                        },
-                        on: function(e, t) {
-                            var n = this;
-                            return "data" === e ? this._worker.on(e, function(e) {
-                                t.call(n, e.data, e.meta);
-                            }) : this._worker.on(e, function() {
-                                r.delay(t, arguments, n);
-                            }), this;
-                        },
-                        resume: function() {
-                            return r.delay(this._worker.resume, [], this._worker), this;
-                        },
-                        pause: function() {
-                            return this._worker.pause(), this;
-                        },
-                        toNodejsStream: function(e) {
-                            if (r.checkSupport("nodestream"), "nodebuffer" !== this._outputType) throw new Error(this._outputType + " is not supported by this method");
-                            return new d(this, {
-                                objectMode: "nodebuffer" !== this._outputType
-                            }, e);
-                        }
-                    }, t.exports = l;
-                }, {
-                    "../base64": 1,
-                    "../external": 6,
-                    "../nodejs/NodejsStreamOutputAdapter": 13,
-                    "../support": 30,
-                    "../utils": 32,
-                    "./ConvertWorker": 24,
-                    "./GenericWorker": 28
-                } ],
-                30: [ function(e, t, n) {
-                    "use strict";
-                    if (n.base64 = !0, n.array = !0, n.string = !0, n.arraybuffer = "undefined" != typeof ArrayBuffer && "undefined" != typeof Uint8Array, 
-                    n.nodebuffer = "undefined" != typeof Buffer, n.uint8array = "undefined" != typeof Uint8Array, 
-                    "undefined" == typeof ArrayBuffer) n.blob = !1; else {
-                        var r = new ArrayBuffer(0);
-                        try {
-                            n.blob = 0 === new Blob([ r ], {
-                                type: "application/zip"
-                            }).size;
-                        } catch (e) {
-                            try {
-                                var a = new (self.BlobBuilder || self.WebKitBlobBuilder || self.MozBlobBuilder || self.MSBlobBuilder);
-                                a.append(r), n.blob = 0 === a.getBlob("application/zip").size;
-                            } catch (e) {
-                                n.blob = !1;
-                            }
-                        }
-                    }
-                    try {
-                        n.nodestream = !!e("readable-stream").Readable;
-                    } catch (e) {
-                        n.nodestream = !1;
-                    }
-                }, {
-                    "readable-stream": 16
-                } ],
-                31: [ function(e, t, n) {
-                    "use strict";
-                    for (var r = e("./utils"), a = e("./support"), i = e("./nodejsUtils"), o = e("./stream/GenericWorker"), s = new Array(256), c = 0; c < 256; c++) s[c] = 252 <= c ? 6 : 248 <= c ? 5 : 240 <= c ? 4 : 224 <= c ? 3 : 192 <= c ? 2 : 1;
-                    function d() {
-                        o.call(this, "utf-8 decode"), this.leftOver = null;
-                    }
-                    function l() {
-                        o.call(this, "utf-8 encode");
-                    }
-                    s[254] = s[254] = 1, n.utf8encode = function(e) {
-                        return a.nodebuffer ? i.newBufferFrom(e, "utf-8") : function(e) {
-                            var t, n, r, i, o, s = e.length, c = 0;
-                            for (i = 0; i < s; i++) 55296 == (64512 & (n = e.charCodeAt(i))) && i + 1 < s && 56320 == (64512 & (r = e.charCodeAt(i + 1))) && (n = 65536 + (n - 55296 << 10) + (r - 56320), 
-                            i++), c += n < 128 ? 1 : n < 2048 ? 2 : n < 65536 ? 3 : 4;
-                            for (t = a.uint8array ? new Uint8Array(c) : new Array(c), i = o = 0; o < c; i++) 55296 == (64512 & (n = e.charCodeAt(i))) && i + 1 < s && 56320 == (64512 & (r = e.charCodeAt(i + 1))) && (n = 65536 + (n - 55296 << 10) + (r - 56320), 
-                            i++), n < 128 ? t[o++] = n : (n < 2048 ? t[o++] = 192 | n >>> 6 : (n < 65536 ? t[o++] = 224 | n >>> 12 : (t[o++] = 240 | n >>> 18, 
-                            t[o++] = 128 | n >>> 12 & 63), t[o++] = 128 | n >>> 6 & 63), t[o++] = 128 | 63 & n);
-                            return t;
-                        }(e);
-                    }, n.utf8decode = function(e) {
-                        return a.nodebuffer ? r.transformTo("nodebuffer", e).toString("utf-8") : function(e) {
-                            var t, n, a, i, o = e.length, c = new Array(2 * o);
-                            for (t = n = 0; t < o; ) if ((a = e[t++]) < 128) c[n++] = a; else if (4 < (i = s[a])) c[n++] = 65533, 
-                            t += i - 1; else {
-                                for (a &= 2 === i ? 31 : 3 === i ? 15 : 7; 1 < i && t < o; ) a = a << 6 | 63 & e[t++], 
-                                i--;
-                                1 < i ? c[n++] = 65533 : a < 65536 ? c[n++] = a : (a -= 65536, c[n++] = 55296 | a >> 10 & 1023, 
-                                c[n++] = 56320 | 1023 & a);
-                            }
-                            return c.length !== n && (c.subarray ? c = c.subarray(0, n) : c.length = n), r.applyFromCharCode(c);
-                        }(e = r.transformTo(a.uint8array ? "uint8array" : "array", e));
-                    }, r.inherits(d, o), d.prototype.processChunk = function(e) {
-                        var t = r.transformTo(a.uint8array ? "uint8array" : "array", e.data);
-                        if (this.leftOver && this.leftOver.length) {
-                            if (a.uint8array) {
-                                var i = t;
-                                (t = new Uint8Array(i.length + this.leftOver.length)).set(this.leftOver, 0), t.set(i, this.leftOver.length);
-                            } else t = this.leftOver.concat(t);
-                            this.leftOver = null;
-                        }
-                        var o = function(e, t) {
-                            var n;
-                            for ((t = t || e.length) > e.length && (t = e.length), n = t - 1; 0 <= n && 128 == (192 & e[n]); ) n--;
-                            return n < 0 || 0 === n ? t : n + s[e[n]] > t ? n : t;
-                        }(t), c = t;
-                        o !== t.length && (a.uint8array ? (c = t.subarray(0, o), this.leftOver = t.subarray(o, t.length)) : (c = t.slice(0, o), 
-                        this.leftOver = t.slice(o, t.length))), this.push({
-                            data: n.utf8decode(c),
-                            meta: e.meta
-                        });
-                    }, d.prototype.flush = function() {
-                        this.leftOver && this.leftOver.length && (this.push({
-                            data: n.utf8decode(this.leftOver),
-                            meta: {}
-                        }), this.leftOver = null);
-                    }, n.Utf8DecodeWorker = d, r.inherits(l, o), l.prototype.processChunk = function(e) {
-                        this.push({
-                            data: n.utf8encode(e.data),
-                            meta: e.meta
-                        });
-                    }, n.Utf8EncodeWorker = l;
-                }, {
-                    "./nodejsUtils": 14,
-                    "./stream/GenericWorker": 28,
-                    "./support": 30,
-                    "./utils": 32
-                } ],
-                32: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./support"), a = e("./base64"), i = e("./nodejsUtils"), o = e("./external");
-                    function s(e) {
-                        return e;
-                    }
-                    function c(e, t) {
-                        for (var n = 0; n < e.length; ++n) t[n] = 255 & e.charCodeAt(n);
-                        return t;
-                    }
-                    e("setimmediate"), n.newBlob = function(e, t) {
-                        n.checkSupport("blob");
-                        try {
-                            return new Blob([ e ], {
-                                type: t
-                            });
-                        } catch (n) {
-                            try {
-                                var r = new (self.BlobBuilder || self.WebKitBlobBuilder || self.MozBlobBuilder || self.MSBlobBuilder);
-                                return r.append(e), r.getBlob(t);
-                            } catch (e) {
-                                throw new Error("Bug : can't construct the Blob.");
-                            }
-                        }
-                    };
-                    var d = {
-                        stringifyByChunk: function(e, t, n) {
-                            var r = [], a = 0, i = e.length;
-                            if (i <= n) return String.fromCharCode.apply(null, e);
-                            for (;a < i; ) "array" === t || "nodebuffer" === t ? r.push(String.fromCharCode.apply(null, e.slice(a, Math.min(a + n, i)))) : r.push(String.fromCharCode.apply(null, e.subarray(a, Math.min(a + n, i)))), 
-                            a += n;
-                            return r.join("");
-                        },
-                        stringifyByChar: function(e) {
-                            for (var t = "", n = 0; n < e.length; n++) t += String.fromCharCode(e[n]);
-                            return t;
-                        },
-                        applyCanBeUsed: {
-                            uint8array: function() {
-                                try {
-                                    return r.uint8array && 1 === String.fromCharCode.apply(null, new Uint8Array(1)).length;
-                                } catch (e) {
-                                    return !1;
-                                }
-                            }(),
-                            nodebuffer: function() {
-                                try {
-                                    return r.nodebuffer && 1 === String.fromCharCode.apply(null, i.allocBuffer(1)).length;
-                                } catch (e) {
-                                    return !1;
-                                }
-                            }()
-                        }
-                    };
-                    function l(e) {
-                        var t = 65536, r = n.getTypeOf(e), a = !0;
-                        if ("uint8array" === r ? a = d.applyCanBeUsed.uint8array : "nodebuffer" === r && (a = d.applyCanBeUsed.nodebuffer), 
-                        a) for (;1 < t; ) try {
-                            return d.stringifyByChunk(e, r, t);
-                        } catch (e) {
-                            t = Math.floor(t / 2);
-                        }
-                        return d.stringifyByChar(e);
-                    }
-                    function u(e, t) {
-                        for (var n = 0; n < e.length; n++) t[n] = e[n];
-                        return t;
-                    }
-                    n.applyFromCharCode = l;
-                    var p = {};
-                    p.string = {
-                        string: s,
-                        array: function(e) {
-                            return c(e, new Array(e.length));
-                        },
-                        arraybuffer: function(e) {
-                            return p.string.uint8array(e).buffer;
-                        },
-                        uint8array: function(e) {
-                            return c(e, new Uint8Array(e.length));
-                        },
-                        nodebuffer: function(e) {
-                            return c(e, i.allocBuffer(e.length));
-                        }
-                    }, p.array = {
-                        string: l,
-                        array: s,
-                        arraybuffer: function(e) {
-                            return new Uint8Array(e).buffer;
-                        },
-                        uint8array: function(e) {
-                            return new Uint8Array(e);
-                        },
-                        nodebuffer: function(e) {
-                            return i.newBufferFrom(e);
-                        }
-                    }, p.arraybuffer = {
-                        string: function(e) {
-                            return l(new Uint8Array(e));
-                        },
-                        array: function(e) {
-                            return u(new Uint8Array(e), new Array(e.byteLength));
-                        },
-                        arraybuffer: s,
-                        uint8array: function(e) {
-                            return new Uint8Array(e);
-                        },
-                        nodebuffer: function(e) {
-                            return i.newBufferFrom(new Uint8Array(e));
-                        }
-                    }, p.uint8array = {
-                        string: l,
-                        array: function(e) {
-                            return u(e, new Array(e.length));
-                        },
-                        arraybuffer: function(e) {
-                            return e.buffer;
-                        },
-                        uint8array: s,
-                        nodebuffer: function(e) {
-                            return i.newBufferFrom(e);
-                        }
-                    }, p.nodebuffer = {
-                        string: l,
-                        array: function(e) {
-                            return u(e, new Array(e.length));
-                        },
-                        arraybuffer: function(e) {
-                            return p.nodebuffer.uint8array(e).buffer;
-                        },
-                        uint8array: function(e) {
-                            return u(e, new Uint8Array(e.length));
-                        },
-                        nodebuffer: s
-                    }, n.transformTo = function(e, t) {
-                        if (t = t || "", !e) return t;
-                        n.checkSupport(e);
-                        var r = n.getTypeOf(t);
-                        return p[r][e](t);
-                    }, n.resolve = function(e) {
-                        for (var t = e.split("/"), n = [], r = 0; r < t.length; r++) {
-                            var a = t[r];
-                            "." === a || "" === a && 0 !== r && r !== t.length - 1 || (".." === a ? n.pop() : n.push(a));
-                        }
-                        return n.join("/");
-                    }, n.getTypeOf = function(e) {
-                        return "string" == typeof e ? "string" : "[object Array]" === Object.prototype.toString.call(e) ? "array" : r.nodebuffer && i.isBuffer(e) ? "nodebuffer" : r.uint8array && e instanceof Uint8Array ? "uint8array" : r.arraybuffer && e instanceof ArrayBuffer ? "arraybuffer" : void 0;
-                    }, n.checkSupport = function(e) {
-                        if (!r[e.toLowerCase()]) throw new Error(e + " is not supported by this platform");
-                    }, n.MAX_VALUE_16BITS = 65535, n.MAX_VALUE_32BITS = -1, n.pretty = function(e) {
-                        var t, n, r = "";
-                        for (n = 0; n < (e || "").length; n++) r += "\\x" + ((t = e.charCodeAt(n)) < 16 ? "0" : "") + t.toString(16).toUpperCase();
-                        return r;
-                    }, n.delay = function(e, t, n) {
-                        setImmediate(function() {
-                            e.apply(n || null, t || []);
-                        });
-                    }, n.inherits = function(e, t) {
-                        function n() {}
-                        n.prototype = t.prototype, e.prototype = new n;
-                    }, n.extend = function() {
-                        var e, t, n = {};
-                        for (e = 0; e < arguments.length; e++) for (t in arguments[e]) arguments[e].hasOwnProperty(t) && void 0 === n[t] && (n[t] = arguments[e][t]);
-                        return n;
-                    }, n.prepareContent = function(e, t, i, s, d) {
-                        return o.Promise.resolve(t).then(function(e) {
-                            return r.blob && (e instanceof Blob || -1 !== [ "[object File]", "[object Blob]" ].indexOf(Object.prototype.toString.call(e))) && "undefined" != typeof FileReader ? new o.Promise(function(t, n) {
-                                var r = new FileReader;
-                                r.onload = function(e) {
-                                    t(e.target.result);
-                                }, r.onerror = function(e) {
-                                    n(e.target.error);
-                                }, r.readAsArrayBuffer(e);
-                            }) : e;
-                        }).then(function(t) {
-                            var l = n.getTypeOf(t);
-                            return l ? ("arraybuffer" === l ? t = n.transformTo("uint8array", t) : "string" === l && (d ? t = a.decode(t) : i && !0 !== s && (t = function(e) {
-                                return c(e, r.uint8array ? new Uint8Array(e.length) : new Array(e.length));
-                            }(t))), t) : o.Promise.reject(new Error("Can't read the data of '" + e + "'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?"));
-                        });
-                    };
-                }, {
-                    "./base64": 1,
-                    "./external": 6,
-                    "./nodejsUtils": 14,
-                    "./support": 30,
-                    setimmediate: 54
-                } ],
-                33: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./reader/readerFor"), a = e("./utils"), i = e("./signature"), o = e("./zipEntry"), s = (e("./utf8"), 
-                    e("./support"));
-                    function c(e) {
-                        this.files = [], this.loadOptions = e;
-                    }
-                    c.prototype = {
-                        checkSignature: function(e) {
-                            if (!this.reader.readAndCheckSignature(e)) {
-                                this.reader.index -= 4;
-                                var t = this.reader.readString(4);
-                                throw new Error("Corrupted zip or bug: unexpected signature (" + a.pretty(t) + ", expected " + a.pretty(e) + ")");
-                            }
-                        },
-                        isSignature: function(e, t) {
-                            var n = this.reader.index;
-                            this.reader.setIndex(e);
-                            var r = this.reader.readString(4) === t;
-                            return this.reader.setIndex(n), r;
-                        },
-                        readBlockEndOfCentral: function() {
-                            this.diskNumber = this.reader.readInt(2), this.diskWithCentralDirStart = this.reader.readInt(2), 
-                            this.centralDirRecordsOnThisDisk = this.reader.readInt(2), this.centralDirRecords = this.reader.readInt(2), 
-                            this.centralDirSize = this.reader.readInt(4), this.centralDirOffset = this.reader.readInt(4), 
-                            this.zipCommentLength = this.reader.readInt(2);
-                            var e = this.reader.readData(this.zipCommentLength), t = s.uint8array ? "uint8array" : "array", n = a.transformTo(t, e);
-                            this.zipComment = this.loadOptions.decodeFileName(n);
-                        },
-                        readBlockZip64EndOfCentral: function() {
-                            this.zip64EndOfCentralSize = this.reader.readInt(8), this.reader.skip(4), this.diskNumber = this.reader.readInt(4), 
-                            this.diskWithCentralDirStart = this.reader.readInt(4), this.centralDirRecordsOnThisDisk = this.reader.readInt(8), 
-                            this.centralDirRecords = this.reader.readInt(8), this.centralDirSize = this.reader.readInt(8), 
-                            this.centralDirOffset = this.reader.readInt(8), this.zip64ExtensibleData = {};
-                            for (var e, t, n, r = this.zip64EndOfCentralSize - 44; 0 < r; ) e = this.reader.readInt(2), 
-                            t = this.reader.readInt(4), n = this.reader.readData(t), this.zip64ExtensibleData[e] = {
-                                id: e,
-                                length: t,
-                                value: n
-                            };
-                        },
-                        readBlockZip64EndOfCentralLocator: function() {
-                            if (this.diskWithZip64CentralDirStart = this.reader.readInt(4), this.relativeOffsetEndOfZip64CentralDir = this.reader.readInt(8), 
-                            this.disksCount = this.reader.readInt(4), 1 < this.disksCount) throw new Error("Multi-volumes zip are not supported");
-                        },
-                        readLocalFiles: function() {
-                            var e, t;
-                            for (e = 0; e < this.files.length; e++) t = this.files[e], this.reader.setIndex(t.localHeaderOffset), 
-                            this.checkSignature(i.LOCAL_FILE_HEADER), t.readLocalPart(this.reader), t.handleUTF8(), 
-                            t.processAttributes();
-                        },
-                        readCentralDir: function() {
-                            var e;
-                            for (this.reader.setIndex(this.centralDirOffset); this.reader.readAndCheckSignature(i.CENTRAL_FILE_HEADER); ) (e = new o({
-                                zip64: this.zip64
-                            }, this.loadOptions)).readCentralPart(this.reader), this.files.push(e);
-                            if (this.centralDirRecords !== this.files.length && 0 !== this.centralDirRecords && 0 === this.files.length) throw new Error("Corrupted zip or bug: expected " + this.centralDirRecords + " records in central dir, got " + this.files.length);
-                        },
-                        readEndOfCentral: function() {
-                            var e = this.reader.lastIndexOfSignature(i.CENTRAL_DIRECTORY_END);
-                            if (e < 0) throw this.isSignature(0, i.LOCAL_FILE_HEADER) ? new Error("Corrupted zip: can't find end of central directory") : new Error("Can't find end of central directory : is this a zip file ? If it is, see https://stuk.github.io/jszip/documentation/howto/read_zip.html");
-                            this.reader.setIndex(e);
-                            var t = e;
-                            if (this.checkSignature(i.CENTRAL_DIRECTORY_END), this.readBlockEndOfCentral(), 
-                            this.diskNumber === a.MAX_VALUE_16BITS || this.diskWithCentralDirStart === a.MAX_VALUE_16BITS || this.centralDirRecordsOnThisDisk === a.MAX_VALUE_16BITS || this.centralDirRecords === a.MAX_VALUE_16BITS || this.centralDirSize === a.MAX_VALUE_32BITS || this.centralDirOffset === a.MAX_VALUE_32BITS) {
-                                if (this.zip64 = !0, (e = this.reader.lastIndexOfSignature(i.ZIP64_CENTRAL_DIRECTORY_LOCATOR)) < 0) throw new Error("Corrupted zip: can't find the ZIP64 end of central directory locator");
-                                if (this.reader.setIndex(e), this.checkSignature(i.ZIP64_CENTRAL_DIRECTORY_LOCATOR), 
-                                this.readBlockZip64EndOfCentralLocator(), !this.isSignature(this.relativeOffsetEndOfZip64CentralDir, i.ZIP64_CENTRAL_DIRECTORY_END) && (this.relativeOffsetEndOfZip64CentralDir = this.reader.lastIndexOfSignature(i.ZIP64_CENTRAL_DIRECTORY_END), 
-                                this.relativeOffsetEndOfZip64CentralDir < 0)) throw new Error("Corrupted zip: can't find the ZIP64 end of central directory");
-                                this.reader.setIndex(this.relativeOffsetEndOfZip64CentralDir), this.checkSignature(i.ZIP64_CENTRAL_DIRECTORY_END), 
-                                this.readBlockZip64EndOfCentral();
-                            }
-                            var n = this.centralDirOffset + this.centralDirSize;
-                            this.zip64 && (n += 20, n += 12 + this.zip64EndOfCentralSize);
-                            var r = t - n;
-                            if (0 < r) this.isSignature(t, i.CENTRAL_FILE_HEADER) || (this.reader.zero = r); else if (r < 0) throw new Error("Corrupted zip: missing " + Math.abs(r) + " bytes.");
-                        },
-                        prepareReader: function(e) {
-                            this.reader = r(e);
-                        },
-                        load: function(e) {
-                            this.prepareReader(e), this.readEndOfCentral(), this.readCentralDir(), this.readLocalFiles();
-                        }
-                    }, t.exports = c;
-                }, {
-                    "./reader/readerFor": 22,
-                    "./signature": 23,
-                    "./support": 30,
-                    "./utf8": 31,
-                    "./utils": 32,
-                    "./zipEntry": 34
-                } ],
-                34: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./reader/readerFor"), a = e("./utils"), i = e("./compressedObject"), o = e("./crc32"), s = e("./utf8"), c = e("./compressions"), d = e("./support");
-                    function l(e, t) {
-                        this.options = e, this.loadOptions = t;
-                    }
-                    l.prototype = {
-                        isEncrypted: function() {
-                            return !(1 & ~this.bitFlag);
-                        },
-                        useUTF8: function() {
-                            return !(2048 & ~this.bitFlag);
-                        },
-                        readLocalPart: function(e) {
-                            var t, n;
-                            if (e.skip(22), this.fileNameLength = e.readInt(2), n = e.readInt(2), this.fileName = e.readData(this.fileNameLength), 
-                            e.skip(n), -1 === this.compressedSize || -1 === this.uncompressedSize) throw new Error("Bug or corrupted zip : didn't get enough information from the central directory (compressedSize === -1 || uncompressedSize === -1)");
-                            if (null === (t = function(e) {
-                                for (var t in c) if (c.hasOwnProperty(t) && c[t].magic === e) return c[t];
-                                return null;
-                            }(this.compressionMethod))) throw new Error("Corrupted zip : compression " + a.pretty(this.compressionMethod) + " unknown (inner file : " + a.transformTo("string", this.fileName) + ")");
-                            this.decompressed = new i(this.compressedSize, this.uncompressedSize, this.crc32, t, e.readData(this.compressedSize));
-                        },
-                        readCentralPart: function(e) {
-                            this.versionMadeBy = e.readInt(2), e.skip(2), this.bitFlag = e.readInt(2), this.compressionMethod = e.readString(2), 
-                            this.date = e.readDate(), this.crc32 = e.readInt(4), this.compressedSize = e.readInt(4), 
-                            this.uncompressedSize = e.readInt(4);
-                            var t = e.readInt(2);
-                            if (this.extraFieldsLength = e.readInt(2), this.fileCommentLength = e.readInt(2), 
-                            this.diskNumberStart = e.readInt(2), this.internalFileAttributes = e.readInt(2), 
-                            this.externalFileAttributes = e.readInt(4), this.localHeaderOffset = e.readInt(4), 
-                            this.isEncrypted()) throw new Error("Encrypted zip are not supported");
-                            e.skip(t), this.readExtraFields(e), this.parseZIP64ExtraField(e), this.fileComment = e.readData(this.fileCommentLength);
-                        },
-                        processAttributes: function() {
-                            this.unixPermissions = null, this.dosPermissions = null;
-                            var e = this.versionMadeBy >> 8;
-                            this.dir = !!(16 & this.externalFileAttributes), 0 == e && (this.dosPermissions = 63 & this.externalFileAttributes), 
-                            3 == e && (this.unixPermissions = this.externalFileAttributes >> 16 & 65535), this.dir || "/" !== this.fileNameStr.slice(-1) || (this.dir = !0);
-                        },
-                        parseZIP64ExtraField: function(e) {
-                            if (this.extraFields[1]) {
-                                var t = r(this.extraFields[1].value);
-                                this.uncompressedSize === a.MAX_VALUE_32BITS && (this.uncompressedSize = t.readInt(8)), 
-                                this.compressedSize === a.MAX_VALUE_32BITS && (this.compressedSize = t.readInt(8)), 
-                                this.localHeaderOffset === a.MAX_VALUE_32BITS && (this.localHeaderOffset = t.readInt(8)), 
-                                this.diskNumberStart === a.MAX_VALUE_32BITS && (this.diskNumberStart = t.readInt(4));
-                            }
-                        },
-                        readExtraFields: function(e) {
-                            var t, n, r, a = e.index + this.extraFieldsLength;
-                            for (this.extraFields || (this.extraFields = {}); e.index + 4 < a; ) t = e.readInt(2), 
-                            n = e.readInt(2), r = e.readData(n), this.extraFields[t] = {
-                                id: t,
-                                length: n,
-                                value: r
-                            };
-                            e.setIndex(a);
-                        },
-                        handleUTF8: function() {
-                            var e = d.uint8array ? "uint8array" : "array";
-                            if (this.useUTF8()) this.fileNameStr = s.utf8decode(this.fileName), this.fileCommentStr = s.utf8decode(this.fileComment); else {
-                                var t = this.findExtraFieldUnicodePath();
-                                if (null !== t) this.fileNameStr = t; else {
-                                    var n = a.transformTo(e, this.fileName);
-                                    this.fileNameStr = this.loadOptions.decodeFileName(n);
-                                }
-                                var r = this.findExtraFieldUnicodeComment();
-                                if (null !== r) this.fileCommentStr = r; else {
-                                    var i = a.transformTo(e, this.fileComment);
-                                    this.fileCommentStr = this.loadOptions.decodeFileName(i);
-                                }
-                            }
-                        },
-                        findExtraFieldUnicodePath: function() {
-                            var e = this.extraFields[28789];
-                            if (e) {
-                                var t = r(e.value);
-                                return 1 !== t.readInt(1) || o(this.fileName) !== t.readInt(4) ? null : s.utf8decode(t.readData(e.length - 5));
-                            }
-                            return null;
-                        },
-                        findExtraFieldUnicodeComment: function() {
-                            var e = this.extraFields[25461];
-                            if (e) {
-                                var t = r(e.value);
-                                return 1 !== t.readInt(1) || o(this.fileComment) !== t.readInt(4) ? null : s.utf8decode(t.readData(e.length - 5));
-                            }
-                            return null;
-                        }
-                    }, t.exports = l;
-                }, {
-                    "./compressedObject": 2,
-                    "./compressions": 3,
-                    "./crc32": 4,
-                    "./reader/readerFor": 22,
-                    "./support": 30,
-                    "./utf8": 31,
-                    "./utils": 32
-                } ],
-                35: [ function(e, t, n) {
-                    "use strict";
-                    function r(e, t, n) {
-                        this.name = e, this.dir = n.dir, this.date = n.date, this.comment = n.comment, this.unixPermissions = n.unixPermissions, 
-                        this.dosPermissions = n.dosPermissions, this._data = t, this._dataBinary = n.binary, 
-                        this.options = {
-                            compression: n.compression,
-                            compressionOptions: n.compressionOptions
-                        };
-                    }
-                    var a = e("./stream/StreamHelper"), i = e("./stream/DataWorker"), o = e("./utf8"), s = e("./compressedObject"), c = e("./stream/GenericWorker");
-                    r.prototype = {
-                        internalStream: function(e) {
-                            var t = null, n = "string";
-                            try {
-                                if (!e) throw new Error("No output type specified.");
-                                var r = "string" === (n = e.toLowerCase()) || "text" === n;
-                                "binarystring" !== n && "text" !== n || (n = "string"), t = this._decompressWorker();
-                                var i = !this._dataBinary;
-                                i && !r && (t = t.pipe(new o.Utf8EncodeWorker)), !i && r && (t = t.pipe(new o.Utf8DecodeWorker));
-                            } catch (e) {
-                                (t = new c("error")).error(e);
-                            }
-                            return new a(t, n, "");
-                        },
-                        async: function(e, t) {
-                            return this.internalStream(e).accumulate(t);
-                        },
-                        nodeStream: function(e, t) {
-                            return this.internalStream(e || "nodebuffer").toNodejsStream(t);
-                        },
-                        _compressWorker: function(e, t) {
-                            if (this._data instanceof s && this._data.compression.magic === e.magic) return this._data.getCompressedWorker();
-                            var n = this._decompressWorker();
-                            return this._dataBinary || (n = n.pipe(new o.Utf8EncodeWorker)), s.createWorkerFrom(n, e, t);
-                        },
-                        _decompressWorker: function() {
-                            return this._data instanceof s ? this._data.getContentWorker() : this._data instanceof c ? this._data : new i(this._data);
-                        }
-                    };
-                    for (var d = [ "asText", "asBinary", "asNodeBuffer", "asUint8Array", "asArrayBuffer" ], l = function() {
-                        throw new Error("This method has been removed in JSZip 3.0, please check the upgrade guide.");
-                    }, u = 0; u < d.length; u++) r.prototype[d[u]] = l;
-                    t.exports = r;
-                }, {
-                    "./compressedObject": 2,
-                    "./stream/DataWorker": 27,
-                    "./stream/GenericWorker": 28,
-                    "./stream/StreamHelper": 29,
-                    "./utf8": 31
-                } ],
-                36: [ function(e, t, r) {
-                    (function(e) {
-                        "use strict";
-                        var n, r, a = e.MutationObserver || e.WebKitMutationObserver;
-                        if (a) {
-                            var i = 0, o = new a(l), s = e.document.createTextNode("");
-                            o.observe(s, {
-                                characterData: !0
-                            }), n = function() {
-                                s.data = i = ++i % 2;
-                            };
-                        } else if (e.setImmediate || void 0 === e.MessageChannel) n = "document" in e && "onreadystatechange" in e.document.createElement("script") ? function() {
-                            var t = e.document.createElement("script");
-                            t.onreadystatechange = function() {
-                                l(), t.onreadystatechange = null, t.parentNode.removeChild(t), t = null;
-                            }, e.document.documentElement.appendChild(t);
-                        } : function() {
-                            setTimeout(l, 0);
-                        }; else {
-                            var c = new e.MessageChannel;
-                            c.port1.onmessage = l, n = function() {
-                                c.port2.postMessage(0);
-                            };
-                        }
-                        var d = [];
-                        function l() {
-                            var e, t;
-                            r = !0;
-                            for (var n = d.length; n; ) {
-                                for (t = d, d = [], e = -1; ++e < n; ) t[e]();
-                                n = d.length;
-                            }
-                            r = !1;
-                        }
-                        t.exports = function(e) {
-                            1 !== d.push(e) || r || n();
-                        };
-                    }).call(this, void 0 !== n.g ? n.g : "undefined" != typeof self ? self : "undefined" != typeof window ? window : {});
-                }, {} ],
-                37: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("immediate");
-                    function a() {}
-                    var i = {}, o = [ "REJECTED" ], s = [ "FULFILLED" ], c = [ "PENDING" ];
-                    function d(e) {
-                        if ("function" != typeof e) throw new TypeError("resolver must be a function");
-                        this.state = c, this.queue = [], this.outcome = void 0, e !== a && h(this, e);
-                    }
-                    function l(e, t, n) {
-                        this.promise = e, "function" == typeof t && (this.onFulfilled = t, this.callFulfilled = this.otherCallFulfilled), 
-                        "function" == typeof n && (this.onRejected = n, this.callRejected = this.otherCallRejected);
-                    }
-                    function u(e, t, n) {
-                        r(function() {
-                            var r;
-                            try {
-                                r = t(n);
-                            } catch (r) {
-                                return i.reject(e, r);
-                            }
-                            r === e ? i.reject(e, new TypeError("Cannot resolve promise with itself")) : i.resolve(e, r);
-                        });
-                    }
-                    function p(e) {
-                        var t = e && e.then;
-                        if (e && ("object" == typeof e || "function" == typeof e) && "function" == typeof t) return function() {
-                            t.apply(e, arguments);
-                        };
-                    }
-                    function h(e, t) {
-                        var n = !1;
-                        function r(t) {
-                            n || (n = !0, i.reject(e, t));
-                        }
-                        function a(t) {
-                            n || (n = !0, i.resolve(e, t));
-                        }
-                        var o = m(function() {
-                            t(a, r);
-                        });
-                        "error" === o.status && r(o.value);
-                    }
-                    function m(e, t) {
-                        var n = {};
-                        try {
-                            n.value = e(t), n.status = "success";
-                        } catch (e) {
-                            n.status = "error", n.value = e;
-                        }
-                        return n;
-                    }
-                    (t.exports = d).prototype.finally = function(e) {
-                        if ("function" != typeof e) return this;
-                        var t = this.constructor;
-                        return this.then(function(n) {
-                            return t.resolve(e()).then(function() {
-                                return n;
-                            });
-                        }, function(n) {
-                            return t.resolve(e()).then(function() {
-                                throw n;
-                            });
-                        });
-                    }, d.prototype.catch = function(e) {
-                        return this.then(null, e);
-                    }, d.prototype.then = function(e, t) {
-                        if ("function" != typeof e && this.state === s || "function" != typeof t && this.state === o) return this;
-                        var n = new this.constructor(a);
-                        return this.state !== c ? u(n, this.state === s ? e : t, this.outcome) : this.queue.push(new l(n, e, t)), 
-                        n;
-                    }, l.prototype.callFulfilled = function(e) {
-                        i.resolve(this.promise, e);
-                    }, l.prototype.otherCallFulfilled = function(e) {
-                        u(this.promise, this.onFulfilled, e);
-                    }, l.prototype.callRejected = function(e) {
-                        i.reject(this.promise, e);
-                    }, l.prototype.otherCallRejected = function(e) {
-                        u(this.promise, this.onRejected, e);
-                    }, i.resolve = function(e, t) {
-                        var n = m(p, t);
-                        if ("error" === n.status) return i.reject(e, n.value);
-                        var r = n.value;
-                        if (r) h(e, r); else {
-                            e.state = s, e.outcome = t;
-                            for (var a = -1, o = e.queue.length; ++a < o; ) e.queue[a].callFulfilled(t);
-                        }
-                        return e;
-                    }, i.reject = function(e, t) {
-                        e.state = o, e.outcome = t;
-                        for (var n = -1, r = e.queue.length; ++n < r; ) e.queue[n].callRejected(t);
-                        return e;
-                    }, d.resolve = function(e) {
-                        return e instanceof this ? e : i.resolve(new this(a), e);
-                    }, d.reject = function(e) {
-                        var t = new this(a);
-                        return i.reject(t, e);
-                    }, d.all = function(e) {
-                        var t = this;
-                        if ("[object Array]" !== Object.prototype.toString.call(e)) return this.reject(new TypeError("must be an array"));
-                        var n = e.length, r = !1;
-                        if (!n) return this.resolve([]);
-                        for (var o = new Array(n), s = 0, c = -1, d = new this(a); ++c < n; ) l(e[c], c);
-                        return d;
-                        function l(e, a) {
-                            t.resolve(e).then(function(e) {
-                                o[a] = e, ++s !== n || r || (r = !0, i.resolve(d, o));
-                            }, function(e) {
-                                r || (r = !0, i.reject(d, e));
-                            });
-                        }
-                    }, d.race = function(e) {
-                        if ("[object Array]" !== Object.prototype.toString.call(e)) return this.reject(new TypeError("must be an array"));
-                        var t = e.length, n = !1;
-                        if (!t) return this.resolve([]);
-                        for (var r, o = -1, s = new this(a); ++o < t; ) r = e[o], this.resolve(r).then(function(e) {
-                            n || (n = !0, i.resolve(s, e));
-                        }, function(e) {
-                            n || (n = !0, i.reject(s, e));
-                        });
-                        return s;
-                    };
-                }, {
-                    immediate: 36
-                } ],
-                38: [ function(e, t, n) {
-                    "use strict";
-                    var r = {};
-                    (0, e("./lib/utils/common").assign)(r, e("./lib/deflate"), e("./lib/inflate"), e("./lib/zlib/constants")), 
-                    t.exports = r;
-                }, {
-                    "./lib/deflate": 39,
-                    "./lib/inflate": 40,
-                    "./lib/utils/common": 41,
-                    "./lib/zlib/constants": 44
-                } ],
-                39: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./zlib/deflate"), a = e("./utils/common"), i = e("./utils/strings"), o = e("./zlib/messages"), s = e("./zlib/zstream"), c = Object.prototype.toString;
-                    function d(e) {
-                        if (!(this instanceof d)) return new d(e);
-                        this.options = a.assign({
-                            level: -1,
-                            method: 8,
-                            chunkSize: 16384,
-                            windowBits: 15,
-                            memLevel: 8,
-                            strategy: 0,
-                            to: ""
-                        }, e || {});
-                        var t = this.options;
-                        t.raw && 0 < t.windowBits ? t.windowBits = -t.windowBits : t.gzip && 0 < t.windowBits && t.windowBits < 16 && (t.windowBits += 16), 
-                        this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new s, 
-                        this.strm.avail_out = 0;
-                        var n = r.deflateInit2(this.strm, t.level, t.method, t.windowBits, t.memLevel, t.strategy);
-                        if (0 !== n) throw new Error(o[n]);
-                        if (t.header && r.deflateSetHeader(this.strm, t.header), t.dictionary) {
-                            var l;
-                            if (l = "string" == typeof t.dictionary ? i.string2buf(t.dictionary) : "[object ArrayBuffer]" === c.call(t.dictionary) ? new Uint8Array(t.dictionary) : t.dictionary, 
-                            0 !== (n = r.deflateSetDictionary(this.strm, l))) throw new Error(o[n]);
-                            this._dict_set = !0;
-                        }
-                    }
-                    function l(e, t) {
-                        var n = new d(t);
-                        if (n.push(e, !0), n.err) throw n.msg || o[n.err];
-                        return n.result;
-                    }
-                    d.prototype.push = function(e, t) {
-                        var n, o, s = this.strm, d = this.options.chunkSize;
-                        if (this.ended) return !1;
-                        o = t === ~~t ? t : !0 === t ? 4 : 0, "string" == typeof e ? s.input = i.string2buf(e) : "[object ArrayBuffer]" === c.call(e) ? s.input = new Uint8Array(e) : s.input = e, 
-                        s.next_in = 0, s.avail_in = s.input.length;
-                        do {
-                            if (0 === s.avail_out && (s.output = new a.Buf8(d), s.next_out = 0, s.avail_out = d), 
-                            1 !== (n = r.deflate(s, o)) && 0 !== n) return this.onEnd(n), !(this.ended = !0);
-                            0 !== s.avail_out && (0 !== s.avail_in || 4 !== o && 2 !== o) || ("string" === this.options.to ? this.onData(i.buf2binstring(a.shrinkBuf(s.output, s.next_out))) : this.onData(a.shrinkBuf(s.output, s.next_out)));
-                        } while ((0 < s.avail_in || 0 === s.avail_out) && 1 !== n);
-                        return 4 === o ? (n = r.deflateEnd(this.strm), this.onEnd(n), this.ended = !0, 0 === n) : 2 !== o || (this.onEnd(0), 
-                        !(s.avail_out = 0));
-                    }, d.prototype.onData = function(e) {
-                        this.chunks.push(e);
-                    }, d.prototype.onEnd = function(e) {
-                        0 === e && ("string" === this.options.to ? this.result = this.chunks.join("") : this.result = a.flattenChunks(this.chunks)), 
-                        this.chunks = [], this.err = e, this.msg = this.strm.msg;
-                    }, n.Deflate = d, n.deflate = l, n.deflateRaw = function(e, t) {
-                        return (t = t || {}).raw = !0, l(e, t);
-                    }, n.gzip = function(e, t) {
-                        return (t = t || {}).gzip = !0, l(e, t);
-                    };
-                }, {
-                    "./utils/common": 41,
-                    "./utils/strings": 42,
-                    "./zlib/deflate": 46,
-                    "./zlib/messages": 51,
-                    "./zlib/zstream": 53
-                } ],
-                40: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./zlib/inflate"), a = e("./utils/common"), i = e("./utils/strings"), o = e("./zlib/constants"), s = e("./zlib/messages"), c = e("./zlib/zstream"), d = e("./zlib/gzheader"), l = Object.prototype.toString;
-                    function u(e) {
-                        if (!(this instanceof u)) return new u(e);
-                        this.options = a.assign({
-                            chunkSize: 16384,
-                            windowBits: 0,
-                            to: ""
-                        }, e || {});
-                        var t = this.options;
-                        t.raw && 0 <= t.windowBits && t.windowBits < 16 && (t.windowBits = -t.windowBits, 
-                        0 === t.windowBits && (t.windowBits = -15)), !(0 <= t.windowBits && t.windowBits < 16) || e && e.windowBits || (t.windowBits += 32), 
-                        15 < t.windowBits && t.windowBits < 48 && !(15 & t.windowBits) && (t.windowBits |= 15), 
-                        this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new c, 
-                        this.strm.avail_out = 0;
-                        var n = r.inflateInit2(this.strm, t.windowBits);
-                        if (n !== o.Z_OK) throw new Error(s[n]);
-                        this.header = new d, r.inflateGetHeader(this.strm, this.header);
-                    }
-                    function p(e, t) {
-                        var n = new u(t);
-                        if (n.push(e, !0), n.err) throw n.msg || s[n.err];
-                        return n.result;
-                    }
-                    u.prototype.push = function(e, t) {
-                        var n, s, c, d, u, p, h = this.strm, m = this.options.chunkSize, g = this.options.dictionary, b = !1;
-                        if (this.ended) return !1;
-                        s = t === ~~t ? t : !0 === t ? o.Z_FINISH : o.Z_NO_FLUSH, "string" == typeof e ? h.input = i.binstring2buf(e) : "[object ArrayBuffer]" === l.call(e) ? h.input = new Uint8Array(e) : h.input = e, 
-                        h.next_in = 0, h.avail_in = h.input.length;
-                        do {
-                            if (0 === h.avail_out && (h.output = new a.Buf8(m), h.next_out = 0, h.avail_out = m), 
-                            (n = r.inflate(h, o.Z_NO_FLUSH)) === o.Z_NEED_DICT && g && (p = "string" == typeof g ? i.string2buf(g) : "[object ArrayBuffer]" === l.call(g) ? new Uint8Array(g) : g, 
-                            n = r.inflateSetDictionary(this.strm, p)), n === o.Z_BUF_ERROR && !0 === b && (n = o.Z_OK, 
-                            b = !1), n !== o.Z_STREAM_END && n !== o.Z_OK) return this.onEnd(n), !(this.ended = !0);
-                            h.next_out && (0 !== h.avail_out && n !== o.Z_STREAM_END && (0 !== h.avail_in || s !== o.Z_FINISH && s !== o.Z_SYNC_FLUSH) || ("string" === this.options.to ? (c = i.utf8border(h.output, h.next_out), 
-                            d = h.next_out - c, u = i.buf2string(h.output, c), h.next_out = d, h.avail_out = m - d, 
-                            d && a.arraySet(h.output, h.output, c, d, 0), this.onData(u)) : this.onData(a.shrinkBuf(h.output, h.next_out)))), 
-                            0 === h.avail_in && 0 === h.avail_out && (b = !0);
-                        } while ((0 < h.avail_in || 0 === h.avail_out) && n !== o.Z_STREAM_END);
-                        return n === o.Z_STREAM_END && (s = o.Z_FINISH), s === o.Z_FINISH ? (n = r.inflateEnd(this.strm), 
-                        this.onEnd(n), this.ended = !0, n === o.Z_OK) : s !== o.Z_SYNC_FLUSH || (this.onEnd(o.Z_OK), 
-                        !(h.avail_out = 0));
-                    }, u.prototype.onData = function(e) {
-                        this.chunks.push(e);
-                    }, u.prototype.onEnd = function(e) {
-                        e === o.Z_OK && ("string" === this.options.to ? this.result = this.chunks.join("") : this.result = a.flattenChunks(this.chunks)), 
-                        this.chunks = [], this.err = e, this.msg = this.strm.msg;
-                    }, n.Inflate = u, n.inflate = p, n.inflateRaw = function(e, t) {
-                        return (t = t || {}).raw = !0, p(e, t);
-                    }, n.ungzip = p;
-                }, {
-                    "./utils/common": 41,
-                    "./utils/strings": 42,
-                    "./zlib/constants": 44,
-                    "./zlib/gzheader": 47,
-                    "./zlib/inflate": 49,
-                    "./zlib/messages": 51,
-                    "./zlib/zstream": 53
-                } ],
-                41: [ function(e, t, n) {
-                    "use strict";
-                    var r = "undefined" != typeof Uint8Array && "undefined" != typeof Uint16Array && "undefined" != typeof Int32Array;
-                    n.assign = function(e) {
-                        for (var t = Array.prototype.slice.call(arguments, 1); t.length; ) {
-                            var n = t.shift();
-                            if (n) {
-                                if ("object" != typeof n) throw new TypeError(n + "must be non-object");
-                                for (var r in n) n.hasOwnProperty(r) && (e[r] = n[r]);
-                            }
-                        }
-                        return e;
-                    }, n.shrinkBuf = function(e, t) {
-                        return e.length === t ? e : e.subarray ? e.subarray(0, t) : (e.length = t, e);
-                    };
-                    var a = {
-                        arraySet: function(e, t, n, r, a) {
-                            if (t.subarray && e.subarray) e.set(t.subarray(n, n + r), a); else for (var i = 0; i < r; i++) e[a + i] = t[n + i];
-                        },
-                        flattenChunks: function(e) {
-                            var t, n, r, a, i, o;
-                            for (t = r = 0, n = e.length; t < n; t++) r += e[t].length;
-                            for (o = new Uint8Array(r), t = a = 0, n = e.length; t < n; t++) i = e[t], o.set(i, a), 
-                            a += i.length;
-                            return o;
-                        }
-                    }, i = {
-                        arraySet: function(e, t, n, r, a) {
-                            for (var i = 0; i < r; i++) e[a + i] = t[n + i];
-                        },
-                        flattenChunks: function(e) {
-                            return [].concat.apply([], e);
-                        }
-                    };
-                    n.setTyped = function(e) {
-                        e ? (n.Buf8 = Uint8Array, n.Buf16 = Uint16Array, n.Buf32 = Int32Array, n.assign(n, a)) : (n.Buf8 = Array, 
-                        n.Buf16 = Array, n.Buf32 = Array, n.assign(n, i));
-                    }, n.setTyped(r);
-                }, {} ],
-                42: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("./common"), a = !0, i = !0;
-                    try {
-                        String.fromCharCode.apply(null, [ 0 ]);
-                    } catch (e) {
-                        a = !1;
-                    }
-                    try {
-                        String.fromCharCode.apply(null, new Uint8Array(1));
-                    } catch (e) {
-                        i = !1;
-                    }
-                    for (var o = new r.Buf8(256), s = 0; s < 256; s++) o[s] = 252 <= s ? 6 : 248 <= s ? 5 : 240 <= s ? 4 : 224 <= s ? 3 : 192 <= s ? 2 : 1;
-                    function c(e, t) {
-                        if (t < 65537 && (e.subarray && i || !e.subarray && a)) return String.fromCharCode.apply(null, r.shrinkBuf(e, t));
-                        for (var n = "", o = 0; o < t; o++) n += String.fromCharCode(e[o]);
-                        return n;
-                    }
-                    o[254] = o[254] = 1, n.string2buf = function(e) {
-                        var t, n, a, i, o, s = e.length, c = 0;
-                        for (i = 0; i < s; i++) 55296 == (64512 & (n = e.charCodeAt(i))) && i + 1 < s && 56320 == (64512 & (a = e.charCodeAt(i + 1))) && (n = 65536 + (n - 55296 << 10) + (a - 56320), 
-                        i++), c += n < 128 ? 1 : n < 2048 ? 2 : n < 65536 ? 3 : 4;
-                        for (t = new r.Buf8(c), i = o = 0; o < c; i++) 55296 == (64512 & (n = e.charCodeAt(i))) && i + 1 < s && 56320 == (64512 & (a = e.charCodeAt(i + 1))) && (n = 65536 + (n - 55296 << 10) + (a - 56320), 
-                        i++), n < 128 ? t[o++] = n : (n < 2048 ? t[o++] = 192 | n >>> 6 : (n < 65536 ? t[o++] = 224 | n >>> 12 : (t[o++] = 240 | n >>> 18, 
-                        t[o++] = 128 | n >>> 12 & 63), t[o++] = 128 | n >>> 6 & 63), t[o++] = 128 | 63 & n);
-                        return t;
-                    }, n.buf2binstring = function(e) {
-                        return c(e, e.length);
-                    }, n.binstring2buf = function(e) {
-                        for (var t = new r.Buf8(e.length), n = 0, a = t.length; n < a; n++) t[n] = e.charCodeAt(n);
-                        return t;
-                    }, n.buf2string = function(e, t) {
-                        var n, r, a, i, s = t || e.length, d = new Array(2 * s);
-                        for (n = r = 0; n < s; ) if ((a = e[n++]) < 128) d[r++] = a; else if (4 < (i = o[a])) d[r++] = 65533, 
-                        n += i - 1; else {
-                            for (a &= 2 === i ? 31 : 3 === i ? 15 : 7; 1 < i && n < s; ) a = a << 6 | 63 & e[n++], 
-                            i--;
-                            1 < i ? d[r++] = 65533 : a < 65536 ? d[r++] = a : (a -= 65536, d[r++] = 55296 | a >> 10 & 1023, 
-                            d[r++] = 56320 | 1023 & a);
-                        }
-                        return c(d, r);
-                    }, n.utf8border = function(e, t) {
-                        var n;
-                        for ((t = t || e.length) > e.length && (t = e.length), n = t - 1; 0 <= n && 128 == (192 & e[n]); ) n--;
-                        return n < 0 || 0 === n ? t : n + o[e[n]] > t ? n : t;
-                    };
-                }, {
-                    "./common": 41
-                } ],
-                43: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = function(e, t, n, r) {
-                        for (var a = 65535 & e, i = e >>> 16 & 65535, o = 0; 0 !== n; ) {
-                            for (n -= o = 2e3 < n ? 2e3 : n; i = i + (a = a + t[r++] | 0) | 0, --o; ) ;
-                            a %= 65521, i %= 65521;
-                        }
-                        return a | i << 16;
-                    };
-                }, {} ],
-                44: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = {
-                        Z_NO_FLUSH: 0,
-                        Z_PARTIAL_FLUSH: 1,
-                        Z_SYNC_FLUSH: 2,
-                        Z_FULL_FLUSH: 3,
-                        Z_FINISH: 4,
-                        Z_BLOCK: 5,
-                        Z_TREES: 6,
-                        Z_OK: 0,
-                        Z_STREAM_END: 1,
-                        Z_NEED_DICT: 2,
-                        Z_ERRNO: -1,
-                        Z_STREAM_ERROR: -2,
-                        Z_DATA_ERROR: -3,
-                        Z_BUF_ERROR: -5,
-                        Z_NO_COMPRESSION: 0,
-                        Z_BEST_SPEED: 1,
-                        Z_BEST_COMPRESSION: 9,
-                        Z_DEFAULT_COMPRESSION: -1,
-                        Z_FILTERED: 1,
-                        Z_HUFFMAN_ONLY: 2,
-                        Z_RLE: 3,
-                        Z_FIXED: 4,
-                        Z_DEFAULT_STRATEGY: 0,
-                        Z_BINARY: 0,
-                        Z_TEXT: 1,
-                        Z_UNKNOWN: 2,
-                        Z_DEFLATED: 8
-                    };
-                }, {} ],
-                45: [ function(e, t, n) {
-                    "use strict";
-                    var r = function() {
-                        for (var e, t = [], n = 0; n < 256; n++) {
-                            e = n;
-                            for (var r = 0; r < 8; r++) e = 1 & e ? 3988292384 ^ e >>> 1 : e >>> 1;
-                            t[n] = e;
-                        }
-                        return t;
-                    }();
-                    t.exports = function(e, t, n, a) {
-                        var i = r, o = a + n;
-                        e ^= -1;
-                        for (var s = a; s < o; s++) e = e >>> 8 ^ i[255 & (e ^ t[s])];
-                        return -1 ^ e;
-                    };
-                }, {} ],
-                46: [ function(e, t, n) {
-                    "use strict";
-                    var r, a = e("../utils/common"), i = e("./trees"), o = e("./adler32"), s = e("./crc32"), c = e("./messages"), d = -2, l = 258, u = 262, p = 113;
-                    function h(e, t) {
-                        return e.msg = c[t], t;
-                    }
-                    function m(e) {
-                        return (e << 1) - (4 < e ? 9 : 0);
-                    }
-                    function g(e) {
-                        for (var t = e.length; 0 <= --t; ) e[t] = 0;
-                    }
-                    function b(e) {
-                        var t = e.state, n = t.pending;
-                        n > e.avail_out && (n = e.avail_out), 0 !== n && (a.arraySet(e.output, t.pending_buf, t.pending_out, n, e.next_out), 
-                        e.next_out += n, t.pending_out += n, e.total_out += n, e.avail_out -= n, t.pending -= n, 
-                        0 === t.pending && (t.pending_out = 0));
-                    }
-                    function f(e, t) {
-                        i._tr_flush_block(e, 0 <= e.block_start ? e.block_start : -1, e.strstart - e.block_start, t), 
-                        e.block_start = e.strstart, b(e.strm);
-                    }
-                    function x(e, t) {
-                        e.pending_buf[e.pending++] = t;
-                    }
-                    function v(e, t) {
-                        e.pending_buf[e.pending++] = t >>> 8 & 255, e.pending_buf[e.pending++] = 255 & t;
-                    }
-                    function y(e, t) {
-                        var n, r, a = e.max_chain_length, i = e.strstart, o = e.prev_length, s = e.nice_match, c = e.strstart > e.w_size - u ? e.strstart - (e.w_size - u) : 0, d = e.window, p = e.w_mask, h = e.prev, m = e.strstart + l, g = d[i + o - 1], b = d[i + o];
-                        e.prev_length >= e.good_match && (a >>= 2), s > e.lookahead && (s = e.lookahead);
-                        do {
-                            if (d[(n = t) + o] === b && d[n + o - 1] === g && d[n] === d[i] && d[++n] === d[i + 1]) {
-                                i += 2, n++;
-                                do {} while (d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && d[++i] === d[++n] && i < m);
-                                if (r = l - (m - i), i = m - l, o < r) {
-                                    if (e.match_start = t, s <= (o = r)) break;
-                                    g = d[i + o - 1], b = d[i + o];
-                                }
-                            }
-                        } while ((t = h[t & p]) > c && 0 != --a);
-                        return o <= e.lookahead ? o : e.lookahead;
-                    }
-                    function w(e) {
-                        var t, n, r, i, c, d, l, p, h, m, g = e.w_size;
-                        do {
-                            if (i = e.window_size - e.lookahead - e.strstart, e.strstart >= g + (g - u)) {
-                                for (a.arraySet(e.window, e.window, g, g, 0), e.match_start -= g, e.strstart -= g, 
-                                e.block_start -= g, t = n = e.hash_size; r = e.head[--t], e.head[t] = g <= r ? r - g : 0, 
-                                --n; ) ;
-                                for (t = n = g; r = e.prev[--t], e.prev[t] = g <= r ? r - g : 0, --n; ) ;
-                                i += g;
-                            }
-                            if (0 === e.strm.avail_in) break;
-                            if (d = e.strm, l = e.window, p = e.strstart + e.lookahead, m = void 0, (h = i) < (m = d.avail_in) && (m = h), 
-                            n = 0 === m ? 0 : (d.avail_in -= m, a.arraySet(l, d.input, d.next_in, m, p), 1 === d.state.wrap ? d.adler = o(d.adler, l, m, p) : 2 === d.state.wrap && (d.adler = s(d.adler, l, m, p)), 
-                            d.next_in += m, d.total_in += m, m), e.lookahead += n, e.lookahead + e.insert >= 3) for (c = e.strstart - e.insert, 
-                            e.ins_h = e.window[c], e.ins_h = (e.ins_h << e.hash_shift ^ e.window[c + 1]) & e.hash_mask; e.insert && (e.ins_h = (e.ins_h << e.hash_shift ^ e.window[c + 3 - 1]) & e.hash_mask, 
-                            e.prev[c & e.w_mask] = e.head[e.ins_h], e.head[e.ins_h] = c, c++, e.insert--, !(e.lookahead + e.insert < 3)); ) ;
-                        } while (e.lookahead < u && 0 !== e.strm.avail_in);
-                    }
-                    function k(e, t) {
-                        for (var n, r; ;) {
-                            if (e.lookahead < u) {
-                                if (w(e), e.lookahead < u && 0 === t) return 1;
-                                if (0 === e.lookahead) break;
-                            }
-                            if (n = 0, e.lookahead >= 3 && (e.ins_h = (e.ins_h << e.hash_shift ^ e.window[e.strstart + 3 - 1]) & e.hash_mask, 
-                            n = e.prev[e.strstart & e.w_mask] = e.head[e.ins_h], e.head[e.ins_h] = e.strstart), 
-                            0 !== n && e.strstart - n <= e.w_size - u && (e.match_length = y(e, n)), e.match_length >= 3) if (r = i._tr_tally(e, e.strstart - e.match_start, e.match_length - 3), 
-                            e.lookahead -= e.match_length, e.match_length <= e.max_lazy_match && e.lookahead >= 3) {
-                                for (e.match_length--; e.strstart++, e.ins_h = (e.ins_h << e.hash_shift ^ e.window[e.strstart + 3 - 1]) & e.hash_mask, 
-                                n = e.prev[e.strstart & e.w_mask] = e.head[e.ins_h], e.head[e.ins_h] = e.strstart, 
-                                0 != --e.match_length; ) ;
-                                e.strstart++;
-                            } else e.strstart += e.match_length, e.match_length = 0, e.ins_h = e.window[e.strstart], 
-                            e.ins_h = (e.ins_h << e.hash_shift ^ e.window[e.strstart + 1]) & e.hash_mask; else r = i._tr_tally(e, 0, e.window[e.strstart]), 
-                            e.lookahead--, e.strstart++;
-                            if (r && (f(e, !1), 0 === e.strm.avail_out)) return 1;
-                        }
-                        return e.insert = e.strstart < 2 ? e.strstart : 2, 4 === t ? (f(e, !0), 0 === e.strm.avail_out ? 3 : 4) : e.last_lit && (f(e, !1), 
-                        0 === e.strm.avail_out) ? 1 : 2;
-                    }
-                    function _(e, t) {
-                        for (var n, r, a; ;) {
-                            if (e.lookahead < u) {
-                                if (w(e), e.lookahead < u && 0 === t) return 1;
-                                if (0 === e.lookahead) break;
-                            }
-                            if (n = 0, e.lookahead >= 3 && (e.ins_h = (e.ins_h << e.hash_shift ^ e.window[e.strstart + 3 - 1]) & e.hash_mask, 
-                            n = e.prev[e.strstart & e.w_mask] = e.head[e.ins_h], e.head[e.ins_h] = e.strstart), 
-                            e.prev_length = e.match_length, e.prev_match = e.match_start, e.match_length = 2, 
-                            0 !== n && e.prev_length < e.max_lazy_match && e.strstart - n <= e.w_size - u && (e.match_length = y(e, n), 
-                            e.match_length <= 5 && (1 === e.strategy || 3 === e.match_length && 4096 < e.strstart - e.match_start) && (e.match_length = 2)), 
-                            e.prev_length >= 3 && e.match_length <= e.prev_length) {
-                                for (a = e.strstart + e.lookahead - 3, r = i._tr_tally(e, e.strstart - 1 - e.prev_match, e.prev_length - 3), 
-                                e.lookahead -= e.prev_length - 1, e.prev_length -= 2; ++e.strstart <= a && (e.ins_h = (e.ins_h << e.hash_shift ^ e.window[e.strstart + 3 - 1]) & e.hash_mask, 
-                                n = e.prev[e.strstart & e.w_mask] = e.head[e.ins_h], e.head[e.ins_h] = e.strstart), 
-                                0 != --e.prev_length; ) ;
-                                if (e.match_available = 0, e.match_length = 2, e.strstart++, r && (f(e, !1), 0 === e.strm.avail_out)) return 1;
-                            } else if (e.match_available) {
-                                if ((r = i._tr_tally(e, 0, e.window[e.strstart - 1])) && f(e, !1), e.strstart++, 
-                                e.lookahead--, 0 === e.strm.avail_out) return 1;
-                            } else e.match_available = 1, e.strstart++, e.lookahead--;
-                        }
-                        return e.match_available && (r = i._tr_tally(e, 0, e.window[e.strstart - 1]), e.match_available = 0), 
-                        e.insert = e.strstart < 2 ? e.strstart : 2, 4 === t ? (f(e, !0), 0 === e.strm.avail_out ? 3 : 4) : e.last_lit && (f(e, !1), 
-                        0 === e.strm.avail_out) ? 1 : 2;
-                    }
-                    function E(e, t, n, r, a) {
-                        this.good_length = e, this.max_lazy = t, this.nice_length = n, this.max_chain = r, 
-                        this.func = a;
-                    }
-                    function C() {
-                        this.strm = null, this.status = 0, this.pending_buf = null, this.pending_buf_size = 0, 
-                        this.pending_out = 0, this.pending = 0, this.wrap = 0, this.gzhead = null, this.gzindex = 0, 
-                        this.method = 8, this.last_flush = -1, this.w_size = 0, this.w_bits = 0, this.w_mask = 0, 
-                        this.window = null, this.window_size = 0, this.prev = null, this.head = null, this.ins_h = 0, 
-                        this.hash_size = 0, this.hash_bits = 0, this.hash_mask = 0, this.hash_shift = 0, 
-                        this.block_start = 0, this.match_length = 0, this.prev_match = 0, this.match_available = 0, 
-                        this.strstart = 0, this.match_start = 0, this.lookahead = 0, this.prev_length = 0, 
-                        this.max_chain_length = 0, this.max_lazy_match = 0, this.level = 0, this.strategy = 0, 
-                        this.good_match = 0, this.nice_match = 0, this.dyn_ltree = new a.Buf16(1146), this.dyn_dtree = new a.Buf16(122), 
-                        this.bl_tree = new a.Buf16(78), g(this.dyn_ltree), g(this.dyn_dtree), g(this.bl_tree), 
-                        this.l_desc = null, this.d_desc = null, this.bl_desc = null, this.bl_count = new a.Buf16(16), 
-                        this.heap = new a.Buf16(573), g(this.heap), this.heap_len = 0, this.heap_max = 0, 
-                        this.depth = new a.Buf16(573), g(this.depth), this.l_buf = 0, this.lit_bufsize = 0, 
-                        this.last_lit = 0, this.d_buf = 0, this.opt_len = 0, this.static_len = 0, this.matches = 0, 
-                        this.insert = 0, this.bi_buf = 0, this.bi_valid = 0;
-                    }
-                    function S(e) {
-                        var t;
-                        return e && e.state ? (e.total_in = e.total_out = 0, e.data_type = 2, (t = e.state).pending = 0, 
-                        t.pending_out = 0, t.wrap < 0 && (t.wrap = -t.wrap), t.status = t.wrap ? 42 : p, 
-                        e.adler = 2 === t.wrap ? 0 : 1, t.last_flush = 0, i._tr_init(t), 0) : h(e, d);
-                    }
-                    function A(e) {
-                        var t = S(e);
-                        return 0 === t && function(e) {
-                            e.window_size = 2 * e.w_size, g(e.head), e.max_lazy_match = r[e.level].max_lazy, 
-                            e.good_match = r[e.level].good_length, e.nice_match = r[e.level].nice_length, e.max_chain_length = r[e.level].max_chain, 
-                            e.strstart = 0, e.block_start = 0, e.lookahead = 0, e.insert = 0, e.match_length = e.prev_length = 2, 
-                            e.match_available = 0, e.ins_h = 0;
-                        }(e.state), t;
-                    }
-                    function I(e, t, n, r, i, o) {
-                        if (!e) return d;
-                        var s = 1;
-                        if (-1 === t && (t = 6), r < 0 ? (s = 0, r = -r) : 15 < r && (s = 2, r -= 16), i < 1 || 9 < i || 8 !== n || r < 8 || 15 < r || t < 0 || 9 < t || o < 0 || 4 < o) return h(e, d);
-                        8 === r && (r = 9);
-                        var c = new C;
-                        return (e.state = c).strm = e, c.wrap = s, c.gzhead = null, c.w_bits = r, c.w_size = 1 << c.w_bits, 
-                        c.w_mask = c.w_size - 1, c.hash_bits = i + 7, c.hash_size = 1 << c.hash_bits, c.hash_mask = c.hash_size - 1, 
-                        c.hash_shift = ~~((c.hash_bits + 3 - 1) / 3), c.window = new a.Buf8(2 * c.w_size), 
-                        c.head = new a.Buf16(c.hash_size), c.prev = new a.Buf16(c.w_size), c.lit_bufsize = 1 << i + 6, 
-                        c.pending_buf_size = 4 * c.lit_bufsize, c.pending_buf = new a.Buf8(c.pending_buf_size), 
-                        c.d_buf = 1 * c.lit_bufsize, c.l_buf = 3 * c.lit_bufsize, c.level = t, c.strategy = o, 
-                        c.method = n, A(e);
-                    }
-                    r = [ new E(0, 0, 0, 0, function(e, t) {
-                        var n = 65535;
-                        for (n > e.pending_buf_size - 5 && (n = e.pending_buf_size - 5); ;) {
-                            if (e.lookahead <= 1) {
-                                if (w(e), 0 === e.lookahead && 0 === t) return 1;
-                                if (0 === e.lookahead) break;
-                            }
-                            e.strstart += e.lookahead, e.lookahead = 0;
-                            var r = e.block_start + n;
-                            if ((0 === e.strstart || e.strstart >= r) && (e.lookahead = e.strstart - r, e.strstart = r, 
-                            f(e, !1), 0 === e.strm.avail_out)) return 1;
-                            if (e.strstart - e.block_start >= e.w_size - u && (f(e, !1), 0 === e.strm.avail_out)) return 1;
-                        }
-                        return e.insert = 0, 4 === t ? (f(e, !0), 0 === e.strm.avail_out ? 3 : 4) : (e.strstart > e.block_start && (f(e, !1), 
-                        e.strm.avail_out), 1);
-                    }), new E(4, 4, 8, 4, k), new E(4, 5, 16, 8, k), new E(4, 6, 32, 32, k), new E(4, 4, 16, 16, _), new E(8, 16, 32, 32, _), new E(8, 16, 128, 128, _), new E(8, 32, 128, 256, _), new E(32, 128, 258, 1024, _), new E(32, 258, 258, 4096, _) ], 
-                    n.deflateInit = function(e, t) {
-                        return I(e, t, 8, 15, 8, 0);
-                    }, n.deflateInit2 = I, n.deflateReset = A, n.deflateResetKeep = S, n.deflateSetHeader = function(e, t) {
-                        return e && e.state ? 2 !== e.state.wrap ? d : (e.state.gzhead = t, 0) : d;
-                    }, n.deflate = function(e, t) {
-                        var n, a, o, c;
-                        if (!e || !e.state || 5 < t || t < 0) return e ? h(e, d) : d;
-                        if (a = e.state, !e.output || !e.input && 0 !== e.avail_in || 666 === a.status && 4 !== t) return h(e, 0 === e.avail_out ? -5 : d);
-                        if (a.strm = e, n = a.last_flush, a.last_flush = t, 42 === a.status) if (2 === a.wrap) e.adler = 0, 
-                        x(a, 31), x(a, 139), x(a, 8), a.gzhead ? (x(a, (a.gzhead.text ? 1 : 0) + (a.gzhead.hcrc ? 2 : 0) + (a.gzhead.extra ? 4 : 0) + (a.gzhead.name ? 8 : 0) + (a.gzhead.comment ? 16 : 0)), 
-                        x(a, 255 & a.gzhead.time), x(a, a.gzhead.time >> 8 & 255), x(a, a.gzhead.time >> 16 & 255), 
-                        x(a, a.gzhead.time >> 24 & 255), x(a, 9 === a.level ? 2 : 2 <= a.strategy || a.level < 2 ? 4 : 0), 
-                        x(a, 255 & a.gzhead.os), a.gzhead.extra && a.gzhead.extra.length && (x(a, 255 & a.gzhead.extra.length), 
-                        x(a, a.gzhead.extra.length >> 8 & 255)), a.gzhead.hcrc && (e.adler = s(e.adler, a.pending_buf, a.pending, 0)), 
-                        a.gzindex = 0, a.status = 69) : (x(a, 0), x(a, 0), x(a, 0), x(a, 0), x(a, 0), x(a, 9 === a.level ? 2 : 2 <= a.strategy || a.level < 2 ? 4 : 0), 
-                        x(a, 3), a.status = p); else {
-                            var u = 8 + (a.w_bits - 8 << 4) << 8;
-                            u |= (2 <= a.strategy || a.level < 2 ? 0 : a.level < 6 ? 1 : 6 === a.level ? 2 : 3) << 6, 
-                            0 !== a.strstart && (u |= 32), u += 31 - u % 31, a.status = p, v(a, u), 0 !== a.strstart && (v(a, e.adler >>> 16), 
-                            v(a, 65535 & e.adler)), e.adler = 1;
-                        }
-                        if (69 === a.status) if (a.gzhead.extra) {
-                            for (o = a.pending; a.gzindex < (65535 & a.gzhead.extra.length) && (a.pending !== a.pending_buf_size || (a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                            b(e), o = a.pending, a.pending !== a.pending_buf_size)); ) x(a, 255 & a.gzhead.extra[a.gzindex]), 
-                            a.gzindex++;
-                            a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                            a.gzindex === a.gzhead.extra.length && (a.gzindex = 0, a.status = 73);
-                        } else a.status = 73;
-                        if (73 === a.status) if (a.gzhead.name) {
-                            o = a.pending;
-                            do {
-                                if (a.pending === a.pending_buf_size && (a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                                b(e), o = a.pending, a.pending === a.pending_buf_size)) {
-                                    c = 1;
-                                    break;
-                                }
-                                c = a.gzindex < a.gzhead.name.length ? 255 & a.gzhead.name.charCodeAt(a.gzindex++) : 0, 
-                                x(a, c);
-                            } while (0 !== c);
-                            a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                            0 === c && (a.gzindex = 0, a.status = 91);
-                        } else a.status = 91;
-                        if (91 === a.status) if (a.gzhead.comment) {
-                            o = a.pending;
-                            do {
-                                if (a.pending === a.pending_buf_size && (a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                                b(e), o = a.pending, a.pending === a.pending_buf_size)) {
-                                    c = 1;
-                                    break;
-                                }
-                                c = a.gzindex < a.gzhead.comment.length ? 255 & a.gzhead.comment.charCodeAt(a.gzindex++) : 0, 
-                                x(a, c);
-                            } while (0 !== c);
-                            a.gzhead.hcrc && a.pending > o && (e.adler = s(e.adler, a.pending_buf, a.pending - o, o)), 
-                            0 === c && (a.status = 103);
-                        } else a.status = 103;
-                        if (103 === a.status && (a.gzhead.hcrc ? (a.pending + 2 > a.pending_buf_size && b(e), 
-                        a.pending + 2 <= a.pending_buf_size && (x(a, 255 & e.adler), x(a, e.adler >> 8 & 255), 
-                        e.adler = 0, a.status = p)) : a.status = p), 0 !== a.pending) {
-                            if (b(e), 0 === e.avail_out) return a.last_flush = -1, 0;
-                        } else if (0 === e.avail_in && m(t) <= m(n) && 4 !== t) return h(e, -5);
-                        if (666 === a.status && 0 !== e.avail_in) return h(e, -5);
-                        if (0 !== e.avail_in || 0 !== a.lookahead || 0 !== t && 666 !== a.status) {
-                            var y = 2 === a.strategy ? function(e, t) {
-                                for (var n; ;) {
-                                    if (0 === e.lookahead && (w(e), 0 === e.lookahead)) {
-                                        if (0 === t) return 1;
-                                        break;
-                                    }
-                                    if (e.match_length = 0, n = i._tr_tally(e, 0, e.window[e.strstart]), e.lookahead--, 
-                                    e.strstart++, n && (f(e, !1), 0 === e.strm.avail_out)) return 1;
-                                }
-                                return e.insert = 0, 4 === t ? (f(e, !0), 0 === e.strm.avail_out ? 3 : 4) : e.last_lit && (f(e, !1), 
-                                0 === e.strm.avail_out) ? 1 : 2;
-                            }(a, t) : 3 === a.strategy ? function(e, t) {
-                                for (var n, r, a, o, s = e.window; ;) {
-                                    if (e.lookahead <= l) {
-                                        if (w(e), e.lookahead <= l && 0 === t) return 1;
-                                        if (0 === e.lookahead) break;
-                                    }
-                                    if (e.match_length = 0, e.lookahead >= 3 && 0 < e.strstart && (r = s[a = e.strstart - 1]) === s[++a] && r === s[++a] && r === s[++a]) {
-                                        o = e.strstart + l;
-                                        do {} while (r === s[++a] && r === s[++a] && r === s[++a] && r === s[++a] && r === s[++a] && r === s[++a] && r === s[++a] && r === s[++a] && a < o);
-                                        e.match_length = l - (o - a), e.match_length > e.lookahead && (e.match_length = e.lookahead);
-                                    }
-                                    if (e.match_length >= 3 ? (n = i._tr_tally(e, 1, e.match_length - 3), e.lookahead -= e.match_length, 
-                                    e.strstart += e.match_length, e.match_length = 0) : (n = i._tr_tally(e, 0, e.window[e.strstart]), 
-                                    e.lookahead--, e.strstart++), n && (f(e, !1), 0 === e.strm.avail_out)) return 1;
-                                }
-                                return e.insert = 0, 4 === t ? (f(e, !0), 0 === e.strm.avail_out ? 3 : 4) : e.last_lit && (f(e, !1), 
-                                0 === e.strm.avail_out) ? 1 : 2;
-                            }(a, t) : r[a.level].func(a, t);
-                            if (3 !== y && 4 !== y || (a.status = 666), 1 === y || 3 === y) return 0 === e.avail_out && (a.last_flush = -1), 
-                            0;
-                            if (2 === y && (1 === t ? i._tr_align(a) : 5 !== t && (i._tr_stored_block(a, 0, 0, !1), 
-                            3 === t && (g(a.head), 0 === a.lookahead && (a.strstart = 0, a.block_start = 0, 
-                            a.insert = 0))), b(e), 0 === e.avail_out)) return a.last_flush = -1, 0;
-                        }
-                        return 4 !== t ? 0 : a.wrap <= 0 ? 1 : (2 === a.wrap ? (x(a, 255 & e.adler), x(a, e.adler >> 8 & 255), 
-                        x(a, e.adler >> 16 & 255), x(a, e.adler >> 24 & 255), x(a, 255 & e.total_in), x(a, e.total_in >> 8 & 255), 
-                        x(a, e.total_in >> 16 & 255), x(a, e.total_in >> 24 & 255)) : (v(a, e.adler >>> 16), 
-                        v(a, 65535 & e.adler)), b(e), 0 < a.wrap && (a.wrap = -a.wrap), 0 !== a.pending ? 0 : 1);
-                    }, n.deflateEnd = function(e) {
-                        var t;
-                        return e && e.state ? 42 !== (t = e.state.status) && 69 !== t && 73 !== t && 91 !== t && 103 !== t && t !== p && 666 !== t ? h(e, d) : (e.state = null, 
-                        t === p ? h(e, -3) : 0) : d;
-                    }, n.deflateSetDictionary = function(e, t) {
-                        var n, r, i, s, c, l, u, p, h = t.length;
-                        if (!e || !e.state) return d;
-                        if (2 === (s = (n = e.state).wrap) || 1 === s && 42 !== n.status || n.lookahead) return d;
-                        for (1 === s && (e.adler = o(e.adler, t, h, 0)), n.wrap = 0, h >= n.w_size && (0 === s && (g(n.head), 
-                        n.strstart = 0, n.block_start = 0, n.insert = 0), p = new a.Buf8(n.w_size), a.arraySet(p, t, h - n.w_size, n.w_size, 0), 
-                        t = p, h = n.w_size), c = e.avail_in, l = e.next_in, u = e.input, e.avail_in = h, 
-                        e.next_in = 0, e.input = t, w(n); n.lookahead >= 3; ) {
-                            for (r = n.strstart, i = n.lookahead - 2; n.ins_h = (n.ins_h << n.hash_shift ^ n.window[r + 3 - 1]) & n.hash_mask, 
-                            n.prev[r & n.w_mask] = n.head[n.ins_h], n.head[n.ins_h] = r, r++, --i; ) ;
-                            n.strstart = r, n.lookahead = 2, w(n);
-                        }
-                        return n.strstart += n.lookahead, n.block_start = n.strstart, n.insert = n.lookahead, 
-                        n.lookahead = 0, n.match_length = n.prev_length = 2, n.match_available = 0, e.next_in = l, 
-                        e.input = u, e.avail_in = c, n.wrap = s, 0;
-                    }, n.deflateInfo = "pako deflate (from Nodeca project)";
-                }, {
-                    "../utils/common": 41,
-                    "./adler32": 43,
-                    "./crc32": 45,
-                    "./messages": 51,
-                    "./trees": 52
-                } ],
-                47: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = function() {
-                        this.text = 0, this.time = 0, this.xflags = 0, this.os = 0, this.extra = null, this.extra_len = 0, 
-                        this.name = "", this.comment = "", this.hcrc = 0, this.done = !1;
-                    };
-                }, {} ],
-                48: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = function(e, t) {
-                        var n, r, a, i, o, s, c, d, l, u, p, h, m, g, b, f, x, v, y, w, k, _, E, C, S;
-                        n = e.state, r = e.next_in, C = e.input, a = r + (e.avail_in - 5), i = e.next_out, 
-                        S = e.output, o = i - (t - e.avail_out), s = i + (e.avail_out - 257), c = n.dmax, 
-                        d = n.wsize, l = n.whave, u = n.wnext, p = n.window, h = n.hold, m = n.bits, g = n.lencode, 
-                        b = n.distcode, f = (1 << n.lenbits) - 1, x = (1 << n.distbits) - 1;
-                        e: do {
-                            m < 15 && (h += C[r++] << m, m += 8, h += C[r++] << m, m += 8), v = g[h & f];
-                            t: for (;;) {
-                                if (h >>>= y = v >>> 24, m -= y, 0 == (y = v >>> 16 & 255)) S[i++] = 65535 & v; else {
-                                    if (!(16 & y)) {
-                                        if (!(64 & y)) {
-                                            v = g[(65535 & v) + (h & (1 << y) - 1)];
-                                            continue t;
-                                        }
-                                        if (32 & y) {
-                                            n.mode = 12;
-                                            break e;
-                                        }
-                                        e.msg = "invalid literal/length code", n.mode = 30;
-                                        break e;
-                                    }
-                                    w = 65535 & v, (y &= 15) && (m < y && (h += C[r++] << m, m += 8), w += h & (1 << y) - 1, 
-                                    h >>>= y, m -= y), m < 15 && (h += C[r++] << m, m += 8, h += C[r++] << m, m += 8), 
-                                    v = b[h & x];
-                                    n: for (;;) {
-                                        if (h >>>= y = v >>> 24, m -= y, !(16 & (y = v >>> 16 & 255))) {
-                                            if (!(64 & y)) {
-                                                v = b[(65535 & v) + (h & (1 << y) - 1)];
-                                                continue n;
-                                            }
-                                            e.msg = "invalid distance code", n.mode = 30;
-                                            break e;
-                                        }
-                                        if (k = 65535 & v, m < (y &= 15) && (h += C[r++] << m, (m += 8) < y && (h += C[r++] << m, 
-                                        m += 8)), c < (k += h & (1 << y) - 1)) {
-                                            e.msg = "invalid distance too far back", n.mode = 30;
-                                            break e;
-                                        }
-                                        if (h >>>= y, m -= y, (y = i - o) < k) {
-                                            if (l < (y = k - y) && n.sane) {
-                                                e.msg = "invalid distance too far back", n.mode = 30;
-                                                break e;
-                                            }
-                                            if (E = p, (_ = 0) === u) {
-                                                if (_ += d - y, y < w) {
-                                                    for (w -= y; S[i++] = p[_++], --y; ) ;
-                                                    _ = i - k, E = S;
-                                                }
-                                            } else if (u < y) {
-                                                if (_ += d + u - y, (y -= u) < w) {
-                                                    for (w -= y; S[i++] = p[_++], --y; ) ;
-                                                    if (_ = 0, u < w) {
-                                                        for (w -= y = u; S[i++] = p[_++], --y; ) ;
-                                                        _ = i - k, E = S;
-                                                    }
-                                                }
-                                            } else if (_ += u - y, y < w) {
-                                                for (w -= y; S[i++] = p[_++], --y; ) ;
-                                                _ = i - k, E = S;
-                                            }
-                                            for (;2 < w; ) S[i++] = E[_++], S[i++] = E[_++], S[i++] = E[_++], w -= 3;
-                                            w && (S[i++] = E[_++], 1 < w && (S[i++] = E[_++]));
-                                        } else {
-                                            for (_ = i - k; S[i++] = S[_++], S[i++] = S[_++], S[i++] = S[_++], 2 < (w -= 3); ) ;
-                                            w && (S[i++] = S[_++], 1 < w && (S[i++] = S[_++]));
-                                        }
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        } while (r < a && i < s);
-                        r -= w = m >> 3, h &= (1 << (m -= w << 3)) - 1, e.next_in = r, e.next_out = i, e.avail_in = r < a ? a - r + 5 : 5 - (r - a), 
-                        e.avail_out = i < s ? s - i + 257 : 257 - (i - s), n.hold = h, n.bits = m;
-                    };
-                }, {} ],
-                49: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils/common"), a = e("./adler32"), i = e("./crc32"), o = e("./inffast"), s = e("./inftrees"), c = -2;
-                    function d(e) {
-                        return (e >>> 24 & 255) + (e >>> 8 & 65280) + ((65280 & e) << 8) + ((255 & e) << 24);
-                    }
-                    function l() {
-                        this.mode = 0, this.last = !1, this.wrap = 0, this.havedict = !1, this.flags = 0, 
-                        this.dmax = 0, this.check = 0, this.total = 0, this.head = null, this.wbits = 0, 
-                        this.wsize = 0, this.whave = 0, this.wnext = 0, this.window = null, this.hold = 0, 
-                        this.bits = 0, this.length = 0, this.offset = 0, this.extra = 0, this.lencode = null, 
-                        this.distcode = null, this.lenbits = 0, this.distbits = 0, this.ncode = 0, this.nlen = 0, 
-                        this.ndist = 0, this.have = 0, this.next = null, this.lens = new r.Buf16(320), this.work = new r.Buf16(288), 
-                        this.lendyn = null, this.distdyn = null, this.sane = 0, this.back = 0, this.was = 0;
-                    }
-                    function u(e) {
-                        var t;
-                        return e && e.state ? (t = e.state, e.total_in = e.total_out = t.total = 0, e.msg = "", 
-                        t.wrap && (e.adler = 1 & t.wrap), t.mode = 1, t.last = 0, t.havedict = 0, t.dmax = 32768, 
-                        t.head = null, t.hold = 0, t.bits = 0, t.lencode = t.lendyn = new r.Buf32(852), 
-                        t.distcode = t.distdyn = new r.Buf32(592), t.sane = 1, t.back = -1, 0) : c;
-                    }
-                    function p(e) {
-                        var t;
-                        return e && e.state ? ((t = e.state).wsize = 0, t.whave = 0, t.wnext = 0, u(e)) : c;
-                    }
-                    function h(e, t) {
-                        var n, r;
-                        return e && e.state ? (r = e.state, t < 0 ? (n = 0, t = -t) : (n = 1 + (t >> 4), 
-                        t < 48 && (t &= 15)), t && (t < 8 || 15 < t) ? c : (null !== r.window && r.wbits !== t && (r.window = null), 
-                        r.wrap = n, r.wbits = t, p(e))) : c;
-                    }
-                    function m(e, t) {
-                        var n, r;
-                        return e ? (r = new l, (e.state = r).window = null, 0 !== (n = h(e, t)) && (e.state = null), 
-                        n) : c;
-                    }
-                    var g, b, f = !0;
-                    function x(e) {
-                        if (f) {
-                            var t;
-                            for (g = new r.Buf32(512), b = new r.Buf32(32), t = 0; t < 144; ) e.lens[t++] = 8;
-                            for (;t < 256; ) e.lens[t++] = 9;
-                            for (;t < 280; ) e.lens[t++] = 7;
-                            for (;t < 288; ) e.lens[t++] = 8;
-                            for (s(1, e.lens, 0, 288, g, 0, e.work, {
-                                bits: 9
-                            }), t = 0; t < 32; ) e.lens[t++] = 5;
-                            s(2, e.lens, 0, 32, b, 0, e.work, {
-                                bits: 5
-                            }), f = !1;
-                        }
-                        e.lencode = g, e.lenbits = 9, e.distcode = b, e.distbits = 5;
-                    }
-                    function v(e, t, n, a) {
-                        var i, o = e.state;
-                        return null === o.window && (o.wsize = 1 << o.wbits, o.wnext = 0, o.whave = 0, o.window = new r.Buf8(o.wsize)), 
-                        a >= o.wsize ? (r.arraySet(o.window, t, n - o.wsize, o.wsize, 0), o.wnext = 0, o.whave = o.wsize) : (a < (i = o.wsize - o.wnext) && (i = a), 
-                        r.arraySet(o.window, t, n - a, i, o.wnext), (a -= i) ? (r.arraySet(o.window, t, n - a, a, 0), 
-                        o.wnext = a, o.whave = o.wsize) : (o.wnext += i, o.wnext === o.wsize && (o.wnext = 0), 
-                        o.whave < o.wsize && (o.whave += i))), 0;
-                    }
-                    n.inflateReset = p, n.inflateReset2 = h, n.inflateResetKeep = u, n.inflateInit = function(e) {
-                        return m(e, 15);
-                    }, n.inflateInit2 = m, n.inflate = function(e, t) {
-                        var n, l, u, p, h, m, g, b, f, y, w, k, _, E, C, S, A, I, N, L, T, z, D, B, P = 0, O = new r.Buf8(4), M = [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ];
-                        if (!e || !e.state || !e.output || !e.input && 0 !== e.avail_in) return c;
-                        12 === (n = e.state).mode && (n.mode = 13), h = e.next_out, u = e.output, g = e.avail_out, 
-                        p = e.next_in, l = e.input, m = e.avail_in, b = n.hold, f = n.bits, y = m, w = g, 
-                        z = 0;
-                        e: for (;;) switch (n.mode) {
-                          case 1:
-                            if (0 === n.wrap) {
-                                n.mode = 13;
-                                break;
-                            }
-                            for (;f < 16; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if (2 & n.wrap && 35615 === b) {
-                                O[n.check = 0] = 255 & b, O[1] = b >>> 8 & 255, n.check = i(n.check, O, 2, 0), f = b = 0, 
-                                n.mode = 2;
-                                break;
-                            }
-                            if (n.flags = 0, n.head && (n.head.done = !1), !(1 & n.wrap) || (((255 & b) << 8) + (b >> 8)) % 31) {
-                                e.msg = "incorrect header check", n.mode = 30;
-                                break;
-                            }
-                            if (8 != (15 & b)) {
-                                e.msg = "unknown compression method", n.mode = 30;
-                                break;
-                            }
-                            if (f -= 4, T = 8 + (15 & (b >>>= 4)), 0 === n.wbits) n.wbits = T; else if (T > n.wbits) {
-                                e.msg = "invalid window size", n.mode = 30;
-                                break;
-                            }
-                            n.dmax = 1 << T, e.adler = n.check = 1, n.mode = 512 & b ? 10 : 12, f = b = 0;
-                            break;
-
-                          case 2:
-                            for (;f < 16; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if (n.flags = b, 8 != (255 & n.flags)) {
-                                e.msg = "unknown compression method", n.mode = 30;
-                                break;
-                            }
-                            if (57344 & n.flags) {
-                                e.msg = "unknown header flags set", n.mode = 30;
-                                break;
-                            }
-                            n.head && (n.head.text = b >> 8 & 1), 512 & n.flags && (O[0] = 255 & b, O[1] = b >>> 8 & 255, 
-                            n.check = i(n.check, O, 2, 0)), f = b = 0, n.mode = 3;
-
-                          case 3:
-                            for (;f < 32; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            n.head && (n.head.time = b), 512 & n.flags && (O[0] = 255 & b, O[1] = b >>> 8 & 255, 
-                            O[2] = b >>> 16 & 255, O[3] = b >>> 24 & 255, n.check = i(n.check, O, 4, 0)), f = b = 0, 
-                            n.mode = 4;
-
-                          case 4:
-                            for (;f < 16; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            n.head && (n.head.xflags = 255 & b, n.head.os = b >> 8), 512 & n.flags && (O[0] = 255 & b, 
-                            O[1] = b >>> 8 & 255, n.check = i(n.check, O, 2, 0)), f = b = 0, n.mode = 5;
-
-                          case 5:
-                            if (1024 & n.flags) {
-                                for (;f < 16; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                n.length = b, n.head && (n.head.extra_len = b), 512 & n.flags && (O[0] = 255 & b, 
-                                O[1] = b >>> 8 & 255, n.check = i(n.check, O, 2, 0)), f = b = 0;
-                            } else n.head && (n.head.extra = null);
-                            n.mode = 6;
-
-                          case 6:
-                            if (1024 & n.flags && (m < (k = n.length) && (k = m), k && (n.head && (T = n.head.extra_len - n.length, 
-                            n.head.extra || (n.head.extra = new Array(n.head.extra_len)), r.arraySet(n.head.extra, l, p, k, T)), 
-                            512 & n.flags && (n.check = i(n.check, l, k, p)), m -= k, p += k, n.length -= k), 
-                            n.length)) break e;
-                            n.length = 0, n.mode = 7;
-
-                          case 7:
-                            if (2048 & n.flags) {
-                                if (0 === m) break e;
-                                for (k = 0; T = l[p + k++], n.head && T && n.length < 65536 && (n.head.name += String.fromCharCode(T)), 
-                                T && k < m; ) ;
-                                if (512 & n.flags && (n.check = i(n.check, l, k, p)), m -= k, p += k, T) break e;
-                            } else n.head && (n.head.name = null);
-                            n.length = 0, n.mode = 8;
-
-                          case 8:
-                            if (4096 & n.flags) {
-                                if (0 === m) break e;
-                                for (k = 0; T = l[p + k++], n.head && T && n.length < 65536 && (n.head.comment += String.fromCharCode(T)), 
-                                T && k < m; ) ;
-                                if (512 & n.flags && (n.check = i(n.check, l, k, p)), m -= k, p += k, T) break e;
-                            } else n.head && (n.head.comment = null);
-                            n.mode = 9;
-
-                          case 9:
-                            if (512 & n.flags) {
-                                for (;f < 16; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                if (b !== (65535 & n.check)) {
-                                    e.msg = "header crc mismatch", n.mode = 30;
-                                    break;
-                                }
-                                f = b = 0;
-                            }
-                            n.head && (n.head.hcrc = n.flags >> 9 & 1, n.head.done = !0), e.adler = n.check = 0, 
-                            n.mode = 12;
-                            break;
-
-                          case 10:
-                            for (;f < 32; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            e.adler = n.check = d(b), f = b = 0, n.mode = 11;
-
-                          case 11:
-                            if (0 === n.havedict) return e.next_out = h, e.avail_out = g, e.next_in = p, e.avail_in = m, 
-                            n.hold = b, n.bits = f, 2;
-                            e.adler = n.check = 1, n.mode = 12;
-
-                          case 12:
-                            if (5 === t || 6 === t) break e;
-
-                          case 13:
-                            if (n.last) {
-                                b >>>= 7 & f, f -= 7 & f, n.mode = 27;
-                                break;
-                            }
-                            for (;f < 3; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            switch (n.last = 1 & b, f -= 1, 3 & (b >>>= 1)) {
-                              case 0:
-                                n.mode = 14;
-                                break;
-
-                              case 1:
-                                if (x(n), n.mode = 20, 6 !== t) break;
-                                b >>>= 2, f -= 2;
-                                break e;
-
-                              case 2:
-                                n.mode = 17;
-                                break;
-
-                              case 3:
-                                e.msg = "invalid block type", n.mode = 30;
-                            }
-                            b >>>= 2, f -= 2;
-                            break;
-
-                          case 14:
-                            for (b >>>= 7 & f, f -= 7 & f; f < 32; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if ((65535 & b) != (b >>> 16 ^ 65535)) {
-                                e.msg = "invalid stored block lengths", n.mode = 30;
-                                break;
-                            }
-                            if (n.length = 65535 & b, f = b = 0, n.mode = 15, 6 === t) break e;
-
-                          case 15:
-                            n.mode = 16;
-
-                          case 16:
-                            if (k = n.length) {
-                                if (m < k && (k = m), g < k && (k = g), 0 === k) break e;
-                                r.arraySet(u, l, p, k, h), m -= k, p += k, g -= k, h += k, n.length -= k;
-                                break;
-                            }
-                            n.mode = 12;
-                            break;
-
-                          case 17:
-                            for (;f < 14; ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if (n.nlen = 257 + (31 & b), b >>>= 5, f -= 5, n.ndist = 1 + (31 & b), b >>>= 5, 
-                            f -= 5, n.ncode = 4 + (15 & b), b >>>= 4, f -= 4, 286 < n.nlen || 30 < n.ndist) {
-                                e.msg = "too many length or distance symbols", n.mode = 30;
-                                break;
-                            }
-                            n.have = 0, n.mode = 18;
-
-                          case 18:
-                            for (;n.have < n.ncode; ) {
-                                for (;f < 3; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                n.lens[M[n.have++]] = 7 & b, b >>>= 3, f -= 3;
-                            }
-                            for (;n.have < 19; ) n.lens[M[n.have++]] = 0;
-                            if (n.lencode = n.lendyn, n.lenbits = 7, D = {
-                                bits: n.lenbits
-                            }, z = s(0, n.lens, 0, 19, n.lencode, 0, n.work, D), n.lenbits = D.bits, z) {
-                                e.msg = "invalid code lengths set", n.mode = 30;
-                                break;
-                            }
-                            n.have = 0, n.mode = 19;
-
-                          case 19:
-                            for (;n.have < n.nlen + n.ndist; ) {
-                                for (;S = (P = n.lencode[b & (1 << n.lenbits) - 1]) >>> 16 & 255, A = 65535 & P, 
-                                !((C = P >>> 24) <= f); ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                if (A < 16) b >>>= C, f -= C, n.lens[n.have++] = A; else {
-                                    if (16 === A) {
-                                        for (B = C + 2; f < B; ) {
-                                            if (0 === m) break e;
-                                            m--, b += l[p++] << f, f += 8;
-                                        }
-                                        if (b >>>= C, f -= C, 0 === n.have) {
-                                            e.msg = "invalid bit length repeat", n.mode = 30;
-                                            break;
-                                        }
-                                        T = n.lens[n.have - 1], k = 3 + (3 & b), b >>>= 2, f -= 2;
-                                    } else if (17 === A) {
-                                        for (B = C + 3; f < B; ) {
-                                            if (0 === m) break e;
-                                            m--, b += l[p++] << f, f += 8;
-                                        }
-                                        f -= C, T = 0, k = 3 + (7 & (b >>>= C)), b >>>= 3, f -= 3;
-                                    } else {
-                                        for (B = C + 7; f < B; ) {
-                                            if (0 === m) break e;
-                                            m--, b += l[p++] << f, f += 8;
-                                        }
-                                        f -= C, T = 0, k = 11 + (127 & (b >>>= C)), b >>>= 7, f -= 7;
-                                    }
-                                    if (n.have + k > n.nlen + n.ndist) {
-                                        e.msg = "invalid bit length repeat", n.mode = 30;
-                                        break;
-                                    }
-                                    for (;k--; ) n.lens[n.have++] = T;
-                                }
-                            }
-                            if (30 === n.mode) break;
-                            if (0 === n.lens[256]) {
-                                e.msg = "invalid code -- missing end-of-block", n.mode = 30;
-                                break;
-                            }
-                            if (n.lenbits = 9, D = {
-                                bits: n.lenbits
-                            }, z = s(1, n.lens, 0, n.nlen, n.lencode, 0, n.work, D), n.lenbits = D.bits, z) {
-                                e.msg = "invalid literal/lengths set", n.mode = 30;
-                                break;
-                            }
-                            if (n.distbits = 6, n.distcode = n.distdyn, D = {
-                                bits: n.distbits
-                            }, z = s(2, n.lens, n.nlen, n.ndist, n.distcode, 0, n.work, D), n.distbits = D.bits, 
-                            z) {
-                                e.msg = "invalid distances set", n.mode = 30;
-                                break;
-                            }
-                            if (n.mode = 20, 6 === t) break e;
-
-                          case 20:
-                            n.mode = 21;
-
-                          case 21:
-                            if (6 <= m && 258 <= g) {
-                                e.next_out = h, e.avail_out = g, e.next_in = p, e.avail_in = m, n.hold = b, n.bits = f, 
-                                o(e, w), h = e.next_out, u = e.output, g = e.avail_out, p = e.next_in, l = e.input, 
-                                m = e.avail_in, b = n.hold, f = n.bits, 12 === n.mode && (n.back = -1);
-                                break;
-                            }
-                            for (n.back = 0; S = (P = n.lencode[b & (1 << n.lenbits) - 1]) >>> 16 & 255, A = 65535 & P, 
-                            !((C = P >>> 24) <= f); ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if (S && !(240 & S)) {
-                                for (I = C, N = S, L = A; S = (P = n.lencode[L + ((b & (1 << I + N) - 1) >> I)]) >>> 16 & 255, 
-                                A = 65535 & P, !(I + (C = P >>> 24) <= f); ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                b >>>= I, f -= I, n.back += I;
-                            }
-                            if (b >>>= C, f -= C, n.back += C, n.length = A, 0 === S) {
-                                n.mode = 26;
-                                break;
-                            }
-                            if (32 & S) {
-                                n.back = -1, n.mode = 12;
-                                break;
-                            }
-                            if (64 & S) {
-                                e.msg = "invalid literal/length code", n.mode = 30;
-                                break;
-                            }
-                            n.extra = 15 & S, n.mode = 22;
-
-                          case 22:
-                            if (n.extra) {
-                                for (B = n.extra; f < B; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                n.length += b & (1 << n.extra) - 1, b >>>= n.extra, f -= n.extra, n.back += n.extra;
-                            }
-                            n.was = n.length, n.mode = 23;
-
-                          case 23:
-                            for (;S = (P = n.distcode[b & (1 << n.distbits) - 1]) >>> 16 & 255, A = 65535 & P, 
-                            !((C = P >>> 24) <= f); ) {
-                                if (0 === m) break e;
-                                m--, b += l[p++] << f, f += 8;
-                            }
-                            if (!(240 & S)) {
-                                for (I = C, N = S, L = A; S = (P = n.distcode[L + ((b & (1 << I + N) - 1) >> I)]) >>> 16 & 255, 
-                                A = 65535 & P, !(I + (C = P >>> 24) <= f); ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                b >>>= I, f -= I, n.back += I;
-                            }
-                            if (b >>>= C, f -= C, n.back += C, 64 & S) {
-                                e.msg = "invalid distance code", n.mode = 30;
-                                break;
-                            }
-                            n.offset = A, n.extra = 15 & S, n.mode = 24;
-
-                          case 24:
-                            if (n.extra) {
-                                for (B = n.extra; f < B; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                n.offset += b & (1 << n.extra) - 1, b >>>= n.extra, f -= n.extra, n.back += n.extra;
-                            }
-                            if (n.offset > n.dmax) {
-                                e.msg = "invalid distance too far back", n.mode = 30;
-                                break;
-                            }
-                            n.mode = 25;
-
-                          case 25:
-                            if (0 === g) break e;
-                            if (k = w - g, n.offset > k) {
-                                if ((k = n.offset - k) > n.whave && n.sane) {
-                                    e.msg = "invalid distance too far back", n.mode = 30;
-                                    break;
-                                }
-                                _ = k > n.wnext ? (k -= n.wnext, n.wsize - k) : n.wnext - k, k > n.length && (k = n.length), 
-                                E = n.window;
-                            } else E = u, _ = h - n.offset, k = n.length;
-                            for (g < k && (k = g), g -= k, n.length -= k; u[h++] = E[_++], --k; ) ;
-                            0 === n.length && (n.mode = 21);
-                            break;
-
-                          case 26:
-                            if (0 === g) break e;
-                            u[h++] = n.length, g--, n.mode = 21;
-                            break;
-
-                          case 27:
-                            if (n.wrap) {
-                                for (;f < 32; ) {
-                                    if (0 === m) break e;
-                                    m--, b |= l[p++] << f, f += 8;
-                                }
-                                if (w -= g, e.total_out += w, n.total += w, w && (e.adler = n.check = n.flags ? i(n.check, u, w, h - w) : a(n.check, u, w, h - w)), 
-                                w = g, (n.flags ? b : d(b)) !== n.check) {
-                                    e.msg = "incorrect data check", n.mode = 30;
-                                    break;
-                                }
-                                f = b = 0;
-                            }
-                            n.mode = 28;
-
-                          case 28:
-                            if (n.wrap && n.flags) {
-                                for (;f < 32; ) {
-                                    if (0 === m) break e;
-                                    m--, b += l[p++] << f, f += 8;
-                                }
-                                if (b !== (4294967295 & n.total)) {
-                                    e.msg = "incorrect length check", n.mode = 30;
-                                    break;
-                                }
-                                f = b = 0;
-                            }
-                            n.mode = 29;
-
-                          case 29:
-                            z = 1;
-                            break e;
-
-                          case 30:
-                            z = -3;
-                            break e;
-
-                          case 31:
-                            return -4;
-
-                          default:
-                            return c;
-                        }
-                        return e.next_out = h, e.avail_out = g, e.next_in = p, e.avail_in = m, n.hold = b, 
-                        n.bits = f, (n.wsize || w !== e.avail_out && n.mode < 30 && (n.mode < 27 || 4 !== t)) && v(e, e.output, e.next_out, w - e.avail_out) ? (n.mode = 31, 
-                        -4) : (y -= e.avail_in, w -= e.avail_out, e.total_in += y, e.total_out += w, n.total += w, 
-                        n.wrap && w && (e.adler = n.check = n.flags ? i(n.check, u, w, e.next_out - w) : a(n.check, u, w, e.next_out - w)), 
-                        e.data_type = n.bits + (n.last ? 64 : 0) + (12 === n.mode ? 128 : 0) + (20 === n.mode || 15 === n.mode ? 256 : 0), 
-                        (0 == y && 0 === w || 4 === t) && 0 === z && (z = -5), z);
-                    }, n.inflateEnd = function(e) {
-                        if (!e || !e.state) return c;
-                        var t = e.state;
-                        return t.window && (t.window = null), e.state = null, 0;
-                    }, n.inflateGetHeader = function(e, t) {
-                        var n;
-                        return e && e.state && 2 & (n = e.state).wrap ? ((n.head = t).done = !1, 0) : c;
-                    }, n.inflateSetDictionary = function(e, t) {
-                        var n, r = t.length;
-                        return e && e.state ? 0 !== (n = e.state).wrap && 11 !== n.mode ? c : 11 === n.mode && a(1, t, r, 0) !== n.check ? -3 : v(e, t, r, r) ? (n.mode = 31, 
-                        -4) : (n.havedict = 1, 0) : c;
-                    }, n.inflateInfo = "pako inflate (from Nodeca project)";
-                }, {
-                    "../utils/common": 41,
-                    "./adler32": 43,
-                    "./crc32": 45,
-                    "./inffast": 48,
-                    "./inftrees": 50
-                } ],
-                50: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils/common"), a = [ 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0 ], i = [ 16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18, 19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 72, 78 ], o = [ 1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, 0, 0 ], s = [ 16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 64, 64 ];
-                    t.exports = function(e, t, n, c, d, l, u, p) {
-                        var h, m, g, b, f, x, v, y, w, k = p.bits, _ = 0, E = 0, C = 0, S = 0, A = 0, I = 0, N = 0, L = 0, T = 0, z = 0, D = null, B = 0, P = new r.Buf16(16), O = new r.Buf16(16), M = null, R = 0;
-                        for (_ = 0; _ <= 15; _++) P[_] = 0;
-                        for (E = 0; E < c; E++) P[t[n + E]]++;
-                        for (A = k, S = 15; 1 <= S && 0 === P[S]; S--) ;
-                        if (S < A && (A = S), 0 === S) return d[l++] = 20971520, d[l++] = 20971520, p.bits = 1, 
-                        0;
-                        for (C = 1; C < S && 0 === P[C]; C++) ;
-                        for (A < C && (A = C), _ = L = 1; _ <= 15; _++) if (L <<= 1, (L -= P[_]) < 0) return -1;
-                        if (0 < L && (0 === e || 1 !== S)) return -1;
-                        for (O[1] = 0, _ = 1; _ < 15; _++) O[_ + 1] = O[_] + P[_];
-                        for (E = 0; E < c; E++) 0 !== t[n + E] && (u[O[t[n + E]]++] = E);
-                        if (x = 0 === e ? (D = M = u, 19) : 1 === e ? (D = a, B -= 257, M = i, R -= 257, 
-                        256) : (D = o, M = s, -1), _ = C, f = l, N = E = z = 0, g = -1, b = (T = 1 << (I = A)) - 1, 
-                        1 === e && 852 < T || 2 === e && 592 < T) return 1;
-                        for (;;) {
-                            for (v = _ - N, w = u[E] < x ? (y = 0, u[E]) : u[E] > x ? (y = M[R + u[E]], D[B + u[E]]) : (y = 96, 
-                            0), h = 1 << _ - N, C = m = 1 << I; d[f + (z >> N) + (m -= h)] = v << 24 | y << 16 | w, 
-                            0 !== m; ) ;
-                            for (h = 1 << _ - 1; z & h; ) h >>= 1;
-                            if (0 !== h ? (z &= h - 1, z += h) : z = 0, E++, 0 == --P[_]) {
-                                if (_ === S) break;
-                                _ = t[n + u[E]];
-                            }
-                            if (A < _ && (z & b) !== g) {
-                                for (0 === N && (N = A), f += C, L = 1 << (I = _ - N); I + N < S && !((L -= P[I + N]) <= 0); ) I++, 
-                                L <<= 1;
-                                if (T += 1 << I, 1 === e && 852 < T || 2 === e && 592 < T) return 1;
-                                d[g = z & b] = A << 24 | I << 16 | f - l;
-                            }
-                        }
-                        return 0 !== z && (d[f + z] = _ - N << 24 | 64 << 16), p.bits = A, 0;
-                    };
-                }, {
-                    "../utils/common": 41
-                } ],
-                51: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = {
-                        2: "need dictionary",
-                        1: "stream end",
-                        0: "",
-                        "-1": "file error",
-                        "-2": "stream error",
-                        "-3": "data error",
-                        "-4": "insufficient memory",
-                        "-5": "buffer error",
-                        "-6": "incompatible version"
-                    };
-                }, {} ],
-                52: [ function(e, t, n) {
-                    "use strict";
-                    var r = e("../utils/common");
-                    function a(e) {
-                        for (var t = e.length; 0 <= --t; ) e[t] = 0;
-                    }
-                    var i = 256, o = 286, s = 30, c = 15, d = [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0 ], l = [ 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13 ], u = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7 ], p = [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ], h = new Array(576);
-                    a(h);
-                    var m = new Array(60);
-                    a(m);
-                    var g = new Array(512);
-                    a(g);
-                    var b = new Array(256);
-                    a(b);
-                    var f = new Array(29);
-                    a(f);
-                    var x, v, y, w = new Array(s);
-                    function k(e, t, n, r, a) {
-                        this.static_tree = e, this.extra_bits = t, this.extra_base = n, this.elems = r, 
-                        this.max_length = a, this.has_stree = e && e.length;
-                    }
-                    function _(e, t) {
-                        this.dyn_tree = e, this.max_code = 0, this.stat_desc = t;
-                    }
-                    function E(e) {
-                        return e < 256 ? g[e] : g[256 + (e >>> 7)];
-                    }
-                    function C(e, t) {
-                        e.pending_buf[e.pending++] = 255 & t, e.pending_buf[e.pending++] = t >>> 8 & 255;
-                    }
-                    function S(e, t, n) {
-                        e.bi_valid > 16 - n ? (e.bi_buf |= t << e.bi_valid & 65535, C(e, e.bi_buf), e.bi_buf = t >> 16 - e.bi_valid, 
-                        e.bi_valid += n - 16) : (e.bi_buf |= t << e.bi_valid & 65535, e.bi_valid += n);
-                    }
-                    function A(e, t, n) {
-                        S(e, n[2 * t], n[2 * t + 1]);
-                    }
-                    function I(e, t) {
-                        for (var n = 0; n |= 1 & e, e >>>= 1, n <<= 1, 0 < --t; ) ;
-                        return n >>> 1;
-                    }
-                    function N(e, t, n) {
-                        var r, a, i = new Array(16), o = 0;
-                        for (r = 1; r <= c; r++) i[r] = o = o + n[r - 1] << 1;
-                        for (a = 0; a <= t; a++) {
-                            var s = e[2 * a + 1];
-                            0 !== s && (e[2 * a] = I(i[s]++, s));
-                        }
-                    }
-                    function L(e) {
-                        var t;
-                        for (t = 0; t < o; t++) e.dyn_ltree[2 * t] = 0;
-                        for (t = 0; t < s; t++) e.dyn_dtree[2 * t] = 0;
-                        for (t = 0; t < 19; t++) e.bl_tree[2 * t] = 0;
-                        e.dyn_ltree[512] = 1, e.opt_len = e.static_len = 0, e.last_lit = e.matches = 0;
-                    }
-                    function T(e) {
-                        8 < e.bi_valid ? C(e, e.bi_buf) : 0 < e.bi_valid && (e.pending_buf[e.pending++] = e.bi_buf), 
-                        e.bi_buf = 0, e.bi_valid = 0;
-                    }
-                    function z(e, t, n, r) {
-                        var a = 2 * t, i = 2 * n;
-                        return e[a] < e[i] || e[a] === e[i] && r[t] <= r[n];
-                    }
-                    function D(e, t, n) {
-                        for (var r = e.heap[n], a = n << 1; a <= e.heap_len && (a < e.heap_len && z(t, e.heap[a + 1], e.heap[a], e.depth) && a++, 
-                        !z(t, r, e.heap[a], e.depth)); ) e.heap[n] = e.heap[a], n = a, a <<= 1;
-                        e.heap[n] = r;
-                    }
-                    function B(e, t, n) {
-                        var r, a, o, s, c = 0;
-                        if (0 !== e.last_lit) for (;r = e.pending_buf[e.d_buf + 2 * c] << 8 | e.pending_buf[e.d_buf + 2 * c + 1], 
-                        a = e.pending_buf[e.l_buf + c], c++, 0 === r ? A(e, a, t) : (A(e, (o = b[a]) + i + 1, t), 
-                        0 !== (s = d[o]) && S(e, a -= f[o], s), A(e, o = E(--r), n), 0 !== (s = l[o]) && S(e, r -= w[o], s)), 
-                        c < e.last_lit; ) ;
-                        A(e, 256, t);
-                    }
-                    function P(e, t) {
-                        var n, r, a, i = t.dyn_tree, o = t.stat_desc.static_tree, s = t.stat_desc.has_stree, d = t.stat_desc.elems, l = -1;
-                        for (e.heap_len = 0, e.heap_max = 573, n = 0; n < d; n++) 0 !== i[2 * n] ? (e.heap[++e.heap_len] = l = n, 
-                        e.depth[n] = 0) : i[2 * n + 1] = 0;
-                        for (;e.heap_len < 2; ) i[2 * (a = e.heap[++e.heap_len] = l < 2 ? ++l : 0)] = 1, 
-                        e.depth[a] = 0, e.opt_len--, s && (e.static_len -= o[2 * a + 1]);
-                        for (t.max_code = l, n = e.heap_len >> 1; 1 <= n; n--) D(e, i, n);
-                        for (a = d; n = e.heap[1], e.heap[1] = e.heap[e.heap_len--], D(e, i, 1), r = e.heap[1], 
-                        e.heap[--e.heap_max] = n, e.heap[--e.heap_max] = r, i[2 * a] = i[2 * n] + i[2 * r], 
-                        e.depth[a] = (e.depth[n] >= e.depth[r] ? e.depth[n] : e.depth[r]) + 1, i[2 * n + 1] = i[2 * r + 1] = a, 
-                        e.heap[1] = a++, D(e, i, 1), 2 <= e.heap_len; ) ;
-                        e.heap[--e.heap_max] = e.heap[1], function(e, t) {
-                            var n, r, a, i, o, s, d = t.dyn_tree, l = t.max_code, u = t.stat_desc.static_tree, p = t.stat_desc.has_stree, h = t.stat_desc.extra_bits, m = t.stat_desc.extra_base, g = t.stat_desc.max_length, b = 0;
-                            for (i = 0; i <= c; i++) e.bl_count[i] = 0;
-                            for (d[2 * e.heap[e.heap_max] + 1] = 0, n = e.heap_max + 1; n < 573; n++) g < (i = d[2 * d[2 * (r = e.heap[n]) + 1] + 1] + 1) && (i = g, 
-                            b++), d[2 * r + 1] = i, l < r || (e.bl_count[i]++, o = 0, m <= r && (o = h[r - m]), 
-                            s = d[2 * r], e.opt_len += s * (i + o), p && (e.static_len += s * (u[2 * r + 1] + o)));
-                            if (0 !== b) {
-                                do {
-                                    for (i = g - 1; 0 === e.bl_count[i]; ) i--;
-                                    e.bl_count[i]--, e.bl_count[i + 1] += 2, e.bl_count[g]--, b -= 2;
-                                } while (0 < b);
-                                for (i = g; 0 !== i; i--) for (r = e.bl_count[i]; 0 !== r; ) l < (a = e.heap[--n]) || (d[2 * a + 1] !== i && (e.opt_len += (i - d[2 * a + 1]) * d[2 * a], 
-                                d[2 * a + 1] = i), r--);
-                            }
-                        }(e, t), N(i, l, e.bl_count);
-                    }
-                    function O(e, t, n) {
-                        var r, a, i = -1, o = t[1], s = 0, c = 7, d = 4;
-                        for (0 === o && (c = 138, d = 3), t[2 * (n + 1) + 1] = 65535, r = 0; r <= n; r++) a = o, 
-                        o = t[2 * (r + 1) + 1], ++s < c && a === o || (s < d ? e.bl_tree[2 * a] += s : 0 !== a ? (a !== i && e.bl_tree[2 * a]++, 
-                        e.bl_tree[32]++) : s <= 10 ? e.bl_tree[34]++ : e.bl_tree[36]++, i = a, d = (s = 0) === o ? (c = 138, 
-                        3) : a === o ? (c = 6, 3) : (c = 7, 4));
-                    }
-                    function M(e, t, n) {
-                        var r, a, i = -1, o = t[1], s = 0, c = 7, d = 4;
-                        for (0 === o && (c = 138, d = 3), r = 0; r <= n; r++) if (a = o, o = t[2 * (r + 1) + 1], 
-                        !(++s < c && a === o)) {
-                            if (s < d) for (;A(e, a, e.bl_tree), 0 != --s; ) ; else 0 !== a ? (a !== i && (A(e, a, e.bl_tree), 
-                            s--), A(e, 16, e.bl_tree), S(e, s - 3, 2)) : s <= 10 ? (A(e, 17, e.bl_tree), S(e, s - 3, 3)) : (A(e, 18, e.bl_tree), 
-                            S(e, s - 11, 7));
-                            i = a, d = (s = 0) === o ? (c = 138, 3) : a === o ? (c = 6, 3) : (c = 7, 4);
-                        }
-                    }
-                    a(w);
-                    var R = !1;
-                    function $(e, t, n, a) {
-                        S(e, 0 + (a ? 1 : 0), 3), function(e, t, n) {
-                            T(e), C(e, n), C(e, ~n), r.arraySet(e.pending_buf, e.window, t, n, e.pending), e.pending += n;
-                        }(e, t, n);
-                    }
-                    n._tr_init = function(e) {
-                        R || (function() {
-                            var e, t, n, r, a, i = new Array(16);
-                            for (r = n = 0; r < 28; r++) for (f[r] = n, e = 0; e < 1 << d[r]; e++) b[n++] = r;
-                            for (b[n - 1] = r, r = a = 0; r < 16; r++) for (w[r] = a, e = 0; e < 1 << l[r]; e++) g[a++] = r;
-                            for (a >>= 7; r < s; r++) for (w[r] = a << 7, e = 0; e < 1 << l[r] - 7; e++) g[256 + a++] = r;
-                            for (t = 0; t <= c; t++) i[t] = 0;
-                            for (e = 0; e <= 143; ) h[2 * e + 1] = 8, e++, i[8]++;
-                            for (;e <= 255; ) h[2 * e + 1] = 9, e++, i[9]++;
-                            for (;e <= 279; ) h[2 * e + 1] = 7, e++, i[7]++;
-                            for (;e <= 287; ) h[2 * e + 1] = 8, e++, i[8]++;
-                            for (N(h, 287, i), e = 0; e < s; e++) m[2 * e + 1] = 5, m[2 * e] = I(e, 5);
-                            x = new k(h, d, 257, o, c), v = new k(m, l, 0, s, c), y = new k(new Array(0), u, 0, 19, 7);
-                        }(), R = !0), e.l_desc = new _(e.dyn_ltree, x), e.d_desc = new _(e.dyn_dtree, v), 
-                        e.bl_desc = new _(e.bl_tree, y), e.bi_buf = 0, e.bi_valid = 0, L(e);
-                    }, n._tr_stored_block = $, n._tr_flush_block = function(e, t, n, r) {
-                        var a, o, s = 0;
-                        0 < e.level ? (2 === e.strm.data_type && (e.strm.data_type = function(e) {
-                            var t, n = 4093624447;
-                            for (t = 0; t <= 31; t++, n >>>= 1) if (1 & n && 0 !== e.dyn_ltree[2 * t]) return 0;
-                            if (0 !== e.dyn_ltree[18] || 0 !== e.dyn_ltree[20] || 0 !== e.dyn_ltree[26]) return 1;
-                            for (t = 32; t < i; t++) if (0 !== e.dyn_ltree[2 * t]) return 1;
-                            return 0;
-                        }(e)), P(e, e.l_desc), P(e, e.d_desc), s = function(e) {
-                            var t;
-                            for (O(e, e.dyn_ltree, e.l_desc.max_code), O(e, e.dyn_dtree, e.d_desc.max_code), 
-                            P(e, e.bl_desc), t = 18; 3 <= t && 0 === e.bl_tree[2 * p[t] + 1]; t--) ;
-                            return e.opt_len += 3 * (t + 1) + 5 + 5 + 4, t;
-                        }(e), a = e.opt_len + 3 + 7 >>> 3, (o = e.static_len + 3 + 7 >>> 3) <= a && (a = o)) : a = o = n + 5, 
-                        n + 4 <= a && -1 !== t ? $(e, t, n, r) : 4 === e.strategy || o === a ? (S(e, 2 + (r ? 1 : 0), 3), 
-                        B(e, h, m)) : (S(e, 4 + (r ? 1 : 0), 3), function(e, t, n, r) {
-                            var a;
-                            for (S(e, t - 257, 5), S(e, n - 1, 5), S(e, r - 4, 4), a = 0; a < r; a++) S(e, e.bl_tree[2 * p[a] + 1], 3);
-                            M(e, e.dyn_ltree, t - 1), M(e, e.dyn_dtree, n - 1);
-                        }(e, e.l_desc.max_code + 1, e.d_desc.max_code + 1, s + 1), B(e, e.dyn_ltree, e.dyn_dtree)), 
-                        L(e), r && T(e);
-                    }, n._tr_tally = function(e, t, n) {
-                        return e.pending_buf[e.d_buf + 2 * e.last_lit] = t >>> 8 & 255, e.pending_buf[e.d_buf + 2 * e.last_lit + 1] = 255 & t, 
-                        e.pending_buf[e.l_buf + e.last_lit] = 255 & n, e.last_lit++, 0 === t ? e.dyn_ltree[2 * n]++ : (e.matches++, 
-                        t--, e.dyn_ltree[2 * (b[n] + i + 1)]++, e.dyn_dtree[2 * E(t)]++), e.last_lit === e.lit_bufsize - 1;
-                    }, n._tr_align = function(e) {
-                        S(e, 2, 3), A(e, 256, h), function(e) {
-                            16 === e.bi_valid ? (C(e, e.bi_buf), e.bi_buf = 0, e.bi_valid = 0) : 8 <= e.bi_valid && (e.pending_buf[e.pending++] = 255 & e.bi_buf, 
-                            e.bi_buf >>= 8, e.bi_valid -= 8);
-                        }(e);
-                    };
-                }, {
-                    "../utils/common": 41
-                } ],
-                53: [ function(e, t, n) {
-                    "use strict";
-                    t.exports = function() {
-                        this.input = null, this.next_in = 0, this.avail_in = 0, this.total_in = 0, this.output = null, 
-                        this.next_out = 0, this.avail_out = 0, this.total_out = 0, this.msg = "", this.state = null, 
-                        this.data_type = 2, this.adler = 0;
-                    };
-                }, {} ],
-                54: [ function(e, t, r) {
-                    (function(e) {
-                        !function(e) {
-                            "use strict";
-                            if (!e.setImmediate) {
-                                var t, n, r, a, i = 1, o = {}, s = !1, c = e.document, d = Object.getPrototypeOf && Object.getPrototypeOf(e);
-                                d = d && d.setTimeout ? d : e, t = "[object process]" === {}.toString.call(e.process) ? function(e) {
-                                    process.nextTick(function() {
-                                        u(e);
-                                    });
-                                } : function() {
-                                    if (e.postMessage && !e.importScripts) {
-                                        var t = !0, n = e.onmessage;
-                                        return e.onmessage = function() {
-                                            t = !1;
-                                        }, e.postMessage("", "*"), e.onmessage = n, t;
-                                    }
-                                }() ? (a = "setImmediate$" + Math.random() + "$", e.addEventListener ? e.addEventListener("message", p, !1) : e.attachEvent("onmessage", p), 
-                                function(t) {
-                                    e.postMessage(a + t, "*");
-                                }) : e.MessageChannel ? ((r = new MessageChannel).port1.onmessage = function(e) {
-                                    u(e.data);
-                                }, function(e) {
-                                    r.port2.postMessage(e);
-                                }) : c && "onreadystatechange" in c.createElement("script") ? (n = c.documentElement, 
-                                function(e) {
-                                    var t = c.createElement("script");
-                                    t.onreadystatechange = function() {
-                                        u(e), t.onreadystatechange = null, n.removeChild(t), t = null;
-                                    }, n.appendChild(t);
-                                }) : function(e) {
-                                    setTimeout(u, 0, e);
-                                }, d.setImmediate = function(e) {
-                                    "function" != typeof e && (e = new Function("" + e));
-                                    for (var n = new Array(arguments.length - 1), r = 0; r < n.length; r++) n[r] = arguments[r + 1];
-                                    var a = {
-                                        callback: e,
-                                        args: n
-                                    };
-                                    return o[i] = a, t(i), i++;
-                                }, d.clearImmediate = l;
-                            }
-                            function l(e) {
-                                delete o[e];
-                            }
-                            function u(e) {
-                                if (s) setTimeout(u, 0, e); else {
-                                    var t = o[e];
-                                    if (t) {
-                                        s = !0;
-                                        try {
-                                            !function(e) {
-                                                var t = e.callback, n = e.args;
-                                                switch (n.length) {
-                                                  case 0:
-                                                    t();
-                                                    break;
-
-                                                  case 1:
-                                                    t(n[0]);
-                                                    break;
-
-                                                  case 2:
-                                                    t(n[0], n[1]);
-                                                    break;
-
-                                                  case 3:
-                                                    t(n[0], n[1], n[2]);
-                                                    break;
-
-                                                  default:
-                                                    t.apply(undefined, n);
-                                                }
-                                            }(t);
-                                        } finally {
-                                            l(e), s = !1;
-                                        }
-                                    }
-                                }
-                            }
-                            function p(t) {
-                                t.source === e && "string" == typeof t.data && 0 === t.data.indexOf(a) && u(+t.data.slice(a.length));
-                            }
-                        }("undefined" == typeof self ? void 0 === e ? this : e : self);
-                    }).call(this, void 0 !== n.g ? n.g : "undefined" != typeof self ? self : "undefined" != typeof window ? window : {});
-                }, {} ]
-            }, {}, [ 10 ])(10);
-        },
         390: (webpackModule, webpackExports, webpackRequire) => {
             "use strict";
             webpackRequire.d(webpackExports, {
@@ -5138,28 +1928,15 @@
         };
         return __webpack_modules__[e](n, n.exports, __webpack_require__), n.exports;
     }
-    __webpack_require__.n = e => {
-        var t = e && e.__esModule ? () => e.default : () => e;
-        return __webpack_require__.d(t, {
-            a: t
-        }), t;
-    }, __webpack_require__.d = (e, t) => {
+    __webpack_require__.d = (e, t) => {
         for (var n in t) __webpack_require__.o(t, n) && !__webpack_require__.o(e, n) && Object.defineProperty(e, n, {
             enumerable: !0,
             get: t[n]
         });
-    }, __webpack_require__.g = function() {
-        if ("object" == typeof globalThis) return globalThis;
-        try {
-            return this || new Function("return this")();
-        } catch (e) {
-            if ("object" == typeof window) return window;
-        }
-    }(), __webpack_require__.o = (e, t) => Object.prototype.hasOwnProperty.call(e, t);
-    var __webpack_exports__ = {};
+    }, __webpack_require__.o = (e, t) => Object.prototype.hasOwnProperty.call(e, t);
     (() => {
         "use strict";
-        var zipModule = __webpack_require__(733), zipDefault = __webpack_require__.n(zipModule), downloadUtils = __webpack_require__(624), configModule = __webpack_require__(390);
+        var downloadUtils = __webpack_require__(624), configModule = __webpack_require__(390);
         class TaskCancelledError extends Error {
             constructor() {
                 super("下载任务已取消"), this.name = "TaskCancelledError";
@@ -5943,6 +2720,7 @@
             }
         }
         function openUnsupportedRuleEditor() {
+            initializeAppStorage();
             state.settings || (state.settings = readSettings()), injectStyle(), showUI(), activateTab("settings");
             const e = window.location.hostname.toLowerCase();
             byId("ten-rule-domain").value || (byId("ten-rule-domain").value = e), byId("ten-rule-homepage").value || (byId("ten-rule-homepage").value = `${window.location.protocol}//${window.location.host}/`), 
@@ -5952,642 +2730,14 @@
             }), 80), toast("已进入当前网站规则编辑，可使用可视化选择");
         }
         function handleGlobalHotkey(e) {
-            if ("Escape" === e.key && byId("ten-mobile-drawer")?.classList.contains("is-open")) return e.preventDefault(), 
-            void closeMobileDrawer();
-            if ("Escape" === e.key && byId("ten-rule-guide")?.classList.contains("is-open")) return e.preventDefault(), 
-            void closeRuleGuide();
-            if ("Escape" === e.key && state.confirmResolve) return e.preventDefault(), void closeConfirm(!1);
+            if (handleModalKeydown(e)) return;
             if (!e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
             const t = String(e.key || "").toUpperCase(), n = String(e.code || "").toUpperCase(), r = state.settings ? state.settings.hotkey : "V";
             "V" !== t && "KEYV" !== n && t !== r && n !== `KEY${r}` || (e.preventDefault(), 
             e.stopPropagation(), toggleUI());
         }
-        function injectStyle() {
-            if (!document.body) return;
-            const e = document.getElementById(ROOT_ID);
-            if (e && state.ready) return;
-            e && e.remove(), function() {
-                if (document.getElementById("ten-comic-style")) return;
-                const e = document.createElement("style");
-                e.id = "ten-comic-style", e.textContent = [ "#ten-comic-root {\n  --ten-bg: rgba(5, 12, 25, .78);\n  --ten-surface: rgba(23, 38, 62, .55);\n  --ten-surface-strong: rgba(31, 50, 78, .76);\n  --ten-line: \
-rgba(137, 225, 255, .2);\n  --ten-text: #eefaff;\n  --ten-muted: #89a2b7;\n  --ten-cyan: #5ff6ff;\n  --ten-blue: #5b8cff;\n  --ten-violet: #9c6cff;\n  \
---ten-pink: #ff5fac;\n  --ten-danger: #ff6174;\n  --ten-success:", " #55efb6;\n  --ten-panel-bg: linear-gradient(150deg, rgba(20,42,67,.68), rgba(9,18,36,.78));\n  --ten-panel-border: rgba(133,233,255,.28);\n  \
---ten-panel-shadow: 0 30px 90px rgba(0,5,15,.5), 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 42px rgba(91,140,255,.12);\n  --ten-header-bg: rgba(4,12,25,.48);\n  \
---ten-card-bg: rgba(23,38,62,.55);\n  --ten-card-border: rgba(1", "37,225,255,.2);\n  --ten-card-shadow: inset 0 1px rgba(255,255,255,.06);\n  --ten-task-bg: rgba(10,25,46,.52);\n  --ten-list-bg: rgba(23,38,62,.46);\n  \
---ten-list-hover-bg: rgba(36,61,91,.6);\n  --ten-control-bg: linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72));\n  \
---ten-control-hover-bg: rgba(95,246,255,.09);\n  --ten-control-bor", "der: rgba(111,220,255,.2);\n  --ten-primary-bg: linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff);\n  --ten-primary-text: #04131c;\n  \
---ten-primary-border: rgba(160,255,255,.72);\n  --ten-danger-bg: rgba(255,97,116,.12);\n  --ten-danger-text: #ffdfe5;\n  --ten-danger-border: \
-rgba(255,97,116,.3);\n  --ten-input-bg: rgba(2,10,22,.42);\n  --ten-popover-bg: linear", "-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98));\n  --ten-empty-bg: rgba(11,27,49,.38);\n  --ten-info-bg: rgba(2,10,22,.25);\n  --ten-mini-bg: \
-linear-gradient(145deg,rgba(28,51,75,.94),rgba(20,28,52,.95));\n  --ten-overlay-bg: rgba(2,8,19,.62);\n  --ten-tooltip-bg: rgba(5,15,29,.97);\n  \
---ten-tooltip-text: #eefaff;\n  --ten-tooltip-border: rgba(95,246,255,.", "28);\n  --ten-tooltip-shadow: 0 10px 28px rgba(0,5,15,.38), inset 0 1px rgba(255,255,255,.08);\n  --ten-toast-bg: rgba(5,15,29,.94);\n  --ten-toast-text: \
-#eefaff;\n  --ten-toast-border: rgba(95,246,255,.3);\n  --ten-launcher-bg: linear-gradient(145deg,rgba(28,72,108,.88),rgba(91,54,148,.86));\n  \
---ten-launcher-border: rgba(111,236,255,.48);\n  --ten-launcher-shadow", ": 0 12px 34px rgba(4,14,30,.3),0 0 25px rgba(95,246,255,.2),inset 0 1px rgba(255,255,255,.18);\n  --ten-radius-launcher: 18px;\n  --ten-focus-ring: 0 0 0 3px \
-rgba(95,246,255,.1);\n  --ten-scroll-thumb: rgba(95,246,255,.3);\n  --ten-radius-panel: 24px;\n  --ten-radius-card: 15px;\n  --ten-radius-control: 11px;\n  \
---ten-scale: 1;\n  position: fixed;\n  z-index: 2147483", '645;\n  inset: 0;\n  pointer-events: none;\n  color: var(--ten-text);\n  font: 13px/1.5 Inter, "PingFang SC", "Microsoft YaHei", \
-sans-serif;\n}\n#ten-comic-root *, #ten-comic-root *::before, #ten-comic-root *::after { box-sizing: border-box; }\n#ten-comic-launcher {\n  all: initial;\n  \
-position: fixed;\n  z-index: 2147483646;\n  top: 50%;\n  right: 12px;\n  width: 52px;\n', '  height: 52px;\n  display: grid;\n  place-items: center;\n  transform: translateY(-50%);\n  overflow: hidden;\n  color: #efffff;\n  font: 800 12px/1 Inter, \
-"Segoe UI", sans-serif;\n  letter-spacing: .06em;\n  cursor: pointer;\n  pointer-events: auto;\n  border: 1px solid var(--ten-launcher-border);\n  \
-border-radius: var(--ten-radius-launcher);\n  background: var(--ten-', 'launcher-bg);\n  box-shadow: var(--ten-launcher-shadow);\n  backdrop-filter: blur(22px) saturate(1.4);\n  -webkit-backdrop-filter: blur(22px) saturate(1.4);\n  \
-transition: opacity .12s ease, transform .18s cubic-bezier(.22,1,.36,1), box-shadow .2s;\n}\n#ten-comic-launcher::before { content: ""; position: absolute; \
-inset: -65%; background: conic-gradient(from 90deg', ", transparent, rgba(95,246,255,.52), transparent 30%); animation: ten-launcher-orbit 5s linear infinite; }\n#ten-comic-launcher span { position: relative; \
-z-index: 1; }\n#ten-comic-launcher:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 15px 40px rgba(4,14,30,.38), 0 0 34px rgba(95,246,255,.28); \
-}\n#ten-comic-launcher:active { transform: transla", "teY(-50%) scale(.95); }\n#ten-comic-launcher.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(20px,-50%) scale(.72); \
-}\n.ten-mini-task { position: fixed; z-index: 2147483646; top: 50%; right: 12px; width: min(292px,calc(100vw - 24px)); min-height: 58px; display: grid; \
-grid-template-columns: minmax(0,1fr) 42px; align-items:", " stretch; overflow: hidden; pointer-events: auto; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
-var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.3); transform: translateY(-50%); transition: opacity .2s \
-ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .2s;", " }\n.ten-mini-task.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(22px,-50%) scale(.9); }\n.ten-mini-open, \
-.ten-mini-toggle { min-width: 0; padding: 0; color: var(--ten-text); font: inherit; cursor: pointer; border: 0; background: transparent; }\n.ten-mini-open { \
-display: grid; grid-template-columns: 32px minmax(0,1fr); a", "lign-items: center; gap: 8px; padding: 8px 5px 8px 10px; text-align: left; }\n.ten-mini-icon { width: 31px; height: 31px; display: grid; place-items: center; \
-color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.22); border-radius: 10px; background: rgba(95,246,255,.08); }\n.ten-mini-icon .ten-icon { width: \
-17px; height: 17px; }\n.ten-mini-copy { min-width", ": 0; display: grid; gap: 1px; }\n.ten-mini-copy strong, .ten-mini-copy small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
-}\n.ten-mini-copy strong { font-size: 10px; }\n.ten-mini-copy small { color: var(--ten-muted); font-size: 9px; }\n.ten-mini-progress { height: 3px; margin-top: \
-3px; overflow: hidden; border-radius: 4px; background: rgba(2", "55,255,255,.09); }\n.ten-mini-progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: \
-linear-gradient(90deg,var(--ten-cyan),var(--ten-violet)); box-shadow: 0 0 8px rgba(95,246,255,.36); transition: width .35s ease; }\n.ten-mini-toggle { display: \
-grid; place-items: center; border-left: 1px solid var(--ten-line); transition: colo", "r .18s,background .18s; }\n.ten-mini-toggle:hover { color: var(--ten-cyan); background: rgba(95,246,255,.08); }\n.ten-mini-toggle[hidden] { display: none; \
-}\n.ten-icon-tooltip { position: fixed; z-index: 2147483647; left: 0; top: 0; max-width: min(240px,calc(100vw - 16px)); padding: 5px 8px; overflow: hidden; \
-color: var(--ten-tooltip-text); font: 10px/1.4 Inter", ',"PingFang SC","Microsoft YaHei",sans-serif; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; opacity: 0; visibility: hidden; border: 1px \
-solid var(--ten-tooltip-border); border-radius: 8px; background: var(--ten-tooltip-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(14px) \
-saturate(1.2); transform: translateY(3px) scale(', ".96); transition: opacity .14s ease,transform .18s cubic-bezier(.22,1,.36,1),visibility .14s; }\n.ten-icon-tooltip.is-show { opacity: 1; visibility: visible; \
-transform: translateY(0) scale(1); }\n.ten-rule-pick-layer { position: fixed; z-index: 2147483647; inset: 0; pointer-events: none; \
-}\n.ten-rule-pick-layer.is-hidden { display: none; }\n.ten-rule-pick-box { ", "position: fixed; border: 2px solid var(--ten-cyan); border-radius: 7px; background: rgba(95,246,255,.1); box-shadow: 0 0 0 9999px rgba(2,8,18,.12),0 0 22px \
-rgba(95,246,255,.42); transition: left .08s,top .08s,width .08s,height .08s; }\n.ten-rule-pick-hud { position: fixed; top: 16px; left: 50%; width: \
-min(420px,calc(100vw - 24px)); min-height: 56px; display: ", "grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 9px; padding: 8px 9px; color: var(--ten-text); border: 1px solid \
-var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: \
-blur(22px); transform: translateX(-50%); }\n.ten-rule-pick-symbo", "l { width: 32px; height: 32px; display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.25); border-radius: 10px; \
-background: rgba(95,246,255,.08); }\n.ten-rule-pick-hud > span:nth-child(2) { min-width: 0; display: grid; }\n.ten-rule-pick-hud strong, .ten-rule-pick-hud \
-small { overflow: hidden; white-space: nowrap; text-ov", "erflow: ellipsis; }\n.ten-rule-pick-hud strong { font-size: 11px; }\n.ten-rule-pick-hud small { color: var(--ten-muted); font: 9px/1.4 \
-ui-monospace,SFMono-Regular,Consolas,monospace; }\n.ten-rule-pick-hud button { min-height: 30px; padding: 4px 10px; color: var(--ten-text); font: inherit; \
-font-size: 10px; cursor: pointer; pointer-events: auto; border: 1px solid", " rgba(255,97,116,.28); border-radius: 9px; background: rgba(255,97,116,.11); }\n#ten-comic-root.is-rule-picking #ten-panel { opacity: 0; pointer-events: none; \
-transform: translate(34px,-50%) scale(.94); }\n#ten-comic-root.is-rule-picking #ten-comic-launcher, #ten-comic-root.is-rule-picking .ten-mini-task { opacity: 0; \
-visibility: hidden; pointer-events: none; ", "}\nhtml.ten-rule-picking-page, html.ten-rule-picking-page * { cursor: crosshair !important; user-select: none !important; }\nhtml.ten-rule-picking-page \
-#ten-rule-pick-cancel { cursor: pointer !important; }\n#ten-panel {\n  position: fixed;\n  top: 50%;\n  right: 14px;\n  width: min(430px, calc(100vw - 44px));\n \
- height: min(780px, calc(100vh - 28px));\n  display: gri", "d;\n  grid-template-rows: 58px minmax(0,1fr) 66px;\n  transform: translate(28px,-50%) scale(var(--ten-scale));\n  transform-origin: right center;\n  opacity: \
-0;\n  pointer-events: none;\n  overflow: hidden;\n  isolation: isolate;\n  border: 1px solid var(--ten-panel-border);\n  border-radius: \
-var(--ten-radius-panel);\n  background: var(--ten-panel-bg);\n  box-shadow: v", 'ar(--ten-panel-shadow);\n  backdrop-filter: blur(32px) saturate(1.45);\n  -webkit-backdrop-filter: blur(32px) saturate(1.45);\n  transition: transform .42s \
-cubic-bezier(.22,1,.36,1), opacity .22s ease;\n}\n#ten-panel.is-open { transform: translate(0,-50%) scale(var(--ten-scale)); opacity: 1; pointer-events: auto; \
-}\n#ten-panel::before {\n  content: "";\n  position: ', "absolute;\n  z-index: 1;\n  inset: 0;\n  pointer-events: none;\n  background: radial-gradient(circle at 85% 0, rgba(95,246,255,.17), transparent 30%), \
-radial-gradient(circle at 0 90%, rgba(156,108,255,.17), transparent 34%);\n}\n#ten-particle-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; \
-pointer-events: none; }\n#ten-particle-field i {\n  position: absolute;\n  left: var(--x);\n  top: var(--y);\n  width: var(--s);\n  height: var(--s);\n  \
-border-radius: 50%;\n  opacity: .45;\n  background: var(--c);\n  box-shadow: 0 0 10px var(--c);\n  animation: ten-parti", 'cle var(--d) ease-in-out var(--delay) infinite alternate;\n}\n#ten-comic-root[data-effects="0"] #ten-particle-field { display: none; \
-}\n#ten-comic-root[data-effects="0"] #ten-comic-launcher::before { animation: none; opacity: 0; }\n#ten-comic-root[data-effects="1"] #ten-particle-field i { \
-opacity: .28; }\n#ten-comic-root[data-effects="1"] #ten-particle-field i:nt', 'h-child(n+12) { display: none; }\n#ten-comic-root[data-effects="1"] #ten-comic-launcher::before { animation-duration: 8s; opacity: .6; }\n#ten-search-panel {\n \
- position: fixed;\n  z-index: 2147483644;\n  top: 50%;\n  right: 456px;\n  width: min(680px, calc(100vw - 486px));\n  height: min(720px, calc(100vh - 44px));\n  \
-display: grid;\n  grid-template-rows: 58px minmax', "(0,1fr);\n  transform: translate(22px,-50%) scale(.98);\n  transform-origin: right center;\n  overflow: hidden;\n  opacity: 0;\n  visibility: hidden;\n  \
-pointer-events: none;\n  color: var(--ten-text);\n  border: 1px solid rgba(133,233,255,.25);\n  border-radius: 22px;\n  background: radial-gradient(circle at \
-100% 0, rgba(95,246,255,.14), transparent 34%), linear-grad", "ient(150deg, rgba(20,42,67,.74), rgba(7,17,34,.84));\n  box-shadow: 0 26px 80px rgba(0,5,15,.44), inset 0 1px rgba(255,255,255,.07);\n  backdrop-filter: \
-blur(30px) saturate(1.4);\n  -webkit-backdrop-filter: blur(30px) saturate(1.4);\n  transition: transform .38s cubic-bezier(.22,1,.36,1), opacity .24s ease, \
-visibility .24s;\n}\n#ten-search-panel.is-open { transfor", "m: translate(0,-50%) scale(1); opacity: 1; visibility: visible; pointer-events: auto; }\n.ten-search-panel-header { display: flex; align-items: center; \
-justify-content: space-between; padding: 0 13px 0 17px; border-bottom: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n.ten-search-panel-content \
-{ min-height: 0; padding: 13px; overflow-y: auto;", " scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n.ten-search-panel-content::-webkit-scrollbar { width: 6px; \
-}\n.ten-search-panel-content::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n.ten-header, .ten-content, .ten-nav { \
-position: relative; z-index: 2; }\n.ten-header { display: flex; align-ite", "ms: center; gap: 11px; padding: 0 14px 0 16px; border-bottom: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n.ten-brand-mark { width: 31px; \
-height: 31px; display: grid; place-items: center; border: 1px solid rgba(95,246,255,.48); border-radius: 11px; color: var(--ten-cyan); font-weight: 900; \
-background: rgba(95,246,255,.08); box-shadow: 0 0 2", "0px rgba(95,246,255,.14); }\n.ten-heading { min-width: 0; flex: 1; }\n.ten-title { font-size: 14px; font-weight: 750; letter-spacing: .04em; }\n.ten-subtitle { \
-color: var(--ten-muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }\n.ten-icon-btn { width: 34px; height: 34px; display: grid; \
-place-items: center; padding: 0; color: var(--ten-m", "uted); cursor: pointer; border: 1px solid transparent; border-radius: 11px; background: transparent; transition: .2s ease; }\n.ten-icon-btn:hover { color: \
-var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-control-hover-bg); transform: translateY(-1px); }\n.ten-icon { width: 18px; height: 18px; \
-fill: none; stroke: currentColor; stroke-width:", " 1.8; stroke-linecap: round; stroke-linejoin: round; }\n.ten-content { min-height: 0; overflow: hidden; font-size: inherit !important; }\n.ten-view { display: \
-none; height: 100%; padding: 13px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n.ten-view.is-active { display: \
-block; animation: ten-view-in .28s ease; }\n.ten-view::-webkit-scrollbar { ", 'width: 6px; }\n.ten-view::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n.ten-nav { --tab: 1; display: grid; \
-grid-template-columns: repeat(4,1fr); padding: 7px; border-top: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n.ten-nav::before { content: ""; \
-position: absolute; z-index: 0; top: 7px; bottom: 7px; ', "left: 7px; width: calc((100% - 14px)/4); border: 1px solid rgba(95,246,255,.28); border-radius: 14px; background: linear-gradient(145deg, rgba(95,246,255,.13), \
-rgba(156,108,255,.12)); box-shadow: 0 7px 20px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.12); transform: translateX(calc(var(--tab)*100%)); transition: \
-transform .38s cubic-bezier(.22,1,.36,1); }", "\n.ten-tab { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: \
-var(--ten-muted); font: inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; transition: color .2s, transform .2s; }\n.ten-tab:hover { \
-color: var(--ten-text); }\n.ten-tab.is-active { color: ", "var(--ten-cyan); }\n.ten-tab.is-active .ten-icon { transform: translateY(-1px) scale(1.08); }\n.ten-toolbar, .ten-row { display: flex; align-items: center; \
-gap: 8px; }\n.ten-toolbar { margin-bottom: 11px; }\n.ten-spacer { flex: 1; }\n.ten-card { margin-bottom: 9px; padding: 11px; border: 1px solid \
-var(--ten-card-border); border-radius: var(--ten-radius-card); bac", "kground: var(--ten-card-bg); box-shadow: var(--ten-card-shadow); backdrop-filter: blur(18px); }\n.ten-card-title { margin-bottom: 7px; color: var(--ten-cyan); \
-font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }\n.ten-card-head { min-height: 30px; display: flex; align-items: center; \
-justify-content: space-between; gap: 8px; ma", "rgin-bottom: 7px; }\n.ten-card-head .ten-card-title { margin-bottom: 0; }\n.ten-btn { position: relative; min-height: 35px; padding: 7px 12px; overflow: \
-hidden; color: var(--ten-text); font: inherit; font-weight: 650; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: \
-var(--ten-radius-control); background: var(--ten-control-bg); backg", 'round-size: 220% 100%; transition: transform .18s, border-color .18s, box-shadow .18s, background-position .35s; }\n.ten-btn::before { content: ""; position: \
-absolute; top: -70%; left: -35%; width: 26%; height: 240%; opacity: 0; pointer-events: none; background: linear-gradient(90deg, transparent, \
-rgba(255,255,255,.5), transparent); transform: rotate(18deg); ', "transition: left .45s cubic-bezier(.22,1,.36,1), opacity .2s; }\n.ten-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: \
-rgba(95,246,255,.5); background-position: 100% 50%; box-shadow: 0 9px 24px rgba(29,117,165,.18); }\n.ten-btn:hover::before { left: 112%; opacity: .75; \
-}\n.ten-btn:active:not(:disabled) { transform: scale(.97); }\n.ten-btn:di", "sabled { opacity: .38; cursor: not-allowed; }\n.ten-btn.is-primary { color: var(--ten-primary-text); border-color: var(--ten-primary-border); background: \
-var(--ten-primary-bg); background-size: 260% 100%; }\n.ten-btn.is-danger { color: var(--ten-danger-text); border-color: var(--ten-danger-border); background: \
-var(--ten-danger-bg); }\n.ten-btn.is-small { min-he", "ight: 30px; padding: 5px 9px; font-size: 11px; }\n.ten-icon-label { display: inline-flex; align-items: center; justify-content: center; gap: 6px; \
-}\n.ten-icon-label span { white-space: nowrap; }\n.ten-ripple { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,.36); \
-transform: scale(0); animation: ten-ripple .62s ease-out", "; }\n.ten-input, .ten-select, .ten-textarea { width: 100%; color: var(--ten-text); font: inherit; border: 1px solid var(--ten-line); border-radius: \
-var(--ten-radius-control); outline: 0; background: var(--ten-input-bg); transition: border-color .2s, box-shadow .2s; }\n.ten-input, .ten-select { height: 36px; \
-padding: 0 10px; }\n.ten-textarea { min-height: 110px;", ' padding: 10px; resize: vertical; }\ninput.ten-input[type="number"] { padding-right: 30px; appearance: textfield; -moz-appearance: textfield; \
-}\ninput.ten-input[type="number"]::-webkit-inner-spin-button,\ninput.ten-input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; \
--webkit-appearance: none; }\n.ten-number-control { position: relative;', " min-width: 0; width: 100%; }\n.ten-number-steps { position: absolute; top: 4px; right: 4px; bottom: 4px; width: 23px; display: grid; grid-template-rows: 1fr \
-1fr; overflow: hidden; border: 1px solid rgba(95,246,255,.12); border-radius: 7px; opacity: .42; transition: opacity .2s, border-color .2s, box-shadow .2s; \
-}\n.ten-number-control:hover .ten-number-steps,\n", ".ten-number-control:focus-within .ten-number-steps { opacity: 1; border-color: rgba(95,246,255,.38); box-shadow: 0 0 10px rgba(95,246,255,.08); \
-}\n.ten-number-steps button { position: relative; display: grid; place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 0; \
-background: rgba(95,246,255,.035); transition: color .16s, backgro", "und .16s; }\n.ten-number-steps button + button { border-top: 1px solid rgba(95,246,255,.12); }\n.ten-number-steps button:hover { color: var(--ten-cyan); \
-background: rgba(95,246,255,.12); }\n.ten-number-steps i { width: 5px; height: 5px; border-top: 1.5px solid currentColor; border-left: 1.5px solid currentColor; \
-transform: translateY(1px) rotate(45deg); }\n.ten-", 'number-steps button:last-child i { transform: translateY(-1px) rotate(225deg); }\n.ten-view[data-view="settings"] .ten-settings-card { border-color: \
-rgba(137,225,255,.2); background: linear-gradient(145deg, rgba(61,77,98,.9), rgba(47,60,80,.9)); box-shadow: inset 0 1px rgba(255,255,255,.075), 0 8px 22px \
-rgba(1,9,20,.08); backdrop-filter: blur(18px) saturate(1', '.15); }\n.ten-view[data-view="settings"] .ten-input,\n.ten-view[data-view="settings"] .ten-select,\n.ten-view[data-view="settings"] .ten-textarea { \
-border-color: rgba(137,225,255,.18); background: rgba(6,18,34,.42); }\n.ten-input:focus, .ten-select:focus, .ten-textarea:focus { border-color: var(--ten-cyan); \
-box-shadow: var(--ten-focus-ring); }\n.ten-select option', ' { color: #eafaff; background: #0c1829; }\n.ten-source { --source: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); flex: 1; \
-padding: 3px; border-radius: 12px; background: rgba(2,10,22,.34); }\n.ten-source::before { content: ""; position: absolute; inset: 3px auto 3px 3px; width: \
-calc(50% - 3px); border: 1px solid rgba(95,246,255,.25', "); border-radius: 9px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.13)); transform: translateX(calc(var(--source)*100%)); \
-transition: transform .35s cubic-bezier(.22,1,.36,1); }\n.ten-source button { position: relative; z-index: 1; min-height: 33px; color: var(--ten-muted); font: \
-inherit; font-size: 11px; cursor: pointer; borde", "r: 0; background: transparent; }\n.ten-source button.is-active { color: var(--ten-cyan); }\n.ten-search-toolbar .ten-input { width: auto; min-width: 0; flex: 1 \
-1 auto; }\n.ten-search-site-picker { position: relative; z-index: 30; flex: 0 0 126px; width: 126px; min-width: 0; }\n#ten-search-site-trigger { width: 100%; \
-height: 36px; display: flex; align-items: cent", "er; gap: 7px; padding: 0 10px 0 11px; overflow: hidden; color: var(--ten-text); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid \
-rgba(95,246,255,.24); border-radius: 11px; background: linear-gradient(145deg, rgba(18,47,70,.76), rgba(36,38,76,.72)); box-shadow: inset 0 1px \
-rgba(255,255,255,.08); transition: border-color .2s, box-shadow .2s; ", "}\n#ten-search-site-trigger:hover, .ten-search-site-picker.is-open #ten-search-site-trigger { border-color: rgba(95,246,255,.58); box-shadow: 0 0 0 3px \
-rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.1); }\n#ten-search-site-label { min-width: 0; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: \
-ellipsis; text-align: left; }\n.ten-picker-arrow {", " width: 7px; height: 7px; flex: 0 0 7px; border-right: 1.5px solid var(--ten-cyan); border-bottom: 1.5px solid var(--ten-cyan); transform: rotate(45deg) \
-translateY(-2px); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n.ten-search-site-picker.is-open .ten-picker-arrow { transform: rotate(225deg) \
-translate(-1px,-1px); }\n.ten-search-site-menu { positio", "n: absolute; z-index: 40; top: 43px; left: 0; width: 252px; max-height: 300px; padding: 6px; overflow-y: auto; border: 1px solid var(--ten-panel-border); \
-border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(26px) saturate(1.35); \
--webkit-backdrop-filter: blur(26px) saturate(1.35", "); animation: ten-picker-in .22s cubic-bezier(.22,1,.36,1); scrollbar-width: thin; scrollbar-color: var(--ten-scroll-thumb) transparent; \
-}\n.ten-search-site-menu[hidden] { display: none !important; }\n.ten-search-site-menu::-webkit-scrollbar { width: 5px; \
-}\n.ten-search-site-menu::-webkit-scrollbar-thumb { border-radius: 8px; background: rgba(95,246,255,.32); }", "\n.ten-search-site-option { width: 100%; min-height: 38px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 8px; padding: \
-7px 9px; color: var(--ten-text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; border: 1px solid transparent; border-radius: 9px; \
-background: transparent; transition: color .18s, bord", "er-color .18s, background .18s, transform .18s; }\n.ten-search-site-option + .ten-search-site-option { margin-top: 3px; }\n.ten-search-site-option span { \
-min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n.ten-search-site-option small { color: var(--ten-muted); font-size: 9px; \
-}\n.ten-search-site-option:hover:not(:disabled) { color:", " var(--ten-cyan); border-color: rgba(95,246,255,.18); background: rgba(95,246,255,.07); transform: translateX(2px); }\n.ten-search-site-option.is-selected { \
-color: var(--ten-cyan); border-color: rgba(95,246,255,.28); background: linear-gradient(100deg, rgba(95,246,255,.11), rgba(156,108,255,.08)); \
-}\n.ten-search-site-option:disabled { opacity: .43; cursor: not", "-allowed; }\n.ten-search-toolbar #ten-search-btn { flex: 0 0 76px; width: 76px; padding: 7px 10px; white-space: nowrap; }\n.ten-search-toolbar #ten-search-btn \
-.ten-icon { flex: 0 0 17px; width: 17px; height: 17px; }\n.ten-rule-manage { display: flex; align-items: center; justify-content: space-between; gap: 8px; \
-margin: -2px 0 10px; padding: 7px 8px 7px 11px; c", "olor: var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: rgba(5,16,31,.3); }\n.ten-rule-manage[hidden] { \
-display: none !important; }\n.ten-rule-item { display: grid; grid-template-columns: minmax(0,1fr) 34px 34px; align-items: center; gap: 5px; }\n.ten-rule-item \
-.ten-list-item { min-width: 0; }\n.ten-rule-edit ", "{ color: var(--ten-cyan); border-color: rgba(95,246,255,.16); background: rgba(95,246,255,.06); }\n.ten-rule-delete { color: var(--ten-danger); border-color: \
-rgba(255,97,116,.18); background: rgba(255,97,116,.07); }\n.ten-list { display: grid; gap: 7px; }\n.ten-list-item { display: flex; align-items: center; gap: \
-9px; width: 100%; min-height: 43px; padding: 9px", " 11px; color: var(--ten-text); text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: \
-var(--ten-list-bg); transition: .2s ease; }\n.ten-list-item:hover { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); transform: \
-translateX(2px); }\n.ten-list-item.is-disabled { opacity: .", '4; cursor: not-allowed; }\n.ten-list-item input[type="checkbox"] { accent-color: var(--ten-cyan); }\n.ten-site-kind { flex: 0 0 auto; padding: 1px 6px; color: \
-var(--ten-cyan); font-size: 9px; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; background: rgba(95,246,255,.06); }\n.ten-name { min-width: 0; \
-flex: 1; overflow: hidden; white-space: nowrap;', " text-overflow: ellipsis; }\n.ten-meta { color: var(--ten-muted); font-size: 10px; }\n.ten-empty { display: grid; place-items: center; min-height: 250px; \
-color: var(--ten-muted); text-align: center; }\n.ten-status { margin-bottom: 10px; padding: 9px 11px; color: var(--ten-muted); border: 1px solid \
-var(--ten-line); border-radius: var(--ten-radius-control); backg", "round: var(--ten-list-bg); }\n.ten-status.is-ready { color: var(--ten-success); }\n.ten-options { max-height: 0; margin-bottom: 0; padding: 0 11px; overflow: \
-hidden; opacity: 0; border-width: 0; transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .2s, margin .2s, padding .2s, border-width .2s; \
-}\n.ten-options.is-open { max-height: 390px; margin-botto", "m: 10px; padding: 11px; opacity: 1; border-width: 1px; }\n.ten-mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }\n.ten-mode { \
-min-height: 36px; color: var(--ten-muted); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 10px; background: \
-rgba(4,13,27,.3); transition: .2s; }\n.ten-mode.is", "-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.48); background: rgba(95,246,255,.1); box-shadow: 0 0 18px rgba(95,246,255,.08); \
-}\n.ten-chapter-tools { position: sticky; z-index: 8; top: -13px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin: 0 -5px 9px; padding: 7px \
-5px; border: 1px solid rgba(137,225,255,.16); border-r", "adius: 13px; background: linear-gradient(145deg,rgba(61,77,98,.94),rgba(47,60,80,.94)); box-shadow: 0 8px 20px rgba(1,9,20,.15), inset 0 1px \
-rgba(255,255,255,.07); backdrop-filter: blur(18px) saturate(1.15); }\n.ten-chapter-tools > :last-child { justify-self: end; }\n.ten-chapter-reload { position: \
-relative; display: grid; place-items: center; min-height: 34px", '; margin: 3px 0 9px; }\n.ten-chapter-reload::before { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, \
-transparent, rgba(95,246,255,.28), transparent); }\n.ten-chapter-reload button { position: relative; display: inline-flex; align-items: center; gap: 6px; \
-padding: 4px 10px; color: var(--ten-cyan); font: inher', "it; font-size: 10px; cursor: pointer; border: 1px solid rgba(95,246,255,.17); border-radius: 999px; background: rgba(9,24,44,.82); transition: .22s ease; \
-}\n.ten-chapter-reload button:hover { border-color: rgba(95,246,255,.42); box-shadow: 0 0 17px rgba(95,246,255,.1); }\n.ten-chapter-empty { display: grid; \
-justify-items: center; gap: 8px; padding: 26px 16px 1", "7px; text-align: center; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-card); background: var(--ten-empty-bg); \
-}\n.ten-chapter-empty[hidden], #ten-chapter-loaded[hidden] { display: none !important; }\n.ten-empty-orbit { width: 52px; height: 52px; display: grid; \
-place-items: center; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,", ".28); border-radius: 17px; background: linear-gradient(145deg, rgba(95,246,255,.1), rgba(156,108,255,.1)); box-shadow: 0 0 24px rgba(95,246,255,.1); \
-}\n.ten-empty-orbit .ten-icon { width: 24px; height: 24px; }\n.ten-empty-title { font-weight: 700; }\n.ten-chapter-empty .ten-btn { margin-top: 4px; \
-}\n.ten-comic-info { width: min(290px,100%); display: grid; grid-t", "emplate-columns: 52px minmax(0,1fr); gap: 1px; margin-top: 6px; overflow: hidden; text-align: left; border: 1px solid var(--ten-line); border-radius: \
-var(--ten-radius-control); background: var(--ten-info-bg); }\n.ten-comic-info span, .ten-comic-info strong { padding: 7px 9px; border-bottom: 1px solid \
-rgba(95,246,255,.08); }\n.ten-comic-info span { color: var(-", "-ten-muted); font-size: 10px; }\n.ten-comic-info strong { min-width: 0; overflow: hidden; color: var(--ten-text); font-size: 11px; font-weight: 600; \
-white-space: nowrap; text-overflow: ellipsis; }\n.ten-chapter-list-head { display: flex; align-items: center; justify-content: space-between; min-height: 39px; \
-margin-bottom: 6px; padding: 3px 5px 3px 11px; color:", " var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: rgba(9,24,44,.38); }\n.ten-chapter-list-head \
-.ten-icon-btn.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.35); background: rgba(95,246,255,.1); }\n.ten-chapter-list { display: grid; \
-gap: 5px; max-height: none; overflow: visible; }\n.ten-pr", "ogress { height: 5px; margin-top: 7px; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.08); }\n.ten-progress > i { position: relative; \
-display: block; height: 100%; overflow: hidden; border-radius: inherit; background: linear-gradient(90deg, var(--ten-cyan), var(--ten-violet)); box-shadow: 0 0 \
-12px rgba(95,246,255,.4); transition: width .3", '5s; }\n.ten-progress > i::after { content: ""; position: absolute; inset: 0; width: 42%; pointer-events: none; opacity: 0; background: \
-linear-gradient(90deg,transparent,rgba(255,255,255,.9),rgba(95,246,255,.45),transparent); transform: translateX(-140%); }\n#ten-comic-root[data-effects="1"] \
-.ten-progress > i::after { opacity: .34; animation: ten-energy-flow va', 'r(--ten-energy-duration,7s) linear infinite; }\n#ten-comic-root[data-effects="2"] .ten-progress > i::after { opacity: .62; animation: ten-energy-flow \
-var(--ten-energy-duration,5.8s) linear infinite; }\n.ten-progress > i.is-paused::after { opacity: 0 !important; animation-play-state: paused !important; \
-}\n.ten-task-title { min-width: 0; overflow: hidden; font-we', "ight: 650; white-space: nowrap; text-overflow: ellipsis; }\n.ten-task-group { margin-bottom: 9px; overflow: hidden; border: 1px solid var(--ten-card-border); \
-border-radius: var(--ten-radius-card); background: var(--ten-task-bg); box-shadow: var(--ten-card-shadow); }\n.ten-task-header { min-height: 48px; display: \
-flex; align-items: center; padding: 5px 8px 5px ", "13px; }\n.ten-task-title-button { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 0; color: var(--ten-text); font: inherit; \
-font-weight: 700; text-align: left; cursor: pointer; border: 0; background: transparent; }\n.ten-task-bulk { flex: 0 0 auto; min-height: 29px; margin-left: 4px; \
-padding: 4px 9px; font-size: 9px; white-spa", "ce: nowrap; }\n.ten-task-bulk[hidden] { display: none; }\n.ten-task-control-group { flex: 0 0 auto; display: flex; align-items: center; gap: 5px; margin-left: \
-4px; }\n.ten-task-control-group .ten-task-bulk { margin-left: 0; }\n.ten-task-arrow-button { width: 31px; height: 31px; flex: 0 0 31px; display: grid; \
-place-items: center; padding: 0; color: var(--ten-mute", "d); cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; transition: color .2s, border-color .2s, background .2s; \
-}\n.ten-task-arrow-button:hover { color: var(--ten-cyan); border-color: rgba(95,246,255,.2); background: rgba(95,246,255,.07); }\n.ten-task-arrow-button \
-.ten-task-arrow { margin: 0; }\n.ten-task-count { min-wi", "dth: 22px; padding: 1px 7px; color: var(--ten-cyan); font-size: 10px; text-align: center; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; \
-background: rgba(95,246,255,.07); }\n.ten-task-arrow { width: 8px; height: 8px; margin-left: auto; margin-right: 5px; border-right: 1.5px solid \
-var(--ten-muted); border-bottom: 1.5px solid var(--ten-muted); tra", "nsform: rotate(45deg) translateY(-2px); transition: transform .5s cubic-bezier(.22,1,.36,1); }\n.ten-task-group.is-open .ten-task-arrow { transform: \
-rotate(225deg) translate(-2px,-2px); }\n.ten-task-body { min-width: 0; display: grid; grid-template-rows: 0fr; padding: 0 10px; overflow: hidden; opacity: 0; \
-border-top: 0 solid var(--ten-line); transition: grid-t", "emplate-rows .5s cubic-bezier(.22,1,.36,1), opacity .5s ease, padding .5s ease, border-width .5s ease; }\n.ten-task-body > .ten-list { min-width: 0; width: \
-100%; min-height: 0; overflow: hidden; }\n.ten-task-group.is-open .ten-task-body { grid-template-rows: 1fr; padding: 9px 10px 10px; opacity: 1; \
-border-top-width: 1px; }\n.ten-task-group.is-open .ten-task-bod", "y > .ten-list { max-height: none; overflow: visible; }\n.ten-task-group.is-open.has-scroll .ten-task-body > .ten-list { max-height: 400px; overflow-y: auto; \
-}\n.ten-task-body .ten-empty { min-height: 72px; }\n.ten-task-meta { min-width: 0; display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; \
-color: var(--ten-muted); font-size: 10px; }\n.ten-", "task-meta > span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n.ten-task-meta > span:last-child { flex: 0 0 \
-auto; white-space: nowrap; }\n.ten-task-performance { min-width: 0; display: flex; justify-content: space-between; gap: 8px; margin-top: 3px; color: \
-rgba(190,216,231,.72); font-size: 9px; font-variant-nume", "ric: tabular-nums; }\n.ten-task-performance > span:first-child { color: rgba(95,246,255,.86); }\n.ten-task-performance > span:last-child { overflow: hidden; \
-white-space: nowrap; text-overflow: ellipsis; text-align: right; }\n.ten-effect-level { position: relative; display: grid; gap: 3px; padding: 3px; \
-border-radius: 11px; background: rgba(3,14,28,", ".38); }\n.ten-effect-level { grid-template-columns: repeat(3,minmax(0,1fr)); }\n.ten-effect-level button { min-width: 0; min-height: 29px; padding: 3px 5px; \
-color: var(--ten-muted); font: inherit; font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8p", "x; background: transparent; transition: color .18s, border-color .18s, background .18s, box-shadow .18s; }\n.ten-effect-level button.is-active { color: \
-var(--ten-cyan); border-color: rgba(95,246,255,.28); background: linear-gradient(145deg,rgba(95,246,255,.12),rgba(156,108,255,.11)); box-shadow: inset 0 1px rgba(255,255,255,.06);", " }\n.ten-state-animate { --ten-state-rgb: 95,246,255; position: relative; }\n.ten-state-animate.is-state-pause { --ten-state-rgb: 156,108,255; \
-}\n.ten-state-animate.is-state-resume { --ten-state-rgb: 95,246,255; }\n.ten-state-animate.is-state-success { --ten-state-rgb: 85,239,182; \
-}\n.ten-state-animate.is-state-danger { --ten-state-rgb: 255,97,116; }\n.ten-state-a", 'nimate::after { content: ""; position: absolute; z-index: 4; top: 0; bottom: 0; left: -42%; width: 38%; pointer-events: none; opacity: 0; border-radius: \
-inherit; background: linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.38),transparent); }\n#ten-comic-root[data-effects="1"] .ten-state-animate { \
-animation: ten-state-border .9s ease-out 1; }\n#ten', '-comic-root[data-effects="1"] .ten-state-animate::after { animation: ten-state-scan .86s cubic-bezier(.22,1,.36,1) 1; }\n#ten-comic-root[data-effects="2"] \
-.ten-state-animate { animation: ten-state-border .68s ease-out 1; }\n#ten-comic-root[data-effects="2"] .ten-state-animate::after { background: \
-linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.62)', ",transparent); animation: ten-state-scan .62s cubic-bezier(.22,1,.36,1) 1; }\n.ten-setting { display: grid; grid-template-columns: minmax(0,1fr) \
-minmax(120px,1fr); align-items: center; gap: 10px; margin-bottom: 9px; }\n.ten-setting label { color: #c9dce8; }\n#ten-comic-root .ten-setting \
-label,#ten-comic-root .ten-rule-fields label { position: static !important; inset: auto !important; transform: none !important; }\n.ten-appearance-card { \
-padding-bottom: 7px; }\n.ten-appearance-setting { margin-bottom: 7px; }\n.ten-appea", "rance-axis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 3px; padding: 3px; border: 1px solid var(--ten-card-border); border-radius: \
-var(--ten-radius-control); background: var(--ten-input-bg); }\n.ten-appearance-axis button { min-width: 0; min-height: 29px; padding: 3px 4px; color: \
-var(--ten-muted); font: inherit; font-size: 9px; curso", "r: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, background .18s, transform \
-.18s; }\n.ten-appearance-axis button:hover { color: var(--ten-text); background: var(--ten-control-hover-bg); }\n.ten-appearance-axis button.is-active { color: \
-var(--ten-cyan); border-color: var(--ten-con", "trol-border); background: var(--ten-control-hover-bg); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n.ten-settings-download .ten-setting { min-height: \
-36px; margin-bottom: 10px; }\n.ten-settings-download .ten-setting > label { font-size: 11px; line-height: 1.5; }\n.ten-settings-download .ten-setting-check { \
-min-height: 30px; margin-top: 2px; margin-bottom: ", "11px; }\n.ten-direct-flow-setting { display: block !important; min-height: 0 !important; }\n.ten-direct-flow-setting > label { display: block; margin-bottom: \
-6px; }\n.ten-direct-flow-options { display: grid; gap: 6px; }\n.ten-direct-flow-options button { width: 100%; padding: 8px 10px; color: var(--ten-text); font: \
-inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: 10px; background: var(--ten-input-bg); transition: \
-border-color .18s, background .18s, transform .18s; }\n.ten-direct-flow-options button:hover { transform: translateY(-1px); background: \
-var(--ten-control-hover-bg); }\n.ten-direct-flow-options button.is-active { border-color: var(--ten-cyan); box-shadow: 0 0 0 3px rgba(95,246,255,.08); \
-}\n.ten-direct-flow-options strong, .ten-direct-flow-options small { display: block; }\n.ten-direct-flow-options small { margin-top: 3px; color: \
-var(--ten-muted); font-size: 10px; line-height: 1.45; }\n.ten-path-sanitize-setting { align-items: center; }\n.ten-path-sanitize-setting > div { min-width: 0; \
-}\n.ten-path-sanitize-setting label, .ten-path-sanitize-setting small { display: block; }\n.ten-path-sanitize-setting small { margin-top: 3px; color: \
-var(--ten-muted); font-size: 9px; line-height: 1.4; }\n.ten-setting .ten-input { text-align: center; font-variant-numeric: tabular-nums; }\n.ten-setting \
-.ten-select { text-align: center; text-align-last: center; }\n.ten-setting-select { position: relative; z-index: 12; min-width: 0; width: 100%; \
-}\n#ten-default-mode-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: ", "0 11px; color: var(--ten-text); font: inherit; cursor: pointer; border: 1px solid rgba(137,225,255,.2); border-radius: 11px; background: rgba(6,18,34,.42); \
-box-shadow: inset 0 1px rgba(255,255,255,.045); transition: border-color .2s, box-shadow .2s, background .2s; \
-}\n#ten-default-mode-trigger:hover,\n.ten-setting-select.is-open #ten-default-mode-trigger { bor", "der-color: rgba(95,246,255,.55); background: rgba(9,27,46,.58); box-shadow: 0 0 0 3px rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.07); \
-}\n#ten-default-mode-label { min-width: 0; flex: 1; text-align: center; }\n.ten-setting-select.is-open .ten-picker-arrow { transform: rotate(225deg) \
-translate(-1px,-1px); }\n.ten-setting-select-menu { position: absolute;", " z-index: 45; top: 42px; right: 0; left: 0; padding: 6px; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
-var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.35); animation: ten-picker-in .22s \
-cubic-bezier(.22,1,.36,1); }\n.ten-setting-select-menu[hidden] { display:", " none !important; }\n.ten-setting-select-menu button { width: 100%; min-height: 43px; display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: \
-center; gap: 8px; padding: 6px 8px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid transparent; border-radius: 9px; \
-background: transparent; transition: border", "-color .18s, background .18s, transform .18s; }\n.ten-setting-select-menu button + button { margin-top: 3px; }\n.ten-setting-select-menu button:hover { \
-border-color: rgba(95,246,255,.2); background: rgba(95,246,255,.08); transform: translateX(2px); }\n.ten-setting-select-menu button.is-selected { border-color: \
-rgba(95,246,255,.28); background: linear-gradient(1", "00deg, rgba(95,246,255,.13), rgba(156,108,255,.09)); }\n.ten-setting-select-menu button > span:last-child { min-width: 0; display: grid; gap: 1px; \
-}\n.ten-setting-select-menu strong { font-size: 11px; font-weight: 700; }\n.ten-setting-select-menu small { color: var(--ten-muted); font-size: 9px; \
-}\n.ten-mode-option-mark { width: 10px; height: 10px; border: 1px so", 'lid rgba(137,225,255,.35); border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(7,18,34,.9); transition: background .18s, box-shadow .18s; \
-}\n.ten-setting-select-menu button.is-selected .ten-mode-option-mark { background: var(--ten-cyan); box-shadow: 0 0 10px rgba(95,246,255,.48), inset 0 0 0 2px \
-rgba(7,18,34,.82); }\n.ten-setting input[type="checkbox"] { just', 'ify-self: end; accent-color: var(--ten-cyan); width: 18px; height: 18px; }\n.ten-setting input[type="range"] { width: 100%; accent-color: var(--ten-cyan); \
-}\n.ten-setting-value { color: var(--ten-cyan); font-variant-numeric: tabular-nums; text-align: right; }\n.ten-grid-2 { display: grid; grid-template-columns: \
-repeat(2,minmax(0,1fr)); gap: 7px; }\n.ten-toast { ', "position: absolute; z-index: 20; left: 50%; bottom: 78px; max-width: 86%; display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 13px; color: \
-var(--ten-toast-text); border: 1px solid var(--ten-toast-border); border-radius: var(--ten-radius-control); background: var(--ten-toast-bg); box-shadow: \
-var(--ten-tooltip-shadow); transform: translate(-50%", ",12px); opacity: 0; pointer-events: none; transition: .22s; }\n.ten-toast.is-show { transform: translate(-50%,0); opacity: 1; }\n#ten-toast-text { min-width: \
-0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n.ten-toast button { flex: 0 0 auto; min-height: 27px; padding: 4px 9px; color: \
-var(--ten-cyan); font: inherit; font-size: 10px; font-we", "ight: 700; cursor: pointer; pointer-events: auto; border: 1px solid var(--ten-control-border); border-radius: 8px; background: var(--ten-control-hover-bg); \
-}\n.ten-toast button[hidden] { display: none; }\n.ten-confirm { position: absolute; z-index: 50; inset: 0; display: grid; place-items: center; padding: 22px; \
-visibility: hidden; opacity: 0; pointer-events: ", "none; transition: opacity .24s ease, visibility .24s; }\n.ten-confirm.is-open { visibility: visible; opacity: 1; pointer-events: auto; }\n.ten-confirm-backdrop \
-{ position: absolute; inset: 0; padding: 0; cursor: default; border: 0; background: var(--ten-overlay-bg); backdrop-filter: blur(7px); }\n.ten-confirm-dialog { \
-position: relative; width: min(310px,100%);", " padding: 18px; text-align: center; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); \
-box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.96); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n.ten-confirm.is-open \
-.ten-confirm-dialog { transform: translateY(0) scal", "e(1); }\n.ten-confirm-icon { width: 42px; height: 42px; display: grid; place-items: center; margin: 0 auto 10px; color: #ff9aac; border: 1px solid \
-rgba(255,97,116,.3); border-radius: 14px; background: rgba(255,97,116,.11); box-shadow: 0 0 22px rgba(255,97,116,.1); }\n.ten-confirm-title { margin-bottom: \
-6px; font-size: 14px; font-weight: 750; }\n.ten-confirm-mes", "sage { min-height: 34px; color: #c5d8e5; font-size: 11px; line-height: 1.55; word-break: break-word; }\n.ten-confirm-actions { display: grid; \
-grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; }\n.ten-diagnostic { position: absolute; z-index: 51; inset: 0; display: grid; \
-place-items: center; padding: 18px; visibility: hidden; opacity: ", "0; pointer-events: none; transition: opacity .24s ease, visibility .24s; }\n.ten-diagnostic.is-open { visibility: visible; opacity: 1; pointer-events: auto; \
-}\n.ten-diagnostic-dialog { position: relative; width: 100%; max-height: 78%; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 11px; padding: \
-15px; border: 1px solid var(--ten-panel-border)", "; border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.97); \
-transition: transform .28s cubic-bezier(.22,1,.36,1); }\n.ten-diagnostic.is-open .ten-diagnostic-dialog { transform: translateY(0) scale(1); \
-}\n.ten-diagnostic-head { display: grid; grid-template-columns: 42", "px minmax(0,1fr) 34px; align-items: center; gap: 10px; text-align: left; }\n.ten-diagnostic-head .ten-confirm-icon { margin: 0; }\n.ten-confirm-icon.is-info { \
-color: var(--ten-cyan); border-color: rgba(95,246,255,.3); background: rgba(95,246,255,.1); box-shadow: 0 0 22px rgba(95,246,255,.1); }\n#ten-diagnostic-content \
-{ min-height: 140px; margin: 0; padding: 11", "px; overflow: auto; color: #c9dce8; font: 10px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; word-break: break-all; border: \
-1px solid rgba(137,225,255,.16); border-radius: 12px; background: rgba(3,13,27,.52); scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; \
-}\n.ten-diagnostic-actions { display: grid; g", "rid-template-columns: repeat(auto-fit,minmax(88px,1fr)); gap: 8px; }\n.ten-rule-guide-dialog { position: absolute; inset: 18px; width: auto; max-height: none; \
-overflow: hidden; }\n.ten-rule-guide-content { min-height: 0; padding-right: 4px; overflow-y: auto; color: #c9dce8; font-size: 10px; line-height: 1.65; \
-scrollbar-width: thin; scrollbar-color: rgba(95,246", ",255,.34) transparent; }\n.ten-rule-guide-content section { padding: 9px 10px; border: 1px solid rgba(137,225,255,.13); border-radius: 11px; background: \
-rgba(3,13,27,.34); }\n.ten-rule-guide-content section + section { margin-top: 7px; }\n.ten-rule-guide-content h3 { margin: 0 0 5px; color: var(--ten-cyan); \
-font-size: 10px; letter-spacing: .04em; }\n.ten-rule-gu", "ide-content ol, .ten-rule-guide-content ul { margin: 0; padding-left: 18px; }\n.ten-rule-guide-content li + li { margin-top: 3px; }\n.ten-rule-guide-content dl \
-{ display: grid; grid-template-columns: 78px minmax(0,1fr); gap: 4px 7px; margin: 0; }\n.ten-rule-guide-content dt { color: var(--ten-text); font-weight: 700; \
-}\n.ten-rule-guide-content dd { margin: 0; }\n", ".ten-rule-guide-content code { padding: 1px 4px; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.13); border-radius: 5px; background: \
-rgba(95,246,255,.06); font: 9px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }\n.ten-rule-guide-example > code { display: block; padding: 7px 8px; \
-color: #bffbff; border-radius: 8px; background: rgba(2,10,", "22,.46); }\n.ten-rule-guide-warning { margin-top: 8px; padding: 7px 9px; color: #ffd0d9; border: 1px solid rgba(255,97,116,.24); border-radius: 9px; \
-background: rgba(255,97,116,.08); }\n.ten-task-card, .ten-history-card { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; \
-contain: paint; cursor: default; transform: none !importan", "t; transition: border-color .24s ease, background-color .24s ease, box-shadow .24s ease; }\n.ten-task-card:hover, .ten-history-card:hover { border-color: \
-rgba(95,246,255,.3); background: rgba(27,46,70,.52); box-shadow: inset 0 1px rgba(255,255,255,.04); transform: none; }\n.ten-task-card .ten-name, \
-.ten-history-card .ten-name { min-width: 0; width: 100%; }\n.te", "n-task-actions { min-width: max-content; flex: 0 0 auto; display: flex; align-items: center; gap: 1px; }\n.ten-task-actions .ten-icon-btn { width: 29px; \
-height: 29px; border-radius: 9px; }\n.ten-task-actions .ten-icon-btn.is-danger { color: #ff9aac; }\n.ten-task-actions .ten-icon-btn:focus-visible { outline: 2px \
-solid var(--ten-cyan); outline-offset: 1px; }\n.te", "n-task-actions .ten-icon-btn:disabled { opacity: .24; cursor: default; }\n.ten-history-card .ten-task-actions .ten-icon-btn { width: 27px; height: 27px; \
-}\n.ten-history-wrap { gap: 7px; }\n.ten-history-filter { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; padding: 3px; border: 1px \
-solid rgba(137,225,255,.12); border-radius: 11px; bac", "kground: rgba(3,14,28,.3); }\n.ten-history-filter button { min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; font-size: \
-9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, background .18s; \
-}\n.ten-history-filter button:hover { color:", " var(--ten-text); background: rgba(95,246,255,.05); }\n.ten-history-filter button.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.24); \
-background: linear-gradient(145deg,rgba(95,246,255,.11),rgba(156,108,255,.09)); }\n.ten-recovery { margin-bottom: 9px; padding: 10px 11px; display: flex; \
-align-items: center; justify-content: space-between; g", "ap: 9px; border: 1px solid rgba(95,246,255,.28); border-radius: 14px; background: linear-gradient(145deg,rgba(35,73,91,.72),rgba(59,48,91,.68)); box-shadow: \
-inset 0 1px rgba(255,255,255,.08); }\n.ten-recovery[hidden] { display: none; }\n.ten-recovery > div:first-child { min-width: 0; display: grid; gap: 2px; \
-}\n.ten-recovery strong { color: var(--ten-text); fon", "t-size: 11px; }\n.ten-recovery span { color: var(--ten-muted); font-size: 9px; }\n.ten-recovery .ten-btn { min-height: 30px; padding: 5px 9px; \
-}\n.ten-task-state { padding: 1px 6px; border: 1px solid rgba(137,225,255,.18); border-radius: 999px; font-size: 9px; }\n.ten-task-state.is-failed, \
-.ten-task-state.is-partial { color: #ff9aac; border-color: rgba(255,97,11", "6,.25); background: rgba(255,97,116,.08); }\n.ten-task-state.is-cancelled { color: #b4c2ce; }\n.ten-task-state.is-completed { color: var(--ten-cyan); \
-}\n.ten-search-results { margin-top: 10px; }\n.ten-result-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(100px,1fr)); gap: 8px; \
-}\n.ten-result { padding: 6px; overflow: hidden; color: var(--ten", "-text); cursor: pointer; border: 1px solid var(--ten-line); border-radius: 12px; background: var(--ten-surface); }\n.ten-result img { width: 100%; \
-aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; background: rgba(255,255,255,.05); }\n.ten-result span { display: block; margin-top: 5px; overflow: \
-hidden; white-space: nowrap; text-overflow: ellipsis; fon", "t-size: 10px; }\n.ten-section-title { margin: 13px 2px 7px; color: var(--ten-muted); font-size: 10px; font-weight: 750; letter-spacing: .13em; text-transform: \
-uppercase; }\n.ten-file-name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ten-muted); font-size: 10px; \
-}\n.ten-dir-control { min-width: 0; display: flex; al", "ign-items: center; justify-content: flex-end; gap: 8px; }\n.ten-dir-control .ten-btn { flex: 0 0 auto; margin: 0; }\n.ten-dir-control .ten-file-name { flex: 1 \
-1 auto; max-width: 92px; text-align: left; }\n.ten-settings-hint { color: var(--ten-muted); font-size: 9px; line-height: 1.5; text-align: right; \
-}\n.ten-rule-fields { display: grid; gap: 8px; }\n.ten-rule-fields label { min-width: 0; display: grid; gap: 4px; color: #c9dce8; font-size: 10px; \
-}\n.ten-rule-fields .ten-input { height: 34px; text", "-align: left; }\n.ten-rule-intro { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; margin-bottom: 9px; padding: 8px 10px; color: \
-var(--ten-muted); font-size: 9px; line-height: 1.45; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: \
-var(--ten-list-bg); }\n.ten-rule-intro strong { color", ": var(--ten-cyan); font-size: 10px; white-space: nowrap; }\n.ten-rule-pick-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; \
-margin: 0 0 8px; }\n.ten-rule-templates { margin: 0 0 8px; overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); \
-background: var(--ten-list-bg); }\n.ten-rule", '-templates summary { display: flex; align-items: center; gap: 8px; padding: 9px 10px; color: var(--ten-text); font-size: 10px; cursor: pointer; list-style: \
-none; }\n.ten-rule-templates summary::-webkit-details-marker { display: none; }\n.ten-rule-templates summary::after { content: ""; width: 6px; height: 6px; \
-flex: 0 0 auto; border-right: 1.5px solid currentC', "olor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .2s; }\n.ten-rule-templates summary span { \
-margin-left: auto; overflow: hidden; color: var(--ten-muted); font-size: 9px; white-space: nowrap; text-overflow: ellipsis; }\n.ten-rule-templates[open] summary \
-{ color: var(--ten-cyan); border-bottom: 1px s", "olid var(--ten-card-border); }\n.ten-rule-templates[open] summary::after { transform: rotate(225deg) translate(-1px,-1px); }\n.ten-rule-template-grid { \
-display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; padding: 8px; animation: ten-picker-in .22s ease both; }\n.ten-rule-template-grid \
-button { min-width: 0; min-height: 48px; display: grid; ", "align-content: center; gap: 2px; padding: 7px 8px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid \
-var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); transition: border-color .18s, background .18s, transform \
-.18s; }\n.ten-rule-template-grid button:hover, .ten-rule-t", "emplate-grid button.is-active { color: var(--ten-cyan); border-color: var(--ten-cyan); background: var(--ten-control-hover-bg); transform: translateY(-1px); \
-}\n.ten-rule-template-grid strong { overflow: hidden; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }\n.ten-rule-template-grid small { \
-overflow: hidden; color: var(--ten-muted); font-size:", " 8px; white-space: nowrap; text-overflow: ellipsis; }\n.ten-mobile-drawer { display: none; }\n.ten-rule-pick-actions button { min-height: 32px; display: \
-inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 7px; color: var(--ten-text); font: inherit; font-size: 9px; cursor: pointer; \
-border: 1px solid var(--ten-control-border); borde", "r-radius: var(--ten-radius-control); background: var(--ten-input-bg); }\n.ten-rule-pick-actions button .ten-icon { width: 14px; height: 14px; color: \
-var(--ten-cyan); }\n.ten-rule-pick-actions button:hover { color: var(--ten-cyan); border-color: rgba(95,246,255,.42); background: rgba(95,246,255,.09); \
-box-shadow: inset 0 1px rgba(255,255,255,.06); }\n.ten-rule-gu", "ide-open { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; color: var(--ten-cyan); font: inherit; font-size: 9px; \
-cursor: pointer; border: 1px solid rgba(95,246,255,.2); border-radius: 9px; background: rgba(95,246,255,.07); transition: transform .18s, border-color .18s, \
-background .18s, box-shadow .18s; }\n.ten-rule-gu", "ide-open .ten-icon { width: 15px; height: 15px; }\n.ten-rule-guide-open:hover { transform: translateY(-1px); border-color: rgba(95,246,255,.5); background: \
-rgba(95,246,255,.12); box-shadow: 0 6px 16px rgba(5,25,43,.14); }\n.ten-rule-simple-hint { margin-top: -3px; color: var(--ten-muted); font-size: 9px; \
-line-height: 1.45; }\n.ten-rule-advanced { overflow: hidd", "en; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); }\n.ten-rule-advanced summary { \
-display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; color: #c9dce8; font-size: 10px; cursor: pointer; list-style: \
-none; }\n.ten-rule-advanced summary::-webkit-detai", 'ls-marker { display: none; }\n.ten-rule-advanced summary::after { content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; \
-border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .25s ease; }\n.ten-rule-advanced[open] summary { \
-color: var(--ten-cyan); border-bottom: 1px soli', "d rgba(137,225,255,.12); }\n.ten-rule-advanced[open] summary::after { transform: rotate(225deg) translate(-1px,-1px); }\n.ten-rule-advanced summary span, \
-.ten-rule-json summary span { margin-left: auto; color: var(--ten-muted); font-size: 9px; font-weight: 400; }\n.ten-rule-advanced-body { display: grid; gap: \
-8px; padding: 9px; animation: ten-picker-in .24s eas", "e both; }\n.ten-rule-frame { min-height: 34px; padding: 0 2px; }\n.ten-rule-function { min-height: 96px; font: 9px/1.55 ui-monospace, SFMono-Regular, Consolas, \
-monospace; }\n.ten-rule-label { display: block; margin-bottom: 4px; color: #c9dce8; font-size: 10px; }\n.ten-rule-readtype { --rule-type: 0; position: relative; \
-display: grid; grid-template-columns: repea", 't(2,1fr); padding: 3px; border-radius: 11px; background: rgba(3,14,28,.38); }\n.ten-rule-readtype::before { content: ""; position: absolute; inset: 3px 50% 3px \
-3px; border: 1px solid rgba(95,246,255,.25); border-radius: 8px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.12)); transform: \
-translateX(calc(var(--rule-type)*100%)); tr', "ansition: transform .28s cubic-bezier(.22,1,.36,1); }\n.ten-rule-readtype button { position: relative; z-index: 1; min-height: 30px; color: var(--ten-muted); \
-font: inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; }\n.ten-rule-readtype button.is-active { color: var(--ten-cyan); \
-}\n.ten-rule-test-result { margin-top: 9px; padding: 9p", "x; color: #c9dce8; font: 9px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; border: 1px solid rgba(137,225,255,.18); \
-border-radius: 10px; background: rgba(3,14,28,.4); }\n.ten-rule-test-result.is-success { color: #a9fff0; border-color: rgba(95,246,255,.3); \
-}\n.ten-rule-test-result.is-error { color: #ffc0cb; border-color: rgba(255", ",97,116,.3); }\n.ten-rule-actions { display: grid; grid-template-columns: repeat(auto-fit,minmax(88px,1fr)); gap: 7px; margin-top: 9px; }\n.ten-backup-actions \
-{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; margin-bottom: 7px; }\n.ten-rule-json { margin-top: 10px; border-top: 1px solid \
-rgba(137,225,255,.13); }\n.ten-rule-json summary { padding: 9px 2px 7px; color: var(--ten-muted); font-size: 10px; cursor: pointer; }\n.ten-rule-json[open] \
-summary { color: var(--ten-cyan); }\n.ten-rule-json .ten-textarea { ", "min-height: 96px; }\n.ten-rule-json .ten-btn { width: 100%; margin-top: 7px; }\n@keyframes ten-particle { from { transform: translate3d(0,0,0) scale(.7); \
-opacity: .15; } to { transform: translate3d(var(--tx),var(--ty),0) scale(1.2); opacity: .7; } }\n@keyframes ten-launcher-orbit { to { transform: rotate(360deg); \
-} }\n@keyframes ten-view-in { from { opacity: 0; ", "transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }\n@keyframes ten-ripple { to { transform: scale(4); opacity: 0; } }\n@keyframes \
-ten-picker-in { from { opacity: 0; transform: translateY(-7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }\n@keyframes ten-energy-flow \
-{ to { transform: translateX(340%); } }\n@keyfr", "ames ten-state-scan { from { left: -42%; opacity: 0; } 24% { opacity: 1; } to { left: 108%; opacity: 0; } }\n@keyframes ten-state-border { 0% { box-shadow: 0 0 \
-0 rgba(var(--ten-state-rgb),0); } 35% { box-shadow: 0 0 18px rgba(var(--ten-state-rgb),.18), inset 0 0 12px rgba(var(--ten-state-rgb),.06); } 100% { box-shadow: \
-0 0 0 rgba(var(--ten-state-rgb),0); } }\n", "@media (max-width: 560px), (max-height: 720px) {\n  #ten-panel { right: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n  \
-#ten-comic-launcher { right: 8px; }\n  .ten-mobile-drawer { position: fixed; z-index: 2147483647; inset: 0; display: block; visibility: hidden; pointer-events: \
-none; }\n  .ten-mobile-drawer.is-open { visibi", "lity: visible; pointer-events: auto; }\n  .ten-mobile-drawer-backdrop { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: \
-var(--ten-overlay-bg); backdrop-filter: blur(5px); opacity: 0; transition: opacity .22s; }\n  .ten-mobile-drawer.is-open .ten-mobile-drawer-backdrop { opacity: \
-1; }\n  .ten-mobile-drawer-sheet { position: absolute", "; right: 0; bottom: 0; left: 0; max-height: min(78vh,620px); display: grid; grid-template-rows: auto auto minmax(0,1fr); padding: 7px 12px 14px; overflow: \
-hidden; border: 1px solid var(--ten-panel-border); border-radius: 22px 22px 0 0; background: var(--ten-popover-bg); box-shadow: 0 -18px 48px rgba(0,5,15,.28); \
-transform: translateY(104%); transition: trans", "form .3s cubic-bezier(.22,1,.36,1); }\n  .ten-mobile-drawer.is-open .ten-mobile-drawer-sheet { transform: translateY(0); }\n  .ten-mobile-drawer-handle { \
-width: 34px; height: 4px; margin: 0 auto 5px; border-radius: 999px; background: var(--ten-scroll-thumb); }\n  .ten-mobile-drawer-sheet header { min-height: \
-38px; display: flex; align-items: center; justify-con", "tent: space-between; color: var(--ten-text); font-size: 12px; font-weight: 750; }\n  #ten-mobile-drawer-content { min-height: 0; overflow-y: auto; padding: 2px \
-1px; }\n  #ten-mobile-drawer-content .ten-options { max-height: none; margin: 0; padding: 10px; opacity: 1; border-width: 1px; }\n  #ten-mobile-drawer-content \
-.ten-options.is-mobile-drawer-content { back", "ground: var(--ten-card-bg); }\n  #ten-mobile-drawer-content .ten-rule-advanced-body { padding: 10px; border: 1px solid var(--ten-card-border); border-radius: \
-var(--ten-radius-card); background: var(--ten-card-bg); }\n}\n@media (min-width: 561px) {\n  .ten-mobile-drawer { display: none; }\n}\n@media (max-width: \
-1000px) {\n  #ten-search-panel { z-index: 2147483647; r", "ight: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n}\n@media (prefers-reduced-motion: reduce) {\n  #ten-comic-root *, \
-#ten-comic-root *::before, #ten-comic-root *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }\n  #ten-particle-field { \
-display: none; }\n}\n\n.ten-theme-presets { display:", " grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }\n.ten-theme-choice { min-width: 0; min-height: 58px; display: grid; align-content: center; \
-gap: 2px; padding: 8px 10px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 13px; \
-background: rgba(4,14,28,.36); transition: b", 'order-color .2s, box-shadow .2s, transform .18s, background .2s; }\n.ten-theme-choice[data-theme-choice="glass"] { box-shadow: inset 3px 0 #5ff6ff; \
-}\n.ten-theme-choice[data-theme-choice="mist"] { box-shadow: inset 3px 0 #78bfe8; }\n.ten-theme-choice[data-theme-choice="porcelain"] { box-shadow: inset 3px 0 \
-#b9835e; }\n.ten-theme-choice[data-theme-choice="express', 'ive"] { box-shadow: inset 3px 0 #aa71ff; }\n.ten-theme-choice[data-theme-choice="carbon"] { box-shadow: inset 3px 0 #ff4f96; \
-}\n.ten-theme-choice[data-theme-choice="ink"] { box-shadow: inset 3px 0 #a18558; }\n.ten-theme-choice:hover { border-color: rgba(95,246,255,.46); transform: \
-translateY(-1px); }\n.ten-theme-choice[aria-pressed="true"] { color: var(--ten-cya', "n); border-color: var(--ten-cyan); background: rgba(95,246,255,.09); box-shadow: 0 0 0 3px rgba(95,246,255,.07), inset 0 1px rgba(255,255,255,.08); \
-}\n.ten-theme-choice strong { overflow: hidden; font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }\n.ten-theme-choice small { overflow: hidden; \
-color: var(--ten-muted); font-size: 8px; white-space: no", 'wrap; text-overflow: ellipsis; }\n\n#ten-comic-root[data-theme="mist"] { --ten-bg: rgba(241,248,253,.76); --ten-surface: rgba(255,255,255,.5); \
---ten-surface-strong: rgba(255,255,255,.74); --ten-line: rgba(67,112,148,.18); --ten-text: #183247; --ten-muted: #667d90; --ten-cyan: #168eaf; --ten-blue: \
-#4d7edc; --ten-violet: #7c69ca; --ten-pink: #c45e91; --ten-dange', 'r: #ce4f6d; --ten-success: #278768; }\n#ten-comic-root[data-theme="mist"] #ten-comic-launcher { color: #183247; border-color: rgba(255,255,255,.84); \
-border-radius: 20px; background: linear-gradient(145deg,rgba(255,255,255,.82),rgba(219,237,250,.68)); box-shadow: 0 14px 38px rgba(49,91,123,.2),0 0 24px \
-rgba(86,168,213,.16),inset 0 1px rgba(255,255,255,.96); }\n', '#ten-comic-root[data-theme="mist"] #ten-panel { border-color: rgba(255,255,255,.86); border-radius: 27px; background: radial-gradient(circle at 90% \
-2%,rgba(151,129,232,.17),transparent 31%),radial-gradient(circle at 2% 88%,rgba(66,177,218,.14),transparent \
-32%),linear-gradient(155deg,rgba(244,250,255,.78),rgba(224,236,248,.7)); box-shadow:', ' 0 30px 86px rgba(43,73,99,.24),inset 0 1px rgba(255,255,255,.96); backdrop-filter: blur(38px) saturate(1.28); }\n#ten-comic-root[data-theme="mist"] \
-#ten-panel::before { opacity: .5; background: radial-gradient(circle at 86% 4%,rgba(117,95,214,.14),transparent 28%),radial-gradient(circle at 6% \
-90%,rgba(37,155,198,.13),transparent 32%); }\n#ten-comic-root[data-', 'theme="mist"] .ten-header,\n#ten-comic-root[data-theme="mist"] .ten-nav { border-color: rgba(70,111,143,.14); background: rgba(248,252,255,.58); \
-backdrop-filter: blur(23px) saturate(1.2); }\n#ten-comic-root[data-theme="mist"] .ten-card,\n#ten-comic-root[data-theme="mist"] .ten-task-group { border-color: \
-rgba(255,255,255,.76); border-radius: 18px; background: li', 'near-gradient(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); box-shadow: 0 10px 25px rgba(54,88,112,.1),inset 0 1px rgba(255,255,255,.88); \
-backdrop-filter: blur(18px) saturate(1.18); }\n#ten-comic-root[data-theme="mist"] .ten-list-item,\n#ten-comic-root[data-theme="mist"] \
-.ten-status,\n#ten-comic-root[data-theme="mist"] .ten-chapter-list-head { border-col', 'or: rgba(78,119,150,.16); border-radius: 14px; background: rgba(255,255,255,.46); box-shadow: inset 0 1px rgba(255,255,255,.8); \
-}\n#ten-comic-root[data-theme="mist"] .ten-list-item:hover { border-color: rgba(22,142,175,.4); background: rgba(255,255,255,.68); \
-}\n#ten-comic-root[data-theme="mist"] .ten-btn { color: #183247; border-color: rgba(77,126,174,.2); bor', 'der-radius: 13px; background: linear-gradient(115deg,rgba(208,235,248,.86),rgba(228,220,249,.8),rgba(213,240,242,.82)); box-shadow: inset 0 1px \
-rgba(255,255,255,.9); }\n#ten-comic-root[data-theme="mist"] .ten-btn.is-danger { color: #a53e5c; background: rgba(255,232,239,.72); \
-}\n#ten-comic-root[data-theme="mist"] .ten-input,\n#ten-comic-root[data-theme="mist"] .', 'ten-select,\n#ten-comic-root[data-theme="mist"] .ten-textarea,\n#ten-comic-root[data-theme="mist"] .ten-setting-select > \
-button,\n#ten-comic-root[data-theme="mist"] .ten-source,\n#ten-comic-root[data-theme="mist"] .ten-effect-level,\n#ten-comic-root[data-theme="mist"] \
-.ten-history-filter,\n#ten-comic-root[data-theme=', '"mist"] .ten-rule-readtype { color: #183247; border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.45); }\n#ten-comic-root[data-theme="mist"] \
-.ten-setting label,\n#ten-comic-root[data-theme="mist"] .ten-rule-fields label,\n#ten-comic-root[data-theme="mist"] .ten-rule-label { color: #29455a; \
-}\n#ten-comic-root[data-theme="mist"] .ten-setting-select-me', 'nu,\n#ten-comic-root[data-theme="mist"] .ten-search-site-menu,\n#ten-comic-root[data-theme="mist"] .ten-confirm-dialog,\n#ten-comic-root[data-theme="mist"] \
-.ten-diagnostic-dialog { color: #183247; border-color: rgba(77,126,174,.2); background: linear-gradient(145deg,rgba(250,253,255,.96),rgba(226,237,247,.96)); \
-box-shadow: 0 22px 55px rgba(44,76,102,.22),inset ', '0 1px rgba(255,255,255,.9); }\n#ten-comic-root[data-theme="mist"] #ten-diagnostic-content { color: #29455a; background: rgba(255,255,255,.52); \
-}\n#ten-comic-root[data-theme="mist"] .ten-select option { color: #183247; background: #f4f9fc; }\n#ten-comic-root[data-theme="mist"] .ten-progress { \
-background: rgba(50,85,111,.12); }\n#ten-comic-root[data-theme="mist"] ', '.ten-progress > i { background: linear-gradient(90deg,#48b9d2,#65a4ea,#9c7cdd); box-shadow: 0 0 10px rgba(62,157,203,.25); \
-}\n#ten-comic-root[data-theme="mist"] .ten-nav::before { border-color: rgba(45,140,184,.24); border-radius: 17px; background: \
-linear-gradient(145deg,rgba(181,229,246,.56),rgba(213,198,246,.52)); box-shadow: 0 7px 19px rgba(57,102,132,.1),', 'inset 0 1px rgba(255,255,255,.88); }\n#ten-comic-root[data-theme="mist"] .ten-chapter-tools { border-color: rgba(255,255,255,.76); border-radius: 16px; \
-background: linear-gradient(145deg,rgba(255,255,255,.84),rgba(226,238,248,.76)); box-shadow: 0 8px 20px rgba(54,88,112,.1),inset 0 1px rgba(255,255,255,.9); \
-}\n#ten-comic-root[data-theme="mist"] #ten-search-pan', 'el { color: #183247; border-color: rgba(255,255,255,.82); background: linear-gradient(155deg,rgba(246,251,255,.94),rgba(225,237,247,.95)); box-shadow: 0 26px \
-70px rgba(43,73,99,.23),inset 0 1px rgba(255,255,255,.9); }\n#ten-comic-root[data-theme="mist"] #ten-particle-field { opacity: .22; filter: saturate(.65); \
-}\n#ten-comic-root[data-theme="mist"] .ten-theme-', 'choice { color: #183247; border-color: rgba(70,111,143,.17); background: rgba(255,255,255,.56); }\n#ten-comic-root[data-theme="mist"] .ten-theme-choice:hover { \
-border-color: rgba(22,142,175,.4); background: rgba(255,255,255,.74); }\n#ten-comic-root[data-theme="mist"] .ten-theme-choice[aria-pressed="true"] { color: \
-#126f8b; border-color: #168eaf; background: rg', 'ba(225,244,252,.8); }\n#ten-comic-root[data-theme="mist"] .ten-rule-intro { border-color: rgba(70,111,143,.16); background: \
-linear-gradient(145deg,rgba(255,255,255,.58),rgba(218,235,246,.46)); box-shadow: inset 0 1px rgba(255,255,255,.78); }\n#ten-comic-root[data-theme="mist"] \
-.ten-rule-advanced { border-color: rgba(70,111,143,.17); background: rgba(250,253,25', '5,.5); box-shadow: inset 0 1px rgba(255,255,255,.72); }\n#ten-comic-root[data-theme="mist"] .ten-rule-advanced summary { color: #29455a; \
-}\n#ten-comic-root[data-theme="mist"] .ten-rule-advanced[open] summary { color: #126f8b; border-bottom-color: rgba(70,111,143,.14); background: \
-rgba(223,241,249,.46); }\n#ten-comic-root[data-theme="mist"] .ten-rule-guide-open ', '{ color: #126f8b; border-color: rgba(22,142,175,.24); background: rgba(225,244,252,.7); box-shadow: inset 0 1px rgba(255,255,255,.84); \
-}\n#ten-comic-root[data-theme="mist"] #ten-search-site-trigger { color: #29455a; border-color: rgba(70,111,143,.18); background: \
-linear-gradient(145deg,rgba(255,255,255,.72),rgba(220,238,248,.62)); box-shadow: inset 0 1px rgba', '(255,255,255,.9),0 5px 14px rgba(54,88,112,.08); }\n#ten-comic-root[data-theme="mist"] .ten-rule-manage { border-color: rgba(70,111,143,.16); background: \
-rgba(255,255,255,.46); }\n#ten-comic-root[data-theme="mist"] .ten-chapter-reload button { border-color: rgba(22,142,175,.2); background: rgba(247,252,255,.82); \
-box-shadow: inset 0 1px rgba(255,255,255,.9); }\n', '#ten-comic-root[data-theme="mist"] .ten-chapter-empty { border-color: rgba(255,255,255,.78); background: \
-linear-gradient(145deg,rgba(255,255,255,.62),rgba(222,237,247,.48)); box-shadow: 0 9px 23px rgba(54,88,112,.09),inset 0 1px rgba(255,255,255,.9); \
-}\n#ten-comic-root[data-theme="mist"] .ten-empty-orbit { border-color: rgba(22,142,175,.22); background: linea', 'r-gradient(145deg,rgba(230,248,253,.82),rgba(231,226,250,.7)); box-shadow: 0 8px 20px rgba(54,110,142,.1),inset 0 1px rgba(255,255,255,.9); \
-}\n#ten-comic-root[data-theme="mist"] .ten-comic-info { border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.5); box-shadow: inset 0 1px \
-rgba(255,255,255,.82); }\n#ten-comic-root[data-theme="mist"] .ten-comic-', 'info span,\n#ten-comic-root[data-theme="mist"] .ten-comic-info strong { border-bottom-color: rgba(70,111,143,.1); }\n#ten-comic-root[data-theme="mist"] \
-.ten-mini-task,\n#ten-comic-root[data-theme="mist"] .ten-rule-pick-hud { color: #183247; border-color: rgba(255,255,255,.86); background: \
-linear-gradient(145deg,rgba(250,253,255,.94),rgba(222,237,248,.92)); box-', 'shadow: 0 16px 42px rgba(43,73,99,.2),inset 0 1px rgba(255,255,255,.94); }\n#ten-comic-root[data-theme="mist"] \
-.ten-mini-icon,\n#ten-comic-root[data-theme="mist"] .ten-rule-pick-symbol { border-color: rgba(22,142,175,.2); background: rgba(225,244,252,.74); \
-}\n#ten-comic-root[data-theme="mist"] .ten-mini-progress { background: rgba(50,85,111,.12); }\n#ten-comic-r', 'oot[data-theme="mist"] .ten-rule-pick-actions button { color: #29455a; border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.5); \
-}\n\n#ten-comic-root[data-theme="porcelain"] { --ten-bg: #f4f0e8; --ten-surface: #fffdf9; --ten-surface-strong: #f8f3ea; --ten-line: rgba(91,82,70,.2); \
---ten-text: #28323b; --ten-muted: #74746f; --ten-cyan: #315f88; --ten', '-blue: #3f6f9d; --ten-violet: #8e6f57; --ten-pink: #b86a5c; --ten-danger: #b94f49; --ten-success: #4f7f64; }\n#ten-comic-root[data-theme="porcelain"] \
-#ten-comic-launcher { color: #28323b; border-color: #d9d1c4; border-radius: 15px; background: #fffdf8; box-shadow: 0 11px 28px rgba(62,54,44,.18),inset 0 1px \
-#fff; }\n#ten-comic-root[data-theme="porcelain"] #ten-', 'panel { border-color: #d6cfc4; border-radius: 20px; background: #f5f1e9; box-shadow: 0 28px 72px rgba(55,48,40,.24),inset 0 1px #fff; backdrop-filter: none; \
-}\n#ten-comic-root[data-theme="porcelain"] #ten-panel::before { opacity: 0; }\n#ten-comic-root[data-theme="porcelain"] \
-.ten-header,\n#ten-comic-root[data-theme="porcelain"] .ten-nav { bo', 'rder-color: #d9d2c7; background: #f0ebe2; backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] .ten-card,\n#ten-comic-root[data-theme="porcelain"] \
-.ten-task-group { border-color: #ddd6ca; border-radius: 13px; background: #fffdf9; box-shadow: 0 7px 18px rgba(65,55,43,.08),inset 0 1px #fff; backdrop-filter: \
-none; }\n#ten-comic-root[data-theme="porcel', 'ain"] .ten-list-item,\n#ten-comic-root[data-theme="porcelain"] .ten-status,\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-list-head { border-color: \
-#e0d9cf; border-radius: 10px; background: #faf7f1; box-shadow: none; backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] .ten-list-item:hover { \
-border-color: #8da5b8; background: #f5f8fa; }\n#te', 'n-comic-root[data-theme="porcelain"] .ten-btn { color: #28323b; border-color: #d2c8bb; border-radius: 9px; background: #eee8de; box-shadow: inset 0 1px \
-rgba(255,255,255,.8); }\n#ten-comic-root[data-theme="porcelain"] .ten-btn.is-primary { color: #f7fbff; border-color: #315f88; background: #315f88; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-btn.is-danger {', ' color: #9c403b; border-color: #dfb8b1; background: #fae9e5; }\n#ten-comic-root[data-theme="porcelain"] .ten-input,\n#ten-comic-root[data-theme="porcelain"] \
-.ten-select,\n#ten-comic-root[data-theme="porcelain"] .ten-textarea,\n#ten-comic-root[data-theme="porcelain"] .ten-setting-select > \
-button,\n#ten-comic-root[data-theme="porcelain"] .ten-source,\n#ten-comic-roo', 't[data-theme="porcelain"] .ten-effect-level,\n#ten-comic-root[data-theme="porcelain"] .ten-history-filter,\n#ten-comic-root[data-theme="porcelain"] \
-.ten-rule-readtype { color: #28323b; border-color: #ddd6ca; background: #fffdf9; box-shadow: none; }\n#ten-comic-root[data-theme="porcelain"] .ten-setting label,\n', '#ten-comic-root[data-theme="porcelain"] .ten-rule-fields label,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-label { color: #3d4650; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-setting-select-menu,\n#ten-comic-root[data-theme="porcelain"] \
-.ten-search-site-menu,\n#ten-comic-root[data-theme="porcelain"] .ten-confirm-dialog,\n#ten-comic-root[data-theme="po', 'rcelain"] .ten-diagnostic-dialog { color: #28323b; border-color: #d8d0c4; background: #fffdf9; box-shadow: 0 20px 50px rgba(65,55,43,.2); \
-}\n#ten-comic-root[data-theme="porcelain"] #ten-diagnostic-content { color: #3d4650; border-color: #ded7cc; background: #f8f4ed; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-select option { color: #28323b; background: #ff', 'fdf9; }\n#ten-comic-root[data-theme="porcelain"] .ten-progress { background: #e5e1da; }\n#ten-comic-root[data-theme="porcelain"] .ten-progress > i { \
-background: linear-gradient(90deg,#315f88,#6286a5,#b57d56); box-shadow: none; }\n#ten-comic-root[data-theme="porcelain"] .ten-nav::before { border-color: \
-#b7c7d4; border-radius: 11px; background: #dde7ee; box-shado', 'w: inset 0 1px #f8fbfd; }\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-tools { border-color: #d9d2c7; border-radius: 11px; background: #fffdf9; \
-box-shadow: 0 7px 18px rgba(65,55,43,.09); backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] #ten-search-panel { color: #28323b; border-color: \
-#d6cfc4; background: #f5f1e9; box-shadow: 0 24px 6', '4px rgba(55,48,40,.22); backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] #ten-particle-field { display: none; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-theme-choice { color: #28323b; border-color: #ddd6ca; background: #fffdf9; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-theme-choice:hover { border-color: #8da5b8; background: #f7f8f7; ', '}\n#ten-comic-root[data-theme="porcelain"] .ten-theme-choice[aria-pressed="true"] { color: #315f88; border-color: #315f88; background: #e8eff4; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-intro { border-color: #ddd6ca; background: #faf7f1; box-shadow: inset 0 1px #fff; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced { border-color: #ddd6c', 'a; background: #fffdf9; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced summary { color: #3d4650; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced[open] summary { color: #315f88; border-bottom-color: #e0d9cf; background: #f7f2ea; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-open { color: #31', '5f88; border-color: #c8d5df; background: #e8eff4; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] #ten-search-site-trigger { color: \
-#3d4650; border-color: #ddd6ca; background: #fffdf9; box-shadow: inset 0 1px #fff,0 4px 12px rgba(65,55,43,.06); }\n#ten-comic-root[data-theme="porcelain"] \
-.ten-rule-manage { border-color: #e0d9cf; backgro', 'und: #faf7f1; }\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-reload button { border-color: #d8d0c4; background: #fffdf9; box-shadow: inset 0 1px #fff; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-empty { border-color: #ddd6ca; background: #fffdf9; box-shadow: 0 7px 18px rgba(65,55,43,.08),inset 0 \
-1px #fff; }\n#ten-comic-root[data-theme="porc', 'elain"] .ten-empty-orbit { border-color: #c8d5df; background: #e8eff4; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info \
-{ border-color: #e0d9cf; background: #faf7f1; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info \
-span,\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info stron', 'g { border-bottom-color: #e6dfd5; }\n#ten-comic-root[data-theme="porcelain"] .ten-mini-task,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-pick-hud { \
-color: #28323b; border-color: #d8d0c4; background: #fffdf9; box-shadow: 0 15px 38px rgba(65,55,43,.2),inset 0 1px #fff; backdrop-filter: none; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-mini-icon,\n#ten-c', 'omic-root[data-theme="porcelain"] .ten-rule-pick-symbol { border-color: #c8d5df; background: #e8eff4; }\n#ten-comic-root[data-theme="porcelain"] \
-.ten-mini-progress { background: #e5e1da; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-pick-actions button { color: #3d4650; border-color: #ddd6ca; \
-background: #faf7f1; }\n#ten-comic-root[data-theme="porcelain"', '] .ten-rule-guide-content { color: #625f59; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-content section { border-color: #e0d9cf; background: \
-#faf7f1; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-content code { border-color: #ded7cc; background: #f0ebe2; \
-}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-example > code { colo', 'r: #3d4650; background: #f0ebe2; }\n\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-mode { color: var(--ten-muted); border-color: \
-var(--ten-line); background: rgba(255,255,255,.48); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-mode.is-active { color: \
-var(--ten-cyan); border-color: var(--ten-cyan); background: ', 'rgba(72,133,174,.1); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) \
-.ten-confirm-message,\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) \
-.ten-rule-test-result,\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-task-performance { color: #53697a; \
-}\n#ten-comic-root:is([data-theme="mist"],[data-theme="por', 'celain"]) .ten-toast { color: #f3f9fc; border-color: rgba(67,112,148,.32); background: rgba(30,48,63,.94); \
-}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-confirm-backdrop { background: rgba(34,48,60,.36); \
-}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-task-actions .ten-icon-btn.is-danger { color: #bc4d66; }\n#', 'ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content { color: #53697a; \
-}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content section { border-color: var(--ten-line); background: \
-rgba(255,255,255,.5); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-conte', 'nt dt { color: var(--ten-text); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content code { color: var(--ten-cyan); \
-border-color: var(--ten-line); background: rgba(66,112,148,.07); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-example > \
-code { color: #29455a; background: rgba(232,241,', '247,.7); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-warning { color: #a53e5c; border-color: rgba(190,77,103,.22); \
-background: rgba(255,232,239,.68); }\n\n#ten-comic-root[data-theme="expressive"] { --ten-bg: rgba(22,20,58,.86); --ten-surface: rgba(52,48,105,.58); \
---ten-surface-strong: rgba(61,56,122,.78); --ten-line: rgba', '(178,173,255,.24); --ten-text: #f7f4ff; --ten-muted: #aaa7cb; --ten-cyan: #61ddff; --ten-blue: #7c98ff; --ten-violet: #aa71ff; --ten-pink: #ff75c7; \
---ten-danger: #ff7697; --ten-success: #74efc7; }\n#ten-comic-root[data-theme="expressive"] #ten-comic-launcher { border-radius: 22px; background: \
-linear-gradient(145deg,rgba(55,164,221,.94),rgba(132,75,226,.94)); ', 'box-shadow: 0 14px 36px rgba(40,23,103,.42),0 0 27px rgba(121,113,255,.27),inset 0 1px rgba(255,255,255,.22); }\n#ten-comic-root[data-theme="expressive"] \
-#ten-panel { border-color: rgba(174,183,255,.3); border-radius: 30px; background: radial-gradient(circle at 90% 4%,rgba(120,85,255,.22),transparent \
-34%),radial-gradient(circle at 8% 92%,r', 'gba(44,190,245,.15),transparent 34%),linear-gradient(155deg,rgba(31,29,79,.94),rgba(13,17,47,.96)); box-shadow: 0 30px 90px rgba(17,9,58,.55),inset 0 1px \
-rgba(255,255,255,.07); }\n#ten-comic-root[data-theme="expressive"] .ten-header { background: rgba(27,27,72,.48); }\n#ten-comic-root[data-theme="expressive"] \
-.ten-card,\n#ten-comic-root[data-theme="expressive"]', ' .ten-task-group { border-color: rgba(180,178,255,.2); border-radius: 21px; background: linear-gradient(145deg,rgba(69,64,128,.48),rgba(31,31,79,.48)); \
-box-shadow: inset 0 1px rgba(255,255,255,.07),0 9px 24px rgba(13,9,50,.14); }\n#ten-comic-root[data-theme="expressive"] .ten-list-item { border-radius: 17px; \
-background: rgba(24,27,71,.55); }\n#ten-comic-root[d', 'ata-theme="expressive"] .ten-btn { border-radius: 14px; background: linear-gradient(115deg,rgba(48,119,174,.78),rgba(107,69,190,.78),rgba(44,129,151,.74)); \
-}\n#ten-comic-root[data-theme="expressive"] .ten-icon-btn,\n#ten-comic-root[data-theme="expressive"] .ten-task-arrow-button { border-radius: 50%; \
-}\n#ten-comic-root[data-theme="expressive"] .ten-progress { h', 'eight: 6px; }\n#ten-comic-root[data-theme="expressive"] .ten-progress > i { background: linear-gradient(90deg,#53dffc,#7597ff,#a970ff); \
-}\n#ten-comic-root[data-theme="expressive"] .ten-nav { background: rgba(13,17,47,.76); }\n#ten-comic-root[data-theme="expressive"] .ten-nav::before { \
-border-radius: 19px; background: linear-gradient(145deg,rgba(72,189,239,.25),', 'rgba(147,91,239,.3)); }\n#ten-comic-root[data-theme="expressive"] #ten-search-panel { border-color: rgba(174,183,255,.28); background: \
-linear-gradient(155deg,rgba(37,34,91,.96),rgba(15,18,51,.98)); }\n#ten-comic-root[data-theme="expressive"] .ten-chapter-tools { border-radius: 17px; background: \
-linear-gradient(145deg,rgba(69,64,128,.9),rgba(31,31,79,.92)); }\n#', 'ten-comic-root[data-theme="expressive"] .ten-mini-task,\n#ten-comic-root[data-theme="expressive"] .ten-rule-pick-hud { border-color: rgba(174,183,255,.3); \
-border-radius: 21px; background: linear-gradient(145deg,rgba(69,64,128,.96),rgba(25,27,72,.97)); box-shadow: 0 18px 46px rgba(17,9,58,.4),inset 0 1px \
-rgba(255,255,255,.08); }\n#ten-comic-root[data-theme="exp', 'ressive"] .ten-rule-pick-actions button { border-color: rgba(180,178,255,.2); background: rgba(31,31,79,.5); }\n\n#ten-comic-root[data-theme="carbon"] { \
---ten-bg: rgba(5,8,13,.94); --ten-surface: rgba(15,20,29,.78); --ten-surface-strong: rgba(20,27,39,.9); --ten-line: rgba(85,145,190,.3); --ten-text: #edf5ff; \
---ten-muted: #7f8b9e; --ten-cyan: #2c9cff; --ten-bl', 'ue: #287fff; --ten-violet: #8b4cff; --ten-pink: #ff4f96; --ten-danger: #ff5d83; --ten-success: #55e5bb; }\n#ten-comic-root[data-theme="carbon"] \
-#ten-comic-launcher { border-color: rgba(45,157,255,.72); border-radius: 15px; background: linear-gradient(145deg,#111824,#080b11); box-shadow: -4px 0 22px \
-rgba(41,143,255,.3),4px 0 22px rgba(255,66,144,.2),inset 0 0 ', '0 1px rgba(255,255,255,.05); }\n#ten-comic-root[data-theme="carbon"] #ten-panel { border-color: rgba(49,153,230,.55); border-radius: 17px; background: \
-linear-gradient(155deg,#111821,#070a0f 76%); box-shadow: -2px 0 25px rgba(37,137,238,.22),2px 0 25px rgba(255,57,139,.15),0 30px 80px rgba(0,0,0,.58),inset -1px \
-0 rgba(255,65,143,.45),inset ', '1px 0 rgba(45,157,255,.55); }\n#ten-comic-root[data-theme="carbon"] #ten-panel::before { opacity: .45; background: \
-linear-gradient(90deg,rgba(41,148,255,.08),transparent 24%,transparent 76%,rgba(255,64,145,.07)); }\n#ten-comic-root[data-theme="carbon"] \
-.ten-header,\n#ten-comic-root[data-theme="carbon"] .ten-nav { background: rgba(5,8,13,.82); }\n#ten-comic-root[', 'data-theme="carbon"] .ten-card,\n#ten-comic-root[data-theme="carbon"] .ten-task-group { border-color: rgba(83,119,149,.38); border-radius: 14px; background: \
-linear-gradient(145deg,rgba(24,31,42,.9),rgba(8,12,18,.88)); box-shadow: inset 1px 0 rgba(44,156,255,.15),inset -1px 0 rgba(255,79,150,.09),0 8px 20px \
-rgba(0,0,0,.24); }\n#ten-comic-root[data-theme="carbon', '"] .ten-list-item { border-color: rgba(79,112,142,.34); border-radius: 11px; background: rgba(7,11,17,.77); box-shadow: inset 2px 0 rgba(44,156,255,.6); \
-}\n#ten-comic-root[data-theme="carbon"] [data-task-group="waiting"] .ten-list-item { box-shadow: inset 2px 0 rgba(255,79,150,.56); \
-}\n#ten-comic-root[data-theme="carbon"] .ten-btn { border-radius: 10px; backgr', 'ound: linear-gradient(110deg,rgba(23,82,133,.75),rgba(46,35,94,.72),rgba(116,27,71,.62)); }\n#ten-comic-root[data-theme="carbon"] .ten-progress > i { \
-background: linear-gradient(90deg,#208dff,#2fa6ff,#9d4cff); box-shadow: 0 0 13px rgba(44,156,255,.48); }\n#ten-comic-root[data-theme="carbon"] .ten-nav { \
-border-top-color: rgba(61,112,151,.38); }\n#ten-comic-root[', 'data-theme="carbon"] .ten-nav::before { border-color: rgba(40,142,255,.65); border-radius: 12px; background: rgba(16,28,43,.78); box-shadow: -4px 0 14px \
-rgba(39,143,255,.18),4px 0 14px rgba(255,65,143,.12),inset 0 0 0 1px rgba(255,255,255,.04); }\n#ten-comic-root[data-theme="carbon"] #ten-search-panel { \
-border-color: rgba(49,153,230,.48); background: linear-g', 'radient(155deg,#111821,#070a0f 78%); box-shadow: -2px 0 22px rgba(37,137,238,.18),2px 0 22px rgba(255,57,139,.12),0 25px 70px rgba(0,0,0,.55); \
-}\n#ten-comic-root[data-theme="carbon"] .ten-chapter-tools { border-color: rgba(49,153,230,.4); border-radius: 11px; background: \
-linear-gradient(145deg,rgba(24,31,42,.96),rgba(8,12,18,.96)); }\n#ten-comic-root[data-them', 'e="carbon"] .ten-mini-task,\n#ten-comic-root[data-theme="carbon"] .ten-rule-pick-hud { border-color: rgba(49,153,230,.48); border-radius: 14px; background: \
-linear-gradient(145deg,#111821,#070a0f); box-shadow: -2px 0 18px rgba(37,137,238,.18),2px 0 18px rgba(255,57,139,.12),0 18px 46px rgba(0,0,0,.48); \
-}\n#ten-comic-root[data-theme="carbon"] .ten-rule-pick-acti', 'ons button { border-color: rgba(83,119,149,.38); background: rgba(7,11,17,.78); }\n\n#ten-comic-root[data-theme="ink"] { --ten-bg: rgba(24,20,15,.94); \
---ten-surface: rgba(38,32,24,.78); --ten-surface-strong: rgba(47,39,29,.9); --ten-line: rgba(206,178,125,.24); --ten-text: #f1e2c5; --ten-muted: #a6977c; \
---ten-cyan: #83a875; --ten-blue: #668c6f; --ten-violet: #', 'a18558; --ten-pink: #d06a52; --ten-danger: #e16d53; --ten-success: #91b67b; font-family: "Noto Serif SC","Songti SC","Microsoft YaHei",serif; \
-}\n#ten-comic-root[data-theme="ink"] #ten-comic-launcher { color: #f0d6a6; border-color: rgba(194,151,82,.48); border-radius: 17px; background: \
-linear-gradient(145deg,rgba(48,48,31,.96),rgba(24,22,17,.96)); box-shadow: ', '0 12px 30px rgba(20,12,5,.4),inset 0 1px rgba(255,232,192,.08); }\n#ten-comic-root[data-theme="ink"] #ten-panel { border-color: rgba(203,171,112,.3); \
-border-radius: 24px; background: radial-gradient(circle at 12% 88%,rgba(68,94,59,.13),transparent 27%),linear-gradient(155deg,#2b261d,#15130f 76%); box-shadow: \
-0 30px 88px rgba(15,9,4,.62),in', 'set 0 1px rgba(255,238,207,.05); }\n#ten-comic-root[data-theme="ink"] #ten-panel::before { opacity: .45; background: radial-gradient(circle at 88% \
-4%,rgba(173,128,67,.12),transparent 28%),radial-gradient(circle at 2% 92%,rgba(67,104,64,.12),transparent 30%); }\n#ten-comic-root[data-theme="ink"] \
-.ten-header,\n#ten-comic-root[data-theme="ink"] .ten-nav { backgrou', 'nd: rgba(20,17,13,.72); }\n#ten-comic-root[data-theme="ink"] .ten-card,\n#ten-comic-root[data-theme="ink"] .ten-task-group { border-color: \
-rgba(202,174,123,.2); border-radius: 19px; background: linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); box-shadow: inset 0 1px \
-rgba(255,231,191,.04),0 8px 22px rgba(12,8,4,.18); }\n#ten-comic-root[data-theme="', 'ink"] .ten-list-item { border-color: rgba(195,169,119,.18); border-radius: 14px; background: rgba(17,16,12,.68); }\n#ten-comic-root[data-theme="ink"] .ten-btn \
-{ color: #f1dfbd; border-color: rgba(190,151,87,.24); border-radius: 12px; background: linear-gradient(110deg,rgba(72,73,45,.72),rgba(85,58,34,.68)); \
-}\n#ten-comic-root[data-theme="ink"] .ten-progress > ', 'i { background: linear-gradient(90deg,#668d64,#90ad75,#c29455); box-shadow: 0 0 10px rgba(135,170,106,.25); }\n#ten-comic-root[data-theme="ink"] \
-.ten-task-state.is-completed { color: #9fbe82; }\n#ten-comic-root[data-theme="ink"] .ten-nav::before { border-color: rgba(193,154,91,.3); border-radius: 15px; \
-background: rgba(89,66,38,.4); box-shadow: inset 0 1px rgb', 'a(255,232,190,.05); }\n#ten-comic-root[data-theme="ink"] #ten-particle-field { opacity: .22; filter: sepia(1) hue-rotate(45deg); \
-}\n#ten-comic-root[data-theme="ink"] #ten-search-panel { color: #f1e2c5; border-color: rgba(203,171,112,.28); background: linear-gradient(155deg,#2b261d,#15130f \
-78%); }\n#ten-comic-root[data-theme="ink"] .ten-chapter-tools { border-co', 'lor: rgba(202,174,123,.2); border-radius: 15px; background: linear-gradient(145deg,rgba(50,43,33,.94),rgba(25,22,17,.94)); }\n#ten-comic-root[data-theme="ink"] \
-.ten-mini-task,\n#ten-comic-root[data-theme="ink"] .ten-rule-pick-hud { border-color: rgba(203,171,112,.28); border-radius: 18px; background: \
-linear-gradient(145deg,rgba(50,43,33,.97),rgba(25,22,17,.98)', '); box-shadow: 0 18px 46px rgba(15,9,4,.48),inset 0 1px rgba(255,238,207,.05); }\n#ten-comic-root[data-theme="ink"] .ten-rule-pick-actions button { \
-border-color: rgba(195,169,119,.2); background: rgba(17,16,12,.68); }\n\n#ten-comic-root[data-theme="glass"] { \
---ten-panel-bg:linear-gradient(150deg,rgba(20,42,67,.68),rgba(9,18,36,.78)); --ten-panel-border:rgba(133', ",233,255,.28); --ten-panel-shadow:0 30px 90px rgba(0,5,15,.5),0 0 0 1px rgba(255,255,255,.05) inset,0 0 42px rgba(91,140,255,.12); \
---ten-header-bg:rgba(4,12,25,.48); --ten-card-bg:rgba(23,38,62,.55); --ten-card-border:rgba(137,225,255,.2); --ten-card-shadow:inset 0 1px \
-rgba(255,255,255,.06); --ten-task-bg:rgba(10,25,46,.52); --ten-list-bg:rgba(23,38,62,.46);", " --ten-list-hover-bg:rgba(36,61,91,.6); --ten-control-bg:linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72)); \
---ten-control-hover-bg:rgba(95,246,255,.09); --ten-control-border:rgba(111,220,255,.2); \
---ten-primary-bg:linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff); --ten-primary-text:#04131c; --ten-primary-border:rgba(16", "0,255,255,.72); --ten-danger-bg:rgba(255,97,116,.12); --ten-danger-text:#ffdfe5; --ten-danger-border:rgba(255,97,116,.3); --ten-input-bg:rgba(2,10,22,.42); \
---ten-popover-bg:linear-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98)); --ten-empty-bg:rgba(11,27,49,.38); --ten-info-bg:rgba(2,10,22,.25); \
---ten-mini-bg:linear-gradient(145deg,rgba(28,51,75,.94),", "rgba(20,28,52,.95)); --ten-overlay-bg:rgba(2,8,19,.62); --ten-tooltip-bg:rgba(5,15,29,.97); --ten-tooltip-text:#eefaff; \
---ten-tooltip-border:rgba(95,246,255,.28); --ten-tooltip-shadow:0 10px 28px rgba(0,5,15,.38),inset 0 1px rgba(255,255,255,.08); --ten-focus-ring:0 0 0 3px \
-rgba(95,246,255,.1); --ten-scroll-thumb:rgba(95,246,255,.3); --ten-radius-panel:24px;", ' --ten-radius-card:15px; --ten-radius-control:11px; }\n#ten-comic-root[data-theme="mist"] { --ten-panel-bg:radial-gradient(circle at 90% \
-2%,rgba(151,129,232,.17),transparent 31%),radial-gradient(circle at 2% 88%,rgba(66,177,218,.14),transparent \
-32%),linear-gradient(155deg,rgba(244,250,255,.78),rgba(224,236,248,.7)); --ten-panel-border:rgba(255,255,255,.86); -', "-ten-panel-shadow:0 30px 86px rgba(43,73,99,.24),inset 0 1px rgba(255,255,255,.96); --ten-header-bg:rgba(248,252,255,.58); \
---ten-card-bg:linear-gradient(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); --ten-card-border:rgba(255,255,255,.76); --ten-card-shadow:0 10px 25px \
-rgba(54,88,112,.1),inset 0 1px rgba(255,255,255,.88); --ten-task-bg:linear-gradient", "(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); --ten-list-bg:rgba(255,255,255,.46); --ten-list-hover-bg:rgba(255,255,255,.68); \
---ten-control-bg:linear-gradient(115deg,rgba(208,235,248,.86),rgba(228,220,249,.8),rgba(213,240,242,.82)); --ten-control-hover-bg:rgba(225,244,252,.8); \
---ten-control-border:rgba(77,126,174,.2); --ten-primary-bg:linear-gradient", "(115deg,#8de7ef,#9bbdf4,#c5b3ef); --ten-primary-text:#183247; --ten-primary-border:rgba(22,142,175,.3); --ten-danger-bg:rgba(255,232,239,.72); \
---ten-danger-text:#a53e5c; --ten-danger-border:rgba(206,79,109,.24); --ten-input-bg:rgba(255,255,255,.45); \
---ten-popover-bg:linear-gradient(145deg,rgba(250,253,255,.97),rgba(226,237,247,.97)); --ten-empty-bg:linear-gr", "adient(145deg,rgba(255,255,255,.62),rgba(222,237,247,.48)); --ten-info-bg:rgba(255,255,255,.5); \
---ten-mini-bg:linear-gradient(145deg,rgba(250,253,255,.94),rgba(222,237,248,.92)); --ten-overlay-bg:rgba(34,48,60,.36); --ten-tooltip-bg:rgba(250,253,255,.98); \
---ten-tooltip-text:#183247; --ten-tooltip-border:rgba(77,126,174,.24); --ten-tooltip-shadow:0 10px 28px ", 'rgba(43,73,99,.2),inset 0 1px rgba(255,255,255,.92); --ten-focus-ring:0 0 0 3px rgba(22,142,175,.12); --ten-scroll-thumb:rgba(22,142,175,.28); \
---ten-radius-panel:27px; --ten-radius-card:18px; --ten-radius-control:13px; }\n#ten-comic-root[data-theme="porcelain"] { --ten-panel-bg:#f5f1e9; \
---ten-panel-border:#d6cfc4; --ten-panel-shadow:0 28px 72px rgba(55,48,40,', ".24),inset 0 1px #fff; --ten-header-bg:#f0ebe2; --ten-card-bg:#fffdf9; --ten-card-border:#ddd6ca; --ten-card-shadow:0 7px 18px rgba(65,55,43,.08),inset 0 1px \
-#fff; --ten-task-bg:#fffdf9; --ten-list-bg:#faf7f1; --ten-list-hover-bg:#f5f8fa; --ten-control-bg:#eee8de; --ten-control-hover-bg:#e8eff4; \
---ten-control-border:#d2c8bb; --ten-primary-bg:#315f88; --ten-p", "rimary-text:#f7fbff; --ten-primary-border:#315f88; --ten-danger-bg:#fae9e5; --ten-danger-text:#9c403b; --ten-danger-border:#dfb8b1; --ten-input-bg:#fffdf9; \
---ten-popover-bg:#fffdf9; --ten-empty-bg:#fffdf9; --ten-info-bg:#faf7f1; --ten-mini-bg:#fffdf9; --ten-overlay-bg:rgba(55,48,40,.28); --ten-tooltip-bg:#fffdf9; \
---ten-tooltip-text:#28323b; --ten-tooltip-bor", 'der:#d8d0c4; --ten-tooltip-shadow:0 10px 26px rgba(65,55,43,.18),inset 0 1px #fff; --ten-focus-ring:0 0 0 3px rgba(49,95,136,.1); \
---ten-scroll-thumb:rgba(49,95,136,.25); --ten-radius-panel:20px; --ten-radius-card:13px; --ten-radius-control:9px; }\n#ten-comic-root[data-theme="expressive"] { \
---ten-panel-bg:radial-gradient(circle at 90% 4%,rgba(120,85,255,.22),t', "ransparent 34%),radial-gradient(circle at 8% 92%,rgba(44,190,245,.15),transparent 34%),linear-gradient(155deg,rgba(31,29,79,.94),rgba(13,17,47,.96)); \
---ten-panel-border:rgba(174,183,255,.3); --ten-panel-shadow:0 30px 90px rgba(17,9,58,.55),inset 0 1px rgba(255,255,255,.07); --ten-header-bg:rgba(27,27,72,.58); \
---ten-card-bg:linear-gradient(145deg,rgba(69,64,1", "28,.48),rgba(31,31,79,.48)); --ten-card-border:rgba(180,178,255,.2); --ten-card-shadow:inset 0 1px rgba(255,255,255,.07),0 9px 24px rgba(13,9,50,.14); \
---ten-task-bg:linear-gradient(145deg,rgba(69,64,128,.48),rgba(31,31,79,.48)); --ten-list-bg:rgba(24,27,71,.55); --ten-list-hover-bg:rgba(56,52,112,.62); \
---ten-control-bg:linear-gradient(115deg,rgba(48,119,174,", ".78),rgba(107,69,190,.78),rgba(44,129,151,.74)); --ten-control-hover-bg:rgba(97,221,255,.1); --ten-control-border:rgba(178,173,255,.24); \
---ten-primary-bg:linear-gradient(115deg,#61ddff,#7c98ff,#aa71ff); --ten-primary-text:#16152f; --ten-primary-border:rgba(174,183,255,.45); \
---ten-danger-bg:rgba(255,117,199,.12); --ten-danger-text:#ffdff3; --ten-danger-border", ":rgba(255,117,199,.3); --ten-input-bg:rgba(19,22,63,.52); --ten-popover-bg:linear-gradient(155deg,rgba(69,64,128,.98),rgba(20,22,61,.98)); \
---ten-empty-bg:rgba(31,31,79,.46); --ten-info-bg:rgba(20,23,64,.48); --ten-mini-bg:linear-gradient(145deg,rgba(69,64,128,.96),rgba(25,27,72,.97)); \
---ten-overlay-bg:rgba(13,10,45,.64); --ten-tooltip-bg:rgba(25,23,68,.98); ", '--ten-tooltip-text:#f7f4ff; --ten-tooltip-border:rgba(174,183,255,.3); --ten-tooltip-shadow:0 12px 30px rgba(17,9,58,.42),inset 0 1px rgba(255,255,255,.08); \
---ten-focus-ring:0 0 0 3px rgba(97,221,255,.11); --ten-scroll-thumb:rgba(97,221,255,.28); --ten-radius-panel:30px; --ten-radius-card:21px; \
---ten-radius-control:14px; }\n#ten-comic-root[data-theme="carbon"', "] { --ten-panel-bg:linear-gradient(155deg,#111821,#070a0f 76%); --ten-panel-border:rgba(49,153,230,.55); --ten-panel-shadow:-2px 0 25px \
-rgba(37,137,238,.22),2px 0 25px rgba(255,57,139,.15),0 30px 80px rgba(0,0,0,.58),inset -1px 0 rgba(255,65,143,.45),inset 1px 0 rgba(45,157,255,.55); \
---ten-header-bg:rgba(5,8,13,.82); --ten-card-bg:linear-gradient(145deg,rgba", "(24,31,42,.9),rgba(8,12,18,.88)); --ten-card-border:rgba(83,119,149,.38); --ten-card-shadow:inset 1px 0 rgba(44,156,255,.15),inset -1px 0 \
-rgba(255,79,150,.09),0 8px 20px rgba(0,0,0,.24); --ten-task-bg:linear-gradient(145deg,rgba(24,31,42,.9),rgba(8,12,18,.88)); --ten-list-bg:rgba(7,11,17,.77); \
---ten-list-hover-bg:rgba(15,25,37,.88); --ten-control-bg:linear-g", "radient(110deg,rgba(23,82,133,.75),rgba(46,35,94,.72),rgba(116,27,71,.62)); --ten-control-hover-bg:rgba(44,156,255,.1); \
---ten-control-border:rgba(85,145,190,.3); --ten-primary-bg:linear-gradient(110deg,#208dff,#9d4cff,#ff4f96); --ten-primary-text:#f6fbff; \
---ten-primary-border:rgba(44,156,255,.55); --ten-danger-bg:rgba(255,79,150,.12); --ten-danger-text:#ffdd", "ea; --ten-danger-border:rgba(255,79,150,.3); --ten-input-bg:rgba(4,8,13,.8); --ten-popover-bg:linear-gradient(155deg,#111821,#070a0f); \
---ten-empty-bg:rgba(8,13,20,.78); --ten-info-bg:rgba(7,11,17,.8); --ten-mini-bg:linear-gradient(145deg,#111821,#070a0f); --ten-overlay-bg:rgba(0,0,0,.7); \
---ten-tooltip-bg:#070a0f; --ten-tooltip-text:#edf5ff; --ten-tooltip-bor", 'der:rgba(49,153,230,.48); --ten-tooltip-shadow:-2px 0 14px rgba(37,137,238,.18),2px 0 14px rgba(255,57,139,.12),0 12px 28px rgba(0,0,0,.48); --ten-focus-ring:0 \
-0 0 3px rgba(44,156,255,.1); --ten-scroll-thumb:rgba(44,156,255,.32); --ten-radius-panel:17px; --ten-radius-card:14px; --ten-radius-control:10px; \
-}\n#ten-comic-root[data-theme="ink"] { --ten-panel-bg:r', "adial-gradient(circle at 12% 88%,rgba(68,94,59,.13),transparent 27%),linear-gradient(155deg,#2b261d,#15130f 76%); --ten-panel-border:rgba(203,171,112,.3); \
---ten-panel-shadow:0 30px 88px rgba(15,9,4,.62),inset 0 1px rgba(255,238,207,.05); --ten-header-bg:rgba(20,17,13,.72); \
---ten-card-bg:linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); --ten-car", "d-border:rgba(202,174,123,.2); --ten-card-shadow:inset 0 1px rgba(255,231,191,.04),0 8px 22px rgba(12,8,4,.18); \
---ten-task-bg:linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); --ten-list-bg:rgba(17,16,12,.68); --ten-list-hover-bg:rgba(50,43,33,.82); \
---ten-control-bg:linear-gradient(110deg,rgba(72,73,45,.72),rgba(85,58,34,.68)); --ten-control-hov", "er-bg:rgba(131,168,117,.1); --ten-control-border:rgba(190,151,87,.24); --ten-primary-bg:linear-gradient(110deg,#83a875,#a18558); --ten-primary-text:#17140f; \
---ten-primary-border:rgba(194,151,82,.42); --ten-danger-bg:rgba(208,106,82,.12); --ten-danger-text:#f3c9b8; --ten-danger-border:rgba(208,106,82,.3); \
---ten-input-bg:rgba(17,15,11,.64); --ten-popover-bg:li", "near-gradient(155deg,rgba(50,43,33,.98),rgba(22,19,14,.99)); --ten-empty-bg:rgba(31,27,20,.68); --ten-info-bg:rgba(17,15,11,.55); \
---ten-mini-bg:linear-gradient(145deg,rgba(50,43,33,.97),rgba(25,22,17,.98)); --ten-overlay-bg:rgba(15,9,4,.68); --ten-tooltip-bg:rgba(28,24,18,.98); \
---ten-tooltip-text:#f1e2c5; --ten-tooltip-border:rgba(203,171,112,.28); --ten-too", 'ltip-shadow:0 12px 28px rgba(15,9,4,.48),inset 0 1px rgba(255,238,207,.05); --ten-focus-ring:0 0 0 3px rgba(131,168,117,.1); \
---ten-scroll-thumb:rgba(161,133,88,.32); --ten-radius-panel:24px; --ten-radius-card:19px; --ten-radius-control:12px; }\n\n#ten-comic-root[data-theme="glass"] { \
---ten-toast-bg:rgba(5,15,29,.94); --ten-toast-text:#eefaff; --ten-toast-borde', 'r:rgba(95,246,255,.3); --ten-launcher-bg:linear-gradient(145deg,rgba(28,72,108,.88),rgba(91,54,148,.86)); --ten-launcher-border:rgba(111,236,255,.48); \
---ten-launcher-shadow:0 12px 34px rgba(4,14,30,.3),0 0 25px rgba(95,246,255,.2),inset 0 1px rgba(255,255,255,.18); --ten-radius-launcher:18px; \
-}\n#ten-comic-root[data-theme="mist"] { --ten-toast-bg:rgba(250,253', ",255,.98); --ten-toast-text:#183247; --ten-toast-border:rgba(77,126,174,.24); --ten-launcher-bg:linear-gradient(145deg,rgba(255,255,255,.82),rgba(219,237,250,.68)); \
---ten-launcher-border:rgba(255,255,255,.84); --ten-launcher-shadow:0 14px 38px rgba(49,91,123,.2),0 0 24px rgba(86,168,213,.16),inset 0 1px \
-rgba(255,255,255,.96); --ten-radius-launcher:20px; }\n#t", 'en-comic-root[data-theme="porcelain"] { --ten-toast-bg:#fffdf9; --ten-toast-text:#28323b; --ten-toast-border:#d8d0c4; --ten-launcher-bg:#fffdf8; \
---ten-launcher-border:#d9d1c4; --ten-launcher-shadow:0 11px 28px rgba(62,54,44,.18),inset 0 1px #fff; --ten-radius-launcher:15px; \
-}\n#ten-comic-root[data-theme="expressive"] { --ten-toast-bg:rgba(25,23,68,.98); --ten', "-toast-text:#f7f4ff; --ten-toast-border:rgba(174,183,255,.3); --ten-launcher-bg:linear-gradient(145deg,rgba(55,164,221,.94),rgba(132,75,226,.94)); \
---ten-launcher-border:rgba(174,183,255,.34); --ten-launcher-shadow:0 14px 36px rgba(40,23,103,.42),0 0 27px rgba(121,113,255,.27),inset 0 1px \
-rgba(255,255,255,.22); --ten-radius-launcher:22px; }\n#ten-comic-root[da", 'ta-theme="carbon"] { --ten-toast-bg:#070a0f; --ten-toast-text:#edf5ff; --ten-toast-border:rgba(49,153,230,.48); \
---ten-launcher-bg:linear-gradient(145deg,#111824,#080b11); --ten-launcher-border:rgba(45,157,255,.72); --ten-launcher-shadow:-4px 0 22px rgba(41,143,255,.3),4px \
-0 22px rgba(255,66,144,.2),inset 0 0 0 1px rgba(255,255,255,.05); --ten-radius-launcher', ':15px; }\n#ten-comic-root[data-theme="ink"] { --ten-toast-bg:rgba(28,24,18,.98); --ten-toast-text:#f1e2c5; --ten-toast-border:rgba(203,171,112,.28); \
---ten-launcher-bg:linear-gradient(145deg,rgba(48,48,31,.96),rgba(24,22,17,.96)); --ten-launcher-border:rgba(194,151,82,.48); --ten-launcher-shadow:0 12px 30px \
-rgba(20,12,5,.4),inset 0 1px rgba(255,232,192,.08); -', "-ten-radius-launcher:17px; }\n\n#ten-comic-root[data-theme] #ten-panel,\n#ten-comic-root[data-theme] #ten-search-panel { border-color:var(--ten-panel-border); \
-border-radius:var(--ten-radius-panel); background:var(--ten-panel-bg); box-shadow:var(--ten-panel-shadow); }\n#ten-comic-root[data-theme] \
-.ten-header,\n#ten-comic-root[data-theme] .ten-n", "av,\n#ten-comic-root[data-theme] .ten-search-panel-header { background:var(--ten-header-bg); }\n#ten-comic-root[data-theme] .ten-card { \
-border-color:var(--ten-card-border); border-radius:var(--ten-radius-card); background:var(--ten-card-bg); box-shadow:var(--ten-card-shadow); \
-}\n#ten-comic-root[data-theme] .ten-task-group { border-color:var(--ten-card-border); ", "border-radius:var(--ten-radius-card); background:var(--ten-task-bg); box-shadow:var(--ten-card-shadow); }\n#ten-comic-root[data-theme] \
-.ten-list-item,\n#ten-comic-root[data-theme] .ten-status,\n#ten-comic-root[data-theme] .ten-chapter-list-head { background:var(--ten-list-bg); \
-}\n#ten-comic-root[data-theme] .ten-list-item:hover { background:var(--ten-list-hover-", "bg); }\n#ten-comic-root[data-theme] .ten-btn:not(.is-primary):not(.is-danger) { color:var(--ten-text); border-color:var(--ten-control-border); \
-border-radius:var(--ten-radius-control); background:var(--ten-control-bg); }\n#ten-comic-root[data-theme] .ten-btn.is-primary { color:var(--ten-primary-text); \
-border-color:var(--ten-primary-border); background:var(--ten", "-primary-bg); }\n#ten-comic-root[data-theme] .ten-btn.is-danger { color:var(--ten-danger-text); border-color:var(--ten-danger-border); \
-background:var(--ten-danger-bg); }\n#ten-comic-root[data-theme] .ten-input,\n#ten-comic-root[data-theme] .ten-select,\n#ten-comic-root[data-theme] \
-.ten-textarea,\n#ten-comic-root[data-theme] .ten-setting-select > button { backgrou", "nd:var(--ten-input-bg); }\n#ten-comic-root[data-theme] .ten-setting-select-menu,\n#ten-comic-root[data-theme] \
-.ten-search-site-menu,\n#ten-comic-root[data-theme] .ten-confirm-dialog,\n#ten-comic-root[data-theme] .ten-diagnostic-dialog { color:var(--ten-text); \
-border-color:var(--ten-panel-border); background:var(--ten-popover-bg); box-shadow:var(--ten-tooltip-sha", "dow); }\n#ten-comic-root[data-theme] .ten-chapter-empty { border-color:var(--ten-card-border); background:var(--ten-empty-bg); \
-box-shadow:var(--ten-card-shadow); }\n#ten-comic-root[data-theme] .ten-comic-info { border-color:var(--ten-card-border); background:var(--ten-info-bg); \
-}\n#ten-comic-root[data-theme] .ten-mini-task,\n#ten-comic-root[data-theme] .ten-rule", "-pick-hud { color:var(--ten-text); border-color:var(--ten-panel-border); border-radius:var(--ten-radius-card); background:var(--ten-mini-bg); \
-box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] .ten-rule-intro { border-color:var(--ten-card-border); \
-border-radius:var(--ten-radius-control); background:var(--ten-list-bg); }\n#ten-comic-root[data-", "theme] .ten-rule-advanced,\n#ten-comic-root[data-theme] .ten-rule-pick-actions button { color:var(--ten-text); border-color:var(--ten-control-border); \
-border-radius:var(--ten-radius-control); background:var(--ten-input-bg); }\n#ten-comic-root[data-theme] .ten-icon-tooltip { color:var(--ten-tooltip-text); \
-border-color:var(--ten-tooltip-border); background:var(-", "-ten-tooltip-bg); box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] .ten-toast { color:var(--ten-toast-text); \
-border-color:var(--ten-toast-border); background:var(--ten-toast-bg); box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] #ten-comic-launcher { \
-border-color:var(--ten-launcher-border); border-radius:var(--ten-radius-", 'launcher); background:var(--ten-launcher-bg); box-shadow:var(--ten-launcher-shadow); }\n\n#ten-comic-root[data-shape="sharp"] { --ten-radius-panel: 14px; \
---ten-radius-card: 10px; --ten-radius-control: 7px; --ten-radius-launcher: 10px; }\n#ten-comic-root[data-shape="round"] { --ten-radius-panel: 30px; --ten-radius-card: 22px; --te', 'n-radius-control: 15px; --ten-radius-launcher: 22px; }\n#ten-comic-root[data-density="compact"] #ten-panel { grid-template-rows: 52px minmax(0,1fr) 58px; \
-}\n#ten-comic-root[data-density="compact"] .ten-view { padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-card { margin-bottom: 6px; padding: 9px; \
-}\n#ten-comic-root[data-density="compact"] .ten-list', ' { gap: 5px; }\n#ten-comic-root[data-density="compact"] .ten-list-item { min-height: 38px; padding: 7px 9px; }\n#ten-comic-root[data-density="comfortable"] \
-.ten-view { padding: 16px; }\n#ten-comic-root[data-density="comfortable"] .ten-card { margin-bottom: 12px; padding: 13px; \
-}\n#ten-comic-root[data-density="comfortable"] .ten-list { gap: 9px; }\n#ten-comic-root', '[data-density="comfortable"] .ten-list-item { min-height: 47px; padding: 11px 13px; }\n#ten-comic-root[data-motion="calm"] #ten-panel { transition-duration: \
-.25s; }\n#ten-comic-root[data-motion="calm"] .ten-task-body { transition-duration: .32s; }\n#ten-comic-root[data-motion="spring"] #ten-panel { \
-transition-timing-function: cubic-bezier(.16,1.35,.3,1); }\n#ten', '-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: cubic-bezier(.16,1.25,.3,1); }\n\n@media (max-width: 380px) {\n  \
-.ten-theme-presets { grid-template-columns: 1fr; }\n}\n' ].join(""), 
-                (document.head || document.documentElement).appendChild(e);
-            }(), (0, siteRules.HL)(window.location.href);
-            const t = document.createElement("div");
-            t.id = ROOT_ID, t.innerHTML = [ [ '<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">\n    <symbol id="ten-i-globe" viewBox="0 0 24 24"><circle cx="12" \
+        function renderShell() {
+            return [ [ '<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">\n    <symbol id="ten-i-globe" viewBox="0 0 24 24"><circle cx="12" \
 cy="12" r="9"/><path d="M3 12h18M12 3c3 3.3 3 14.7 0 18M12 3c-3 3.3-3 14.7 0 18"/></symbol>\n    <symbol id="ten-i-layers" viewBox="0 0 24 24"><path d="m12 3 9 \
 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5', ' 9-5"/></symbol>\n    <symbol id="ten-i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></symbol>\n    <symbol id="ten-i-settings" \
 viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 \
@@ -6687,16 +2837,16 @@ class="ten-btn is-danger" type="button" hidden>取消编辑</button></div><detai
 id="ten-rule-text" class="ten-textarea" place', 'holder="粘贴原版站点规则数组" autocomplete="off" spellcheck="false"></textarea><button id="ten-import-rules" class="ten-btn" \
 type="button">导入并保存</button></details></div><div class="ten-card ten-settings-card"><div class="ten-card-title">设置与规则备份</div><div \
 class="ten-backup-actions"><button id="ten-backup-export" class="ten-btn" type="button">导出备份</button><button id="te', 'n-backup-import" class="ten-btn is-primary" type="button">导入备份</button></div><input id="ten-backup-file" type="file" accept="application/json,.json" \
-hidden><div class="ten-settings-hint">包含界面、下载设置和自定义规则</div></div><button id="ten-reset" class="ten-btn is-danger" type="button" style="width:100%">重置全部设置</button></section>' ].join("") ].join(""), '</main><nav class="ten-nav" aria-label="功能导航">', navButton("sites", "globe", "站点"), navButton("chapters", "layers", "章节"), navButton("tasks", "download", "任务"), navButton("settings", "settings", "设置"), '</nav><div id="ten-toast" class="ten-toast" role="status" aria-live="polite"><span id="ten-toast-text"></span><button id="ten-toast-action" type="button" hidden>撤销</button></div>', `<div id="ten-confirm" class="ten-confirm" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-confirm-cancel \
+hidden><div class="ten-settings-hint">包含界面、下载设置和自定义规则</div></div><button id="ten-reset" class="ten-btn is-danger" type="button" style="width:100%">重置全部设置</button></section>' ].join("") ].join(""), '</main><nav class="ten-nav" aria-label="功能导航">', navButton("sites", "globe", "站点"), navButton("chapters", "layers", "章节"), navButton("tasks", "download", "任务"), navButton("settings", "settings", "设置"), '</nav><div id="ten-toast" class="ten-toast" role="status" aria-live="polite"><span id="ten-toast-text"></span><button id="ten-toast-action" type="button" hidden>撤销</button></div>', `<div id="ten-confirm" inert class="ten-confirm" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-confirm-cancel \
 aria-label="取消"></button><div class="ten-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ten-confirm-title" \
 aria-describedby="ten-confirm-message"><div class="ten-confirm-icon">${icon("trash")}</div><div id="ten-confirm-title" class="ten-confirm-title">确认操作</div><div id="ten-confirm-message" class="ten-confirm-message"></div><div \
 class="ten-confirm-actions"><button id="ten-confirm-cancel" class="ten-btn" type="button" data-confirm-cancel>取消</button><button id="ten-confirm-ok" \
-class="ten-btn is-danger" type="button">确认</button></div></div></div>`, `<div id="ten-diagnostic" class="ten-diagnostic" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-diagnostic-close \
+class="ten-btn is-danger" type="button">确认</button></div></div></div>`, `<div id="ten-diagnostic" inert class="ten-diagnostic" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-diagnostic-close \
 aria-label="关闭诊断"></button><div class="ten-diagnostic-dialog" role="dialog" aria-modal="true" aria-labelledby="ten-diagnostic-title"><div \
 class="ten-diagnostic-head"><div class="ten-confirm-icon is-info">${icon("info")}</div><div><div id="ten-diagnostic-title" class="ten-confirm-title">下载诊断</div><div id="ten-diagnostic-summary" class="ten-meta"></div></div><button \
 class="ten-icon-btn" type="button" data-diagnostic-close aria-label="关闭">${icon("close")}</button></div><pre id="ten-diagnostic-content"></pre><div class="ten-diagnostic-actions"><button id="ten-copy-failures" class="ten-btn" \
 type="button">复制失败清单</button><button id="ten-diagnostic-copy" class="ten-btn" type="button">复制诊断信息</button><button class="ten-btn is-primary" type="button" \
-data-diagnostic-close>完成</button></div></div></div>`, `<div id="ten-rule-guide" class="ten-diagnostic ten-rule-guide" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-rule-guide-close \
+data-diagnostic-close>完成</button></div></div></div>`, `<div id="ten-rule-guide" inert class="ten-diagnostic ten-rule-guide" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-rule-guide-close \
 aria-label="关闭方法说明"></button><div class="ten-diagnostic-dialog ten-rule-guide-dialog" role="dialog" aria-modal="true" \
 aria-labelledby="ten-rule-guide-title"><div class="ten-diagnostic-head"><div class="ten-confirm-icon is-info">${icon("guide")}</div><div><div id="ten-rule-guide-title" class="ten-confirm-title">自定义站点设置方法</div><div class="ten-meta">从页面选择器到保存测试</div></div><button class="ten-icon-btn" \
 type="button" data-rule-guide-close aria-label="关闭">${icon("close")}</button></div><div class="ten-rule-guide-content"><section><h3>一、添加前准备</h3><ol><li>先打开漫画的目录页面，确保页面中能看到漫画名称和章节链接。</li><li>按 F12 \
@@ -6708,233 +2858,9 @@ img</code></section><section><h3>四、测试与保存</h3><ol><li>在漫画目�
 JSON 导入：</b>用于导入已有规则数组；只导入来源可信的规则。</li></ul></section><section><h3>六、常见问题</h3><ul><li>章节为 0：检查章节选择器指向的容器内是否真的包含 <code>&lt;a&gt;</code> 链接。</li><li>图片为 \
 0：在章节阅读页重新检查选择器，必要时开启隐藏页面读取。</li><li>下载被拒绝：通常与登录、Cookie、防盗链或网站接口更新有关，需要调整高级规则。</li></ul></section><div \
 class="ten-rule-guide-warning">解析函数可以执行代码，请勿导入来源不明的规则。</div></div><button class="ten-btn is-primary" type="button" data-rule-guide-close>我知道了</button></div></div>`, "</aside>", `<aside id="ten-search-panel" aria-hidden="true">\n    <header class="ten-search-panel-header"><div><div class="ten-title">搜索结果</div><div \
-id="ten-search-panel-subtitle" class="ten-subtitle">全部站点</div></div><button id="ten-search-close" class="ten-icon-btn" type="button" aria-label="关闭搜索结果">${icon("close")}</button></header>\n    <div id="ten-search-results" class="ten-search-panel-content"></div>\n  </aside>`, '<div id="ten-mobile-drawer" class="ten-mobile-drawer" aria-hidden="true"><button class="ten-mobile-drawer-backdrop" type="button" data-drawer-close \
+id="ten-search-panel-subtitle" class="ten-subtitle">全部站点</div></div><button id="ten-search-close" class="ten-icon-btn" type="button" aria-label="关闭搜索结果">${icon("close")}</button></header>\n    <div id="ten-search-results" class="ten-search-panel-content"></div>\n  </aside>`, '<div id="ten-mobile-drawer" inert class="ten-mobile-drawer" aria-hidden="true"><button class="ten-mobile-drawer-backdrop" type="button" data-drawer-close \
 aria-label="关闭抽屉"></button><section class="ten-mobile-drawer-sheet" role="dialog" aria-modal="true" aria-labelledby="ten-mobile-drawer-title"><div \
-class="ten-mobile-drawer-handle"></div><header><div id="ten-mobile-drawer-title">下载选项</div><button type="button" class="ten-icon-btn" data-drawer-close aria-label="关闭">' + icon("close") + '</button></header><div id="ten-mobile-drawer-content"></div></section></div>' ].join(""), 
-            document.body.appendChild(t), state.historyRenderKey = "", state.miniNodes = null, 
-            createParticles(), function() {
-                const e = one(".ten-rule-intro");
-                e && !byId("ten-rule-pick-actions") && e.insertAdjacentHTML("afterend", `<details id="ten-rule-template-library" class="ten-rule-templates"><summary>规则模板库 <span>先选类型，再点选网页元素</span></summary><div class="ten-rule-template-grid"><button \
-type="button" data-rule-template="basic"><strong>基础卷轴</strong><small>普通图片列表</small></button><button type="button" \
-data-rule-template="lazy"><strong>懒加载阅读</strong><small>data-src 等属性</small></button><button type="button" \
-data-rule-template="frame"><strong>隐藏页面</strong><small>等待网页脚本渲染</small></button><button type="button" \
-data-rule-template="paged"><strong>翻页阅读</strong><small>需要高级解析函数</small></button></div></details><div id="ten-rule-pick-actions" class="ten-rule-pick-actions" \
-role="group" aria-label="可视化规则选择"><button type="button" data-rule-pick="title">${icon("target")}<span>选择标题</span></button><button type="button" data-rule-pick="chapters">${icon("target")}<span>选择章节</span></button><button type="button" data-rule-pick="images">${icon("target")}<span>选择图片</span></button></div>`);
-            }(), byId(LAUNCHER_ID).addEventListener("click", showUI), byId("ten-mini-open").addEventListener("click", () => {
-                showUI(), activateTab("tasks");
-            }), byId("ten-mini-toggle").addEventListener("click", toggleMiniTasks), byId("ten-rule-pick-cancel").addEventListener("click", cancelRulePicking), 
-            all("[data-rule-pick]").forEach(e => e.addEventListener("click", () => function(e) {
-                const t = RULE_PICK_CONFIG[e];
-                if (!t || state.rulePicking) return;
-                closeRuleGuide(), state.rulePicking = t, state.rulePickElement = null, document.documentElement.classList.add("ten-rule-picking-page"), 
-                byId(ROOT_ID).classList.add("is-rule-picking");
-                const n = byId("ten-rule-pick-layer");
-                n.classList.remove("is-hidden"), n.setAttribute("aria-hidden", "false"), byId("ten-rule-pick-title").textContent = `请选择${t.label}`, 
-                byId("ten-rule-pick-selector").textContent = "移动鼠标并点击，Esc 取消", document.addEventListener("pointermove", handleRulePickMove, !0), 
-                document.addEventListener("click", handleRulePickClick, !0), document.addEventListener("keydown", handleRulePickKey, !0), 
-                window.addEventListener("scroll", refreshRulePickBox, !0), window.addEventListener("resize", refreshRulePickBox, !0), 
-                syncMiniTaskBar();
-            }(e.dataset.rulePick))), all("[data-rule-template]").forEach(e => e.addEventListener("click", () => function(e) {
-                const t = RULE_TEMPLATES[e];
-                t && (t.imageCss && (byId("ten-rule-image-selector").value = t.imageCss), byId("ten-rule-use-frame").checked = t.useFrame, 
-                setRuleReadType(t.readtype), byId("ten-rule-advanced").open = 0 === t.readtype || t.useFrame, 
-                all("[data-rule-template]").forEach(t => t.classList.toggle("is-active", t.dataset.ruleTemplate === e)), 
-                toast(0 === t.readtype ? "已应用翻页模板，请在高级设置填写图片解析函数" : `已应用${t.name}模板`));
-            }(e.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
-            byId(ROOT_ID).addEventListener("pointerout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("focusin", showIconTooltip), 
-            byId(ROOT_ID).addEventListener("focusout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("click", hideIconTooltip), 
-            window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", hideIconTooltip), 
-            byId("ten-close").addEventListener("click", hideUI), byId("ten-toast-action").addEventListener("click", runToastUndo), 
-            all("[data-drawer-close]").forEach(e => e.addEventListener("click", closeMobileDrawer)), 
-            one("summary", byId("ten-rule-advanced")).addEventListener("click", openRuleAdvancedDrawer), 
-            all(".ten-tab").forEach(e => e.addEventListener("click", () => activateTab(e.dataset.tab))), 
-            all(".ten-source button").forEach(e => e.addEventListener("click", () => {
-                state.sourceMode = Number(e.dataset.source), renderSites();
-            })), byId("ten-site-list").addEventListener("click", deleteImportedRule), byId("ten-rule-clear-all").addEventListener("click", clearRules), 
-            byId("ten-search-site-trigger").addEventListener("click", toggleSearchSiteMenu), 
-            byId("ten-search-site-menu").addEventListener("click", handleSearchSiteChoice), 
-            document.addEventListener("click", closeSearchSiteMenuOnOutsideClick), byId("ten-search-btn").addEventListener("click", searchComics), 
-            byId("ten-search-close").addEventListener("click", closeSearchPanel), byId("ten-search-input").addEventListener("keydown", e => {
-                "Enter" === e.key && searchComics();
-            }), byId("ten-load-chapters").addEventListener("click", loadChapters), byId("ten-reload-chapters").addEventListener("click", reloadChapters), 
-            byId("ten-select-all").addEventListener("click", () => selectAllChapters(!0)), byId("ten-clear-select").addEventListener("click", () => selectAllChapters(!1)), 
-            byId("ten-reverse-list").addEventListener("click", reverseChapters), byId("ten-edit-list").addEventListener("click", toggleChapterEdit), 
-            byId("ten-toggle-options").addEventListener("click", toggleOptions), byId("ten-download-selected").addEventListener("click", downloadSelected), 
-            byId("ten-download-current").addEventListener("click", downloadCurrentChapter), 
-            all(".ten-mode").forEach(e => e.addEventListener("click", () => setDownloadMode(Number(e.dataset.mode)))), 
-            byId("ten-add-sequence").addEventListener("change", updateChapterSequence), byId("ten-reverse-sequence").addEventListener("change", updateChapterSequence), 
-            byId("ten-clear-history").addEventListener("click", clearHistory), byId("ten-toggle-all-active").addEventListener("click", toggleAllActiveTasks), 
-            byId("ten-cancel-all-active").addEventListener("click", cancelAllActiveTasks), byId("ten-remove-all-waiting").addEventListener("click", removeAllWaitingTasks), 
-            byId("ten-recovery-restore").addEventListener("click", restorePendingTasks), byId("ten-recovery-discard").addEventListener("click", discardPendingTasks), 
-            byId("ten-active-tasks").addEventListener("click", handleTaskAction), byId("ten-waiting-tasks").addEventListener("click", handleTaskAction), 
-            byId("ten-history").addEventListener("click", handleHistoryClick), byId("ten-history-filter").addEventListener("click", handleHistoryFilter), 
-            byId("ten-confirm-ok").addEventListener("click", () => closeConfirm(!0)), all("[data-confirm-cancel]").forEach(e => e.addEventListener("click", () => closeConfirm(!1))), 
-            all("[data-diagnostic-close]").forEach(e => e.addEventListener("click", closeDiagnostic)), 
-            byId("ten-rule-guide-open").addEventListener("click", openRuleGuide), all("[data-rule-guide-close]").forEach(e => e.addEventListener("click", closeRuleGuide)), 
-            byId("ten-diagnostic-copy").addEventListener("click", copyDiagnostic), byId("ten-copy-failures").addEventListener("click", () => copyFailureList(state.diagnosticItem)), 
-            all(".ten-task-title-button").forEach(e => e.addEventListener("click", () => toggleTaskGroup(e))), 
-            all(".ten-task-arrow-button").forEach(e => e.addEventListener("click", e => toggleTaskGroup(e.currentTarget))), 
-            all('.ten-setting input[type="number"]').forEach(e => {
-                if (e.parentElement.classList.contains("ten-number-control")) return;
-                const t = document.createElement("div");
-                t.className = "ten-number-control", e.before(t), t.appendChild(e);
-                const n = document.createElement("span");
-                n.className = "ten-number-steps", n.innerHTML = '<button type="button" data-number-step="1" aria-label="增加数值"><i></i></button><button type="button" data-number-step="-1" aria-label="减少数值"><i></i></button>', 
-                t.appendChild(n), n.addEventListener("click", t => {
-                    const n = t.target.closest("[data-number-step]");
-                    n && (Number(n.dataset.numberStep) > 0 ? e.stepUp() : e.stepDown(), e.dispatchEvent(new Event("change", {
-                        bubbles: !0
-                    })));
-                });
-            }), all("[data-theme-choice]").forEach(e => e.addEventListener("click", () => setThemePreset(e.dataset.themeChoice, !0))), 
-            all("[data-appearance-axis]").forEach(e => e.addEventListener("click", () => function(e, t) {
-                const n = {
-                    density: [ "compact", "standard", "comfortable" ],
-                    shape: [ "sharp", "standard", "round" ],
-                    motion: [ "calm", "standard", "spring" ]
-                };
-                n[e] && n[e].includes(t) && (state.settings.appearance[e] = t, applyAppearance(state.settings.appearance), 
-                (0, configModule.po)("appearanceAxes", state.settings.appearance), toast("主题外观已更新"));
-            }(e.dataset.appearanceAxis, e.dataset.appearanceValue))), bindChange("ten-auto-open", e => saveLoadSetting("isShowUI", e.target.checked)), 
-            bindChange("ten-hotkey", e => {
-                const t = String(e.target.value || "V").slice(-1).toUpperCase();
-                e.target.value = t, state.settings.hotkey = t, saveLoadSetting("loadHotKey", t);
-            }), byId("ten-scale").addEventListener("input", e => applyScale(Number(e.target.value), !1)), 
-            byId("ten-scale").addEventListener("change", e => applyScale(Number(e.target.value), !0)), 
-            all("[data-effect-level]").forEach(e => e.addEventListener("click", () => setEffectLevel(Number(e.dataset.effectLevel), !0))), 
-            bindNumber("ten-max-chapters", "maxChapterNum", 1, 3, e => {
-                state.settings.maxChapters = e, syncQueueLimits();
-            }), bindNumber("ten-concurrent-images", "maxPictureNum", 1, 5, e => {
-                state.settings.concurrentImages = e, syncQueueLimits();
-            }), byId("ten-default-mode-trigger").addEventListener("click", toggleDefaultModeMenu), 
-            byId("ten-default-mode-menu").addEventListener("click", chooseDefaultMode), all("[data-direct-flow]").forEach(e => e.addEventListener("click", () => setDirectFlow(Number(e.dataset.directFlow), !0))), 
-            document.addEventListener("click", closeDefaultModeMenuOnOutsideClick), bindNumber("ten-max-height", "maxSplicingHeight", 1e4, 65530, e => {
-                state.settings.maxSplicingHeight = e;
-            }), bindNumber("ten-digits", "imgIndexBitNum", 1, 8, e => {
-                state.settings.digits = e;
-            }), bindNumber("ten-history-limit", "historyLimit", 10, 500, e => {
-                state.settings.historyLimit = e, trimHistory();
-            }), bindChange("ten-range-start", saveImageRange), bindChange("ten-range-end", saveImageRange), 
-            bindChange("ten-splice-page", e => {
-                state.settings.splicePage = e.target.checked, (0, configModule.po)("imgSplicingFlag", state.settings.splicePage), 
-                applyPageSplicing();
-            }), bindChange("ten-notify-complete", e => {
-                state.settings.notifyComplete = e.target.checked, (0, configModule.po)("downloadNotification", state.settings.notifyComplete);
-            }), bindChange("ten-sanitize-paths", e => {
-                state.settings.sanitizePaths = e.target.checked, (0, configModule.po)("sanitizePathNames", state.settings.sanitizePaths);
-            }), byId("ten-choose-dir").addEventListener("click", chooseDirectory), all("[data-rule-readtype]").forEach(e => e.addEventListener("click", () => setRuleReadType(Number(e.dataset.ruleReadtype)))), 
-            byId("ten-rule-test").addEventListener("click", testRuleEditor), byId("ten-rule-save").addEventListener("click", saveRuleEditor), 
-            byId("ten-rule-cancel-edit").addEventListener("click", resetRuleEditor), byId("ten-import-rules").addEventListener("click", importRules), 
-            byId("ten-backup-export").addEventListener("click", exportSettingsBackup), byId("ten-backup-import").addEventListener("click", () => byId("ten-backup-file").click()), 
-            byId("ten-backup-file").addEventListener("change", importSettingsBackup), byId("ten-reset").addEventListener("click", resetSettings), 
-            byId(ROOT_ID).addEventListener("click", addRipple), applySettingsToUI(), detectComicInfo(), 
-            renderSites(), renderChapters(), renderTasks(), async function() {
-                if ("function" != typeof window.showDirectoryPicker) return void (byId("ten-dir-name").textContent = "浏览器默认下载目录");
-                const e = await (0, downloadUtils.oZ)();
-                if (e) try {
-                    "granted" === await e.queryPermission({
-                        mode: "readwrite"
-                    }) && (state.dirHandle = e, window.__tenComicDirectoryHandle = e, byId("ten-dir-name").textContent = e.name);
-                } catch (e) {
-                    byId("ten-dir-name").textContent = "请重新选择目录";
-                }
-            }(), state.ready = !0, function() {
-                const e = safeGet(PENDING_TASKS_KEY, []), t = window.location.hostname.toLowerCase();
-                state.recoveryTasks = uniqueTaskSnapshots(Array.isArray(e) ? e : []).filter(e => taskHost(e) === t), 
-                renderRecoveryTasks();
-            }(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
-        }
-        function icon(e) {
-            return `<svg class="ten-icon" aria-hidden="true"><use href="#ten-i-${e}"></use></svg>`;
-        }
-        function navButton(e, t, n) {
-            return `<button class="ten-tab" type="button" data-tab="${e}">${icon(t)}<span>${n}</span></button>`;
-        }
-        function appearanceAxesCard() {
-            const e = (e, t, n) => `<div class="ten-setting ten-appearance-setting"><label>${t}</label><div class="ten-appearance-axis" role="group" aria-label="${t}">${n.map(([t, n]) => `<button type="button" data-appearance-axis="${e}" data-appearance-value="${t}">${n}</button>`).join("")}</div></div>`;
-            return `<div class="ten-card ten-settings-card ten-appearance-card"><div class="ten-card-title">主题外观</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</div>`;
-        }
-        function settingCheck(e, t) {
-            return `<div class="ten-setting ten-setting-check"><label for="${e}">${t}</label><input id="${e}" type="checkbox"></div>`;
-        }
-        function bindChange(e, t) {
-            byId(e).addEventListener("change", t);
-        }
-        function bindNumber(e, t, n, a, i) {
-            bindChange(e, e => {
-                const o = Math.max(n, Math.min(a, Number(e.target.value)));
-                e.target.value = o, (0, configModule.po)(t, o), i(o);
-            });
-        }
-        function setDirectFlow(e, t = !1) {
-            const n = 1 === Number(e) ? 1 : 0;
-            state.settings.directFlow = n, all("[data-direct-flow]").forEach(e => {
-                const t = Number(e.dataset.directFlow) === n;
-                e.classList.toggle("is-active", t), e.setAttribute("aria-pressed", String(t));
-            }), t && (0, configModule.po)("directDownloadFlow", n);
-        }
-        function syncQueueLimits() {
-            state.queue && state.queue.updateLimits(state.settings.maxChapters, state.settings.concurrentImages);
-        }
-        function toggleDefaultModeMenu(e) {
-            e.stopPropagation();
-            const t = byId("ten-default-mode"), n = byId("ten-default-mode-menu"), r = n.hidden;
-            n.hidden = !r, t.classList.toggle("is-open", r), byId("ten-default-mode-trigger").setAttribute("aria-expanded", String(r)), 
-            r && closeSearchSiteMenu();
-        }
-        function chooseDefaultMode(e) {
-            const t = e.target.closest("[data-default-mode]");
-            t && (setDownloadMode(Number(t.dataset.defaultMode), !0), closeDefaultModeMenu());
-        }
-        function closeDefaultModeMenuOnOutsideClick(e) {
-            const t = byId("ten-default-mode");
-            t && !t.contains(e.target) && closeDefaultModeMenu();
-        }
-        function closeDefaultModeMenu() {
-            const e = byId("ten-default-mode-menu");
-            e && (e.hidden = !0, byId("ten-default-mode").classList.remove("is-open"), byId("ten-default-mode-trigger").setAttribute("aria-expanded", "false"));
-        }
-        function applySettingsToUI() {
-            const e = state.settings;
-            setThemePreset(e.themePreset, !1), applyAppearance(e.appearance), byId("ten-auto-open").checked = e.autoOpen, 
-            byId("ten-hotkey").value = e.hotkey, byId("ten-scale").value = e.scale, byId("ten-scale-value").textContent = `${e.scale}%`, 
-            byId("ten-max-chapters").value = e.maxChapters, byId("ten-concurrent-images").value = e.concurrentImages, 
-            byId("ten-max-height").value = e.maxSplicingHeight, byId("ten-digits").value = e.digits, 
-            byId("ten-history-limit").value = e.historyLimit, byId("ten-range-start").value = e.imageRange[0], 
-            byId("ten-range-end").value = e.imageRange[1], byId("ten-splice-page").checked = e.splicePage, 
-            byId("ten-notify-complete").checked = e.notifyComplete, byId("ten-sanitize-paths").checked = e.sanitizePaths;
-            byId("ten-rule-text").value = "", resetRuleEditor(), applyScale(e.scale, !1), setEffectLevel(e.effectLevel, !1), 
-            setDownloadMode(e.downloadType, !1), setDirectFlow(e.directFlow, !1), applyPageSplicing();
-        }
-        function showUI() {
-            state.ready && (state.visible = !0, byId(PANEL_ID).classList.add("is-open"), byId(PANEL_ID).setAttribute("aria-hidden", "false"), 
-            byId(LAUNCHER_ID).classList.add("is-hidden"), syncMiniTaskBar(), refreshQueueOnVisibility(), 
-            state.recoveryTasks.length && toast(`发现 ${state.recoveryTasks.length} 个未完成任务`));
-        }
-        function hideUI() {
-            state.ready && (state.rulePicking && finishRulePicking(), state.visible = !1, byId(PANEL_ID).classList.remove("is-open"), 
-            byId(PANEL_ID).setAttribute("aria-hidden", "true"), byId(LAUNCHER_ID).classList.toggle("is-hidden", !state.launcherVisible), 
-            closeSearchPanel(), closeDefaultModeMenu(), closeDiagnostic(), closeRuleGuide(), 
-            closeMobileDrawer(), state.confirmResolve && closeConfirm(!1), syncMiniTaskBar(), 
-            refreshQueueOnVisibility());
-        }
-        function toggleUI() {
-            return state.ready && !byId(PANEL_ID) && (state.ready = !1), state.ready ? state.visible ? (state.launcherVisible = !1, 
-            void hideUI()) : void (state.launcherVisible ? state.ready && (state.launcherVisible = !1, 
-            byId(LAUNCHER_ID).classList.add("is-hidden"), syncMiniTaskBar()) : showLauncher()) : (state.pendingLauncher = !0, 
-            void injectStyle());
-        }
-        function showLauncher() {
-            state.ready && (state.launcherVisible = !0, state.pendingLauncher = !1, byId(LAUNCHER_ID).classList.remove("is-hidden"), 
-            syncMiniTaskBar());
-        }
-        function activateTab(e) {
-            if (!TAB_ORDER.includes(e)) return;
-            state.activeTab = e, all(".ten-view").forEach(t => t.classList.toggle("is-active", t.dataset.view === e)), 
-            all(".ten-tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === e));
-            const t = TAB_ORDER.indexOf(e);
-            one(".ten-nav").style.setProperty("--tab", t), byId("ten-title").textContent = TAB_TITLES[e][0], 
-            byId("ten-subtitle").textContent = TAB_TITLES[e][1], "tasks" === e && renderTasks();
+class="ten-mobile-drawer-handle"></div><header><div id="ten-mobile-drawer-title">下载选项</div><button type="button" class="ten-icon-btn" data-drawer-close aria-label="关闭">' + icon("close") + '</button></header><div id="ten-mobile-drawer-content"></div></section></div>' ].join("");
         }
         function renderSites() {
             const e = (0, siteRules.eT)(), t = Array.isArray(e.originalInfo) ? e.originalInfo.slice() : [], n = Array.isArray(e.userWebInfo) ? e.userWebInfo.slice() : [], r = 0 === state.sourceMode ? t : n;
@@ -7117,30 +3043,86 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         function canSelectChapter(e) {
             return Boolean(e && e.url && "javascript:void();" !== e.url && !e.isUnavailable);
         }
+        function handleChapterClick(event) {
+            const row = event.target.closest("[data-index]");
+            if (!row || !event.currentTarget.contains(row) || event.target.closest(".ten-chapter-name")) return;
+            const index = Number(row.dataset.index);
+            const chapter = state.chapters[index];
+            if (!canSelectChapter(chapter)) return;
+            const selected = !chapter.isSelect;
+            if (event.shiftKey && state.lastSelected !== null && selected) {
+                const first = Math.min(state.lastSelected, index);
+                const last = Math.max(state.lastSelected, index);
+                for (let cursor = first; cursor <= last; cursor++) {
+                    if (canSelectChapter(state.chapters[cursor])) state.chapters[cursor].isSelect = true;
+                }
+            } else chapter.isSelect = selected;
+            state.lastSelected = selected ? index : null;
+            renderChapters();
+        }
+        function handleChapterNameChange(event) {
+            if (!event.target.matches(".ten-chapter-name")) return;
+            const row = event.target.closest("[data-index]");
+            const chapter = state.chapters[Number(row && row.dataset.index)];
+            if (chapter) chapter.chapterName = event.target.value;
+        }
         function renderChapters() {
-            const e = byId("ten-chapter-list"), t = state.chapters.length > 0, n = state.chapters.some(canSelectChapter), r = state.chapters.some(e => e.isSelect && canSelectChapter(e));
-            byId("ten-chapter-empty").hidden = t, byId("ten-chapter-loaded").hidden = !t, byId("ten-select-all").disabled = !n, 
-            byId("ten-clear-select").disabled = !r, byId("ten-download-selected").disabled = !r, 
-            byId("ten-chapter-count").textContent = t ? `章节列表 · ${state.chapters.length}` : "章节列表", 
-            t ? (e.innerHTML = state.chapters.map((e, t) => {
-                const n = !canSelectChapter(e), r = showChapterName(e);
-                return `<div class="ten-list-item${n ? " is-disabled" : ""}" data-index="${t}">\n      <input type="checkbox" ${e.isSelect ? "checked" : ""} ${n ? "disabled" : ""} aria-label="${e.isUnavailable ? escapeHtml(e.unavailableReason || "当前账号未解锁") : "选择章节"}">\n      ${state.editMode ? `<input class="ten-input ten-chapter-name" value="${escapeAttr(e.chapterName)}">` : `<span class="ten-name">${escapeHtml(r)}</span>`}\n      <span class="ten-meta">${e.isUnavailable ? escapeHtml(e.unavailableReason || "未解锁") : e.isPay ? "付费" : "many" === e.characterType ? "分卷" : ""}</span>\n    </div>`;
-            }).join(""), all("#ten-chapter-list [data-index]").forEach(e => {
-                e.addEventListener("click", t => function(e, t) {
-                    const n = state.chapters[e];
-                    if (!canSelectChapter(n) || t.target.classList.contains("ten-chapter-name")) return;
-                    const r = !n.isSelect;
-                    if (t.shiftKey && null !== state.lastSelected && r) {
-                        const t = Math.min(state.lastSelected, e), n = Math.max(state.lastSelected, e);
-                        for (let e = t; e <= n; e++) canSelectChapter(state.chapters[e]) && (state.chapters[e].isSelect = !0);
-                    } else n.isSelect = r;
-                    state.lastSelected = r ? e : null, renderChapters();
-                }(Number(e.dataset.index), t));
-                const t = e.querySelector(".ten-chapter-name");
-                t && (t.addEventListener("click", e => e.stopPropagation()), t.addEventListener("change", t => {
-                    state.chapters[Number(e.dataset.index)].chapterName = t.target.value;
-                }));
-            })) : e.innerHTML = "";
+            const list = byId("ten-chapter-list");
+            const hasChapters = state.chapters.length > 0;
+            const hasSelectable = state.chapters.some(canSelectChapter);
+            const hasSelected = state.chapters.some(chapter => chapter.isSelect && canSelectChapter(chapter));
+            byId("ten-chapter-empty").hidden = hasChapters;
+            byId("ten-chapter-loaded").hidden = !hasChapters;
+            byId("ten-select-all").disabled = !hasSelectable;
+            byId("ten-clear-select").disabled = !hasSelected;
+            byId("ten-download-selected").disabled = !hasSelected;
+            setText(byId("ten-chapter-count"), hasChapters ? `章节列表 · ${state.chapters.length}` : "章节列表");
+            byId("ten-edit-list").classList.toggle("is-active", state.editMode);
+            if (!list._tenEventsBound) {
+                list.addEventListener("click", handleChapterClick);
+                list.addEventListener("change", handleChapterNameChange);
+                list._tenEventsBound = true;
+            }
+            const previous = list._tenRows || new Map;
+            const current = new Map;
+            state.chapters.forEach((chapter, index) => {
+                let row = previous.get(chapter);
+                if (!row) {
+                    row = document.createElement("div");
+                    row.className = "ten-list-item";
+                    row.innerHTML = '<input type="checkbox"><span class="ten-chapter-label"></span><span class="ten-meta"></span>';
+                    row._tenCheckbox = row.firstElementChild;
+                    row._tenLabel = row.children[1];
+                    row._tenMeta = row.lastElementChild;
+                }
+                const disabled = !canSelectChapter(chapter);
+                const name = showChapterName(chapter);
+                setAttribute(row, "data-index", index);
+                row.classList.toggle("is-disabled", disabled);
+                row.classList.toggle("is-selected", Boolean(chapter.isSelect && !disabled));
+                row._tenCheckbox.checked = Boolean(chapter.isSelect);
+                row._tenCheckbox.disabled = disabled;
+                setAttribute(row._tenCheckbox, "aria-label", chapter.isUnavailable ? chapter.unavailableReason || "当前账号未解锁" : `选择章节：${name}`);
+                const editMode = Boolean(state.editMode);
+                if (row._tenEditMode !== editMode) {
+                    row._tenLabel.replaceChildren();
+                    const label = document.createElement(editMode ? "input" : "span");
+                    label.className = editMode ? "ten-input ten-chapter-name" : "ten-name";
+                    if (editMode) label.setAttribute("aria-label", "章节名称");
+                    row._tenLabel.appendChild(label);
+                    row._tenName = label;
+                    row._tenEditMode = editMode;
+                }
+                if (editMode) {
+                    if (document.activeElement !== row._tenName && row._tenName.value !== chapter.chapterName) row._tenName.value = chapter.chapterName;
+                } else setText(row._tenName, name);
+                setAttribute(row._tenName, "title", name);
+                setText(row._tenMeta, chapter.isUnavailable ? chapter.unavailableReason || "未解锁" : chapter.isPay ? "付费" : chapter.characterType === "many" ? "分卷" : "");
+                current.set(chapter, row);
+                if (list.children[index] !== row) list.insertBefore(row, list.children[index] || null);
+            });
+            for (const [chapter, row] of previous) if (!current.has(chapter)) row.remove();
+            list._tenRows = current;
         }
         function reloadChapters() {
             state.chapters = [], state.lastSelected = null, state.editMode = !1, byId("ten-edit-list").classList.remove("is-active"), 
@@ -7158,173 +3140,6 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             state.editMode = !state.editMode, byId("ten-edit-list").classList.toggle("is-active", state.editMode), 
             byId("ten-edit-list").title = state.editMode ? "完成编辑" : "编辑名称", renderChapters();
         }
-        function toggleOptions() {
-            isNarrowLayout() ? byId("ten-mobile-drawer").classList.contains("is-open") ? closeMobileDrawer() : openMobileDrawer("下载选项", byId("ten-options")) : (state.optionsOpen = !state.optionsOpen, 
-            byId("ten-options").classList.toggle("is-open", state.optionsOpen));
-        }
-        function isNarrowLayout() {
-            return window.matchMedia("(max-width: 560px)").matches;
-        }
-        function openMobileDrawer(e, t) {
-            if (!t || state.drawerContent) return;
-            const n = byId("ten-mobile-drawer"), r = document.createComment("ten-mobile-drawer-anchor");
-            t.before(r), byId("ten-mobile-drawer-content").appendChild(t), state.drawerAnchor = r, 
-            state.drawerContent = t, "ten-options" === t.id && (state.optionsOpen = !0), t.classList.add("is-open", "is-mobile-drawer-content"), 
-            byId("ten-mobile-drawer-title").textContent = e, n.classList.add("is-open"), n.setAttribute("aria-hidden", "false"), 
-            setTimeout(() => {
-                byId("ten-mobile-drawer-content").scrollTop = 0;
-            }, 0);
-        }
-        function closeMobileDrawer() {
-            const e = byId("ten-mobile-drawer");
-            if (!e) return;
-            e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true");
-            const t = state.drawerContent;
-            t && state.drawerAnchor?.parentNode && (t.classList.remove("is-open", "is-mobile-drawer-content"), 
-            state.drawerAnchor.replaceWith(t)), "ten-options" === t?.id && (state.optionsOpen = !1), 
-            t?.classList.contains("ten-rule-advanced-body") && (byId("ten-rule-advanced").open = !1), 
-            state.drawerContent = null, state.drawerAnchor = null;
-        }
-        function openRuleAdvancedDrawer(e) {
-            if (!isNarrowLayout()) return;
-            e.preventDefault();
-            const t = byId("ten-rule-advanced");
-            t.open = !0, openMobileDrawer("复杂站点设置", one(".ten-rule-advanced-body", t));
-        }
-        function setDownloadMode(e, t = !1) {
-            state.settings.downloadType = e, all(".ten-mode").forEach(t => t.classList.toggle("is-active", Number(t.dataset.mode) === e));
-            const n = [ "直接下载", "压缩下载", "图片拼接" ];
-            byId("ten-default-mode-label") && (byId("ten-default-mode-label").textContent = n[e] || n[0]), 
-            all("[data-default-mode]").forEach(t => t.classList.toggle("is-selected", Number(t.dataset.defaultMode) === e)), 
-            t && (0, configModule.po)("downType", e);
-        }
-        function updateChapterSequence() {
-            const e = byId("ten-add-sequence").checked, t = byId("ten-reverse-sequence").checked, r = state.chapters.length;
-            state.chapters.forEach((a, i) => {
-                a.chapterNumStr = e ? (0, downloadUtils.xo)(t ? r - i : i + 1, 3) : "";
-            }), renderChapters();
-        }
-        function showChapterName(e) {
-            return e.chapterNumStr ? `${e.chapterNumStr}${e.chapterName ? `-${e.chapterName}` : ""}` : e.chapterName;
-        }
-        function downloadSelected() {
-            const e = state.chapters.filter(e => e.isSelect && canSelectChapter(e)).map(e => function(e) {
-                const t = Object.assign({}, e);
-                return t.downChapterName = showChapterName(t), t.downType = state.settings.downloadType, 
-                t.downHeaders = siteRules.Po && siteRules.Po.downHeaders, t.batchDelay = siteRules.Po && siteRules.Po.batchDelay, 
-                t.directFlow = state.settings.directFlow, t.directRemoteDownload = Boolean(siteRules.Po && siteRules.Po.directRemoteDownload), 
-                t.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport), t;
-            }(e));
-            e.length ? (enqueueDownloads(e), state.chapters.forEach(e => {
-                e.isSelect = !1;
-            }), renderChapters()) : toast("请先选择章节");
-        }
-        function downloadCurrentChapter() {
-            if (!siteRules.Po) return void toast("当前网站没有匹配规则");
-            const e = byId("ten-current-comic").value.trim(), t = byId("ten-current-chapter").value.trim();
-            e && t ? (enqueueDownloads([ {
-                comicName: e,
-                chapterName: t,
-                downChapterName: t,
-                url: window.location.href,
-                characterType: "one",
-                readtype: siteRules.Po.readtype,
-                isPay: Boolean(siteRules.Po.hasSpend),
-                downType: state.settings.downloadType,
-                downHeaders: siteRules.Po.downHeaders,
-                batchDelay: siteRules.Po.batchDelay,
-                directFlow: state.settings.directFlow,
-                directRemoteDownload: Boolean(siteRules.Po.directRemoteDownload),
-                heavyCanvasExport: Boolean(siteRules.Po.heavyCanvasExport)
-            } ]), state.optionsOpen = !1, byId("ten-options").classList.remove("is-open")) : toast("请输入漫画名和章节名");
-        }
-        async function enqueueDownloads(e) {
-            siteRules.Po && void 0 !== siteRules.Po.batchDelay && e.forEach(e => {
-                void 0 === e.batchDelay && (e.batchDelay = siteRules.Po.batchDelay);
-            }), e.forEach(e => {
-                void 0 === e.directFlow && (e.directFlow = state.settings.directFlow), void 0 === e.directRemoteDownload && (e.directRemoteDownload = Boolean(siteRules.Po && siteRules.Po.directRemoteDownload)), 
-                void 0 === e.heavyCanvasExport && (e.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport));
-            }), "function" != typeof window.showDirectoryPicker || await (0, downloadUtils.Oh)() || toast("未选择保存目录，将使用浏览器默认下载目录"), 
-            e.forEach(e => {
-                e.useDirectory = Boolean(window.__tenComicDirectoryHandle || window.__ylDirectoryHandle);
-            }), state.queue || (state.queue = new DownloadQueue(state.settings.maxChapters, state.settings.concurrentImages, state.settings.digits, {
-                getHistoryData: renderTasks,
-                $forceUpdate: scheduleTaskRender,
-                persistTasks: scheduleTaskPersist,
-                notifyTask: notifyDownloadTask
-            })), state.queue, state.queue.addList(e), state.queue.run(), activateTab("tasks"), 
-            renderTasks();
-        }
-        function taskHost(e) {
-            if (e && e.originHost) return String(e.originHost).toLowerCase();
-            try {
-                return new URL(e && e.url || "", window.location.href).hostname.toLowerCase();
-            } catch (e) {
-                return window.location.hostname.toLowerCase();
-            }
-        }
-        function uniqueTaskSnapshots(e) {
-            const t = new Set;
-            return e.filter(e => {
-                if (!e || !e.url) return !1;
-                const n = JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url ]);
-                return !t.has(n) && (t.add(n), !0);
-            });
-        }
-        function renderRecoveryTasks() {
-            state.ready && (byId("ten-recovery").hidden = 0 === state.recoveryTasks.length, 
-            byId("ten-recovery-count").textContent = state.recoveryTasks.length ? `${state.recoveryTasks.length} 个任务可恢复` : "");
-        }
-        async function restorePendingTasks() {
-            const e = state.recoveryTasks.slice();
-            e.length && (state.recoveryTasks = [], renderRecoveryTasks(), await enqueueDownloads(e), 
-            toast(`已恢复 ${e.length} 个任务`));
-        }
-        async function discardPendingTasks() {
-            state.recoveryTasks.length && await showConfirm("放弃未完成任务", `将删除当前站点的 ${state.recoveryTasks.length} 个恢复点。`, "放弃任务") && (state.recoveryTasks = [], 
-            persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
-        }
-        function scheduleTaskPersist() {
-            clearTimeout(state.persistTimer), state.persistTimer = setTimeout(persistQueueState, 750);
-        }
-        function persistQueueState() {
-            clearTimeout(state.persistTimer), state.persistTimer = null;
-            const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
-            (0, configModule.po)(PENDING_TASKS_KEY, uniqueTaskSnapshots(n.concat(a)));
-        }
-        function handlePageHide() {
-            (state.queue || state.recoveryTasks.length) && persistQueueState();
-        }
-        !function() {
-            try {
-                (0, configModule.Iq)();
-            } catch (e) {
-                console.warn("10漫画：初始化存储失败。", e);
-            }
-            (0, siteRules.HL)(window.location.href), siteRules.Po ? (state.settings = readSettings(), 
-            window.addEventListener("keydown", handleGlobalHotkey, {
-                capture: !0,
-                passive: !1
-            }), window.addEventListener("pageshow", injectStyle), window.addEventListener("pagehide", handlePageHide), 
-            document.addEventListener("visibilitychange", refreshQueueOnVisibility), function() {
-                try {
-                    GM_registerMenuCommand("显示/隐藏 10漫画入口", toggleUI, {
-                        accessKey: "v",
-                        autoClose: !0
-                    }), GM_registerMenuCommand("重置 10漫画设置", resetSettings);
-                } catch (e) {
-                    console.warn("10漫画：菜单注册失败。", e);
-                }
-            }(), "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", injectStyle, {
-                once: !0
-            }) : injectStyle()) : function() {
-                try {
-                    GM_registerMenuCommand("为当前网站添加自定义规则", openUnsupportedRuleEditor);
-                } catch (e) {
-                    console.warn("10漫画：自定义规则菜单注册失败。", e);
-                }
-            }();
-        }();
         let taskRenderFrame = null;
         function scheduleTaskRender() {
             state.visible && "tasks" !== state.activeTab || taskRenderFrame || (taskRenderFrame = requestAnimationFrame(() => {
@@ -7659,167 +3474,6 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             await showConfirm("清空下载记录", `将删除全部 ${e.length} 条下载记录，此操作无法撤销。`, "全部清空") && (writeHistory([]), 
             renderTasks(), toast("下载记录已清空"));
         }
-        function showConfirm(e, t, n = "确认") {
-            state.confirmResolve && closeConfirm(!1), byId("ten-confirm-title").textContent = e, 
-            byId("ten-confirm-message").textContent = t, byId("ten-confirm-ok").textContent = n;
-            const r = byId("ten-confirm");
-            return r.classList.add("is-open"), r.setAttribute("aria-hidden", "false"), setTimeout(() => byId("ten-confirm-cancel").focus(), 0), 
-            new Promise(e => {
-                state.confirmResolve = e;
-            });
-        }
-        function closeConfirm(e) {
-            const t = state.confirmResolve;
-            state.confirmResolve = null;
-            const n = byId("ten-confirm");
-            n && (n.classList.remove("is-open"), n.setAttribute("aria-hidden", "true")), t && t(e);
-        }
-        function openRuleGuide() {
-            const e = byId("ten-rule-guide");
-            e && (e.classList.add("is-open"), e.setAttribute("aria-hidden", "false"), setTimeout(() => e.querySelector(".ten-rule-guide-dialog [data-rule-guide-close]")?.focus(), 0));
-        }
-        function closeRuleGuide() {
-            const e = byId("ten-rule-guide");
-            e && (e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true"));
-        }
-        function openDiagnostic(e) {
-            if (!e) return;
-            state.diagnosticItem = e;
-            const t = Array.isArray(e.diagnostics) ? e.diagnostics : [], n = Array.isArray(e.failedImages) ? e.failedImages : Array.isArray(e.failures) ? e.failures : [], r = e.stage || (e.hasError ? "存在下载错误" : "没有发现错误"), a = [ `漫画：${e.comicName || "未知"}`, `章节：${e.downChapterName || e.chapterName || "未知"}`, `状态：${r}`, `页面：${e.comicPageUrl || e.url || window.location.href}`, `失败图片：${n.length} 张`, "" ];
-            t.length ? (a.push("诊断详情："), t.forEach((e, t) => {
-                const n = e.time ? new Date(e.time).toLocaleString() : "未知时间";
-                a.push(`${t + 1}. [${n}] ${e.stage || "下载"}：${e.message || "未知错误"}`), e.imgIndex && a.push(`   图片序号：${e.imgIndex}`), 
-                e.url && a.push(`   地址：${e.url}`);
-            })) : a.push(e.hasError ? "这是旧版记录，没有保存详细错误信息。" : "当前没有错误详情。"), byId("ten-diagnostic-summary").textContent = `${e.comicName || "未知漫画"} · ${e.downChapterName || e.chapterName || "未知章节"}`, 
-            byId("ten-diagnostic-content").textContent = a.join("\n");
-            const i = byId("ten-diagnostic");
-            i.classList.add("is-open"), i.setAttribute("aria-hidden", "false");
-        }
-        function closeDiagnostic() {
-            const e = byId("ten-diagnostic");
-            e && (e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true"));
-        }
-        function copyDiagnostic() {
-            copyText(byId("ten-diagnostic-content").textContent, "诊断信息已复制");
-        }
-        function copyFailureList(e) {
-            const t = Array.isArray(e && e.failedImages) ? e.failedImages : Array.isArray(e && e.failures) ? e.failures : [];
-            if (!t.length) return toast("没有失败图片可复制");
-            const n = [ `漫画：${e.comicName || "未知"}`, `章节：${e.downChapterName || e.chapterName || "未知"}`, `失败图片：${t.length} 张`, "" ];
-            t.forEach((e, t) => n.push(`${t + 1}. 序号：${e.imgIndex || "未知"}\n   原因：${e.reason || "未知错误"}\n   地址：${e.url || "无"}`)), 
-            copyText(n.join("\n"), "失败清单已复制");
-        }
-        function copyText(e, t) {
-            try {
-                GM_setClipboard(e, "text"), toast(t);
-            } catch (n) {
-                navigator.clipboard && "function" == typeof navigator.clipboard.writeText ? navigator.clipboard.writeText(e).then(() => toast(t)).catch(() => toast("复制失败")) : toast("复制失败");
-            }
-        }
-        function saveLoadSetting(e, t) {
-            const n = safeGet("appLoadDefault", {}), a = n && "object" == typeof n ? n : {};
-            a[e] = t, (0, configModule.po)("appLoadDefault", a), "isShowUI" === e && (state.settings.autoOpen = t);
-        }
-        function applyScale(e, t) {
-            state.settings.scale = e, byId(PANEL_ID).style.setProperty("--ten-scale", e / 100), 
-            byId("ten-scale-value").textContent = `${e}%`, t && saveLoadSetting("rightSize", e);
-        }
-        function setEffectLevel(e, t) {
-            const n = Math.max(0, Math.min(2, Number(e) || 0));
-            state.settings.effectLevel = n, byId(ROOT_ID).dataset.effects = String(n), createParticles(n), 
-            all("[data-effect-level]").forEach(e => {
-                const t = Number(e.dataset.effectLevel) === n;
-                e.classList.toggle("is-active", t), e.setAttribute("aria-pressed", String(t));
-            }), t && ((0, configModule.po)("effectLevel", n), toast([ "特效已关闭", "已切换为轻量特效", "已切换为标准特效" ][n]));
-        }
-        function setThemePreset(e, t) {
-            const n = Object.prototype.hasOwnProperty.call(THEMES, e) ? e : "glass";
-            state.settings.themePreset = n, byId(ROOT_ID).dataset.theme = n, all("[data-theme-choice]").forEach(e => e.setAttribute("aria-pressed", String(e.dataset.themeChoice === n))), 
-            t && ((0, configModule.po)("themePreset", n), toast(`已切换为${THEMES[n][0]}`));
-        }
-        function applyAppearance(e) {
-            const t = byId(ROOT_ID), n = e || {};
-            t.dataset.density = n.density || "standard", t.dataset.shape = n.shape || "standard", 
-            t.dataset.motion = n.motion || "standard", all("[data-appearance-axis]").forEach(e => {
-                const t = e.dataset.appearanceValue === n[e.dataset.appearanceAxis];
-                e.classList.toggle("is-active", t), setAttribute(e, "aria-pressed", String(t));
-            });
-        }
-        function saveImageRange() {
-            const e = Math.max(1, Math.trunc(Number(byId("ten-range-start").value) || 1)), t = Math.trunc(Number(byId("ten-range-end").value) || -1), n = -1 === t ? -1 : Math.max(e, t);
-            state.settings.imageRange = [ e, n ], byId("ten-range-start").value = e, byId("ten-range-end").value = n, 
-            (0, configModule.po)("imgDownRange", state.settings.imageRange);
-        }
-        function exportSettingsBackup() {
-            const e = Object.fromEntries(BACKUP_KEYS.map(e => [ e, safeGet(e, null) ])), n = {
-                format: "10Comic-settings-backup",
-                version: 1,
-                exportedAt: (new Date).toISOString(),
-                settings: e,
-                rules: Array.isArray(safeGet("userWebInfo", [])) ? safeGet("userWebInfo", []) : []
-            }, r = (new Date).toISOString().slice(0, 10);
-            !function(e, t) {
-                const n = URL.createObjectURL(e);
-                let r = !1, a = !1;
-                const i = () => {
-                    r || (r = !0, URL.revokeObjectURL(n));
-                }, o = () => {
-                    if (r || a) return;
-                    a = !0;
-                    const e = document.createElement("a");
-                    e.href = n, e.download = t, e.hidden = !0, document.body.appendChild(e), e.click(), 
-                    e.remove(), setTimeout(i, 1e3), toast("设置与规则备份已导出");
-                };
-                try {
-                    GM_download({
-                        url: n,
-                        name: t,
-                        saveAs: !0,
-                        onload: () => {
-                            i(), toast("设置与规则备份已导出");
-                        },
-                        onerror: o,
-                        ontimeout: o
-                    });
-                } catch (e) {
-                    o();
-                }
-            }(new Blob([ JSON.stringify(n, null, 2) ], {
-                type: "application/json"
-            }), `10Comic-设置与规则备份-${r}.json`);
-        }
-        async function importSettingsBackup(e) {
-            const t = e.target.files && e.target.files[0];
-            if (e.target.value = "", t) try {
-                const e = JSON.parse(await t.text());
-                if (!e || "10Comic-settings-backup" !== e.format || !e.settings || !Array.isArray(e.rules)) throw new Error("不是有效的 10漫画备份文件");
-                const n = e => (Array.isArray(e) ? e : [ e ]).some(e => String(e || "").trim());
-                if (e.rules.some(e => !e || !n(e.domain))) throw new Error("备份中的规则域名无效");
-                if (!await showConfirm("导入设置与规则", `将使用备份中的设置和 ${e.rules.length} 条规则覆盖当前配置。`, "确认导入")) return;
-                BACKUP_KEYS.forEach(t => {
-                    void 0 !== e.settings[t] && null !== e.settings[t] && (0, configModule.po)(t, e.settings[t]);
-                }), (0, configModule.po)("userWebInfo", e.rules), state.settings = readSettings(), 
-                applySettingsToUI(), trimHistory(), renderSites(), toast(`备份已导入，共 ${e.rules.length} 条规则`);
-            } catch (e) {
-                toast(e.message || "备份文件读取失败");
-            }
-        }
-        function applyPageSplicing() {
-            let e = document.getElementById("ten-comic-page-style");
-            e || (e = document.createElement("style"), e.id = "ten-comic-page-style", document.head.appendChild(e)), 
-            e.textContent = state.settings.splicePage && siteRules.Po && siteRules.Po.readCssText ? siteRules.Po.readCssText : "";
-        }
-        async function chooseDirectory() {
-            if ("function" == typeof window.showDirectoryPicker) try {
-                const e = await (0, downloadUtils.IJ)();
-                e && (state.dirHandle = e, byId("ten-dir-name").textContent = e.name, toast("保存目录已更新"));
-            } catch (e) {
-                e && "AbortError" !== e.name && toast("目录选择失败");
-            } else toast("当前浏览器将使用默认下载目录");
-        }
-        function refreshQueueOnVisibility() {
-            document.hidden || state.queue && state.queue.refresh();
-        }
         const RULE_PICK_CONFIG = {
             title: {
                 field: "ten-rule-title-selector",
@@ -8090,6 +3744,1482 @@ catch (error) { return url } })\n    if (frame) frame.remove()\n    return [...n
         async function clearRules() {
             await showConfirm("清空自定义规则", "将删除全部已导入规则，此操作无法撤销。", "全部清空") && ((0, configModule.po)("userWebInfo", []), 
             renderSites(), toast("导入规则已清空"));
+        }
+        // One focus stack is shared by confirmation, diagnostics, help and drawers.
+                const modalFocusStack = [];
+        let modalFocusListenersReady = false;
+        function resetModalFocus() {
+            modalFocusStack.length = 0;
+            document.removeEventListener("keydown", handleModalKeydown, true);
+            document.removeEventListener("focusin", keepModalFocus, true);
+            modalFocusListenersReady = false;
+        }
+        function modalFocusables(dialog) {
+            return [ ...dialog.querySelectorAll("button, input, select, textarea, a[href], [tabindex]") ].filter(element => element.tabIndex >= 0 && !element.disabled && !element.closest("[inert]") && element.getClientRects().length && getComputedStyle(element).visibility === "visible");
+        }
+        function activateModalFocus(id, preferredSelector) {
+            const overlay = byId(id);
+            const dialog = overlay?.querySelector('[role="dialog"], [role="alertdialog"]');
+            if (!dialog) return;
+            overlay.inert = false;
+            if (!modalFocusStack.some(entry => entry.id === id)) {
+                modalFocusStack.push({
+                    id: id,
+                    dialog: dialog,
+                    returnFocus: document.activeElement
+                });
+            }
+            if (!modalFocusListenersReady) {
+                document.addEventListener("keydown", handleModalKeydown, true);
+                document.addEventListener("focusin", keepModalFocus, true);
+                modalFocusListenersReady = true;
+            }
+            dialog.setAttribute("tabindex", "-1");
+            const target = preferredSelector && dialog.querySelector(preferredSelector);
+            (target || modalFocusables(dialog)[0] || dialog).focus({
+                preventScroll: true
+            });
+        }
+        function releaseModalFocus(id) {
+            const index = modalFocusStack.findIndex(entry => entry.id === id);
+            byId(id) && (byId(id).inert = true);
+            if (index < 0) return;
+            const wasTop = index === modalFocusStack.length - 1;
+            const [entry] = modalFocusStack.splice(index, 1);
+            if (!wasTop) return;
+            const top = modalFocusStack[modalFocusStack.length - 1];
+            const target = entry.returnFocus;
+            if (target?.isConnected && !target.closest("[inert]") && target.getClientRects().length && (!top || top.dialog.contains(target))) {
+                target.focus({
+                    preventScroll: true
+                });
+            } else if (top) (modalFocusables(top.dialog)[0] || top.dialog).focus({
+                preventScroll: true
+            });
+        }
+        function keepModalFocus(event) {
+            const entry = modalFocusStack[modalFocusStack.length - 1];
+            if (entry && !entry.dialog.contains(event.target)) {
+                (modalFocusables(entry.dialog)[0] || entry.dialog).focus({
+                    preventScroll: true
+                });
+            }
+        }
+        function handleModalKeydown(event) {
+            const entry = modalFocusStack[modalFocusStack.length - 1];
+            if (!entry || event.defaultPrevented) return false;
+            if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                if (entry.id === "ten-confirm") closeConfirm(false); else if (entry.id === "ten-diagnostic") closeDiagnostic(); else if (entry.id === "ten-rule-guide") closeRuleGuide(); else if (entry.id === "ten-mobile-drawer") closeMobileDrawer();
+                return true;
+            }
+            if (event.key !== "Tab") return false;
+            const focusables = modalFocusables(entry.dialog);
+            const index = focusables.indexOf(document.activeElement);
+            if (!focusables.length || index < 0 || (event.shiftKey ? index === 0 : index === focusables.length - 1)) {
+                event.preventDefault();
+                event.stopPropagation();
+                (focusables[event.shiftKey ? focusables.length - 1 : 0] || entry.dialog).focus({
+                    preventScroll: true
+                });
+                return true;
+            }
+            return false;
+        }
+        function injectStyle() {
+            if (!document.body) return;
+            const e = document.getElementById(ROOT_ID);
+            if (e && state.ready) return;
+            resetModalFocus();
+            e && e.remove(), function() {
+                if (document.getElementById("ten-comic-style")) return;
+                const e = document.createElement("style");
+                e.id = "ten-comic-style", e.textContent = '#ten-comic-root {\n--ten-bg: rgba(5, 12, 25, .78);\n  --ten-surface: rgba(23, 38, 62, .55);\n  --ten-surface-strong: rgba(31, 50, 78, .76);\n  --ten-line: \
+rgba(137, 225, 255, .2);\n  --ten-text: #eefaff;\n  --ten-muted: #89a2b7;\n  --ten-cyan: #5ff6ff;\n  --ten-blue: #5b8cff;\n  --ten-violet: #9c6cff;\n  \
+--ten-pink: #ff5fac;\n  --ten-danger: #ff6174;\n  --ten-success: #55efb6;\n  --ten-panel-bg: linear-gradient(150deg, rgba(20,42,67,.68), rgba(9,18,36,.78));\n  \
+--ten-panel-border: rgba(133,233,255,.28);\n  --ten-panel-shadow: 0 30px 90px rgba(0,5,15,.5), 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 42px \
+rgba(91,140,255,.12);\n  --ten-header-bg: rgba(4,12,25,.48);\n  --ten-card-bg: rgba(23,38,62,.55);\n  --ten-card-border: rgba(137,225,255,.2);\n  \
+--ten-card-shadow: inset 0 1px rgba(255,255,255,.06);\n  --ten-task-bg: rgba(10,25,46,.52);\n  --ten-list-bg: rgba(23,38,62,.46);\n  --ten-list-hover-bg: \
+rgba(36,61,91,.6);\n  --ten-control-bg: linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72));\n  --ten-control-hover-bg: \
+rgba(95,246,255,.09);\n  --ten-control-border: rgba(111,220,255,.2);\n  --ten-primary-bg: linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff);\n  \
+--ten-primary-text: #04131c;\n  --ten-primary-border: rgba(160,255,255,.72);\n  --ten-danger-bg: rgba(255,97,116,.12);\n  --ten-danger-text: #ffdfe5;\n  \
+--ten-danger-border: rgba(255,97,116,.3);\n  --ten-input-bg: rgba(2,10,22,.42);\n  --ten-popover-bg: \
+linear-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98));\n  --ten-empty-bg: rgba(11,27,49,.38);\n  --ten-info-bg: rgba(2,10,22,.25);\n  --ten-mini-bg: \
+linear-gradient(145deg,rgba(28,51,75,.94),rgba(20,28,52,.95));\n  --ten-overlay-bg: rgba(2,8,19,.62);\n  --ten-tooltip-bg: rgba(5,15,29,.97);\n  \
+--ten-tooltip-text: #eefaff;\n  --ten-tooltip-border: rgba(95,246,255,.28);\n  --ten-tooltip-shadow: 0 10px 28px rgba(0,5,15,.38), inset 0 1px \
+rgba(255,255,255,.08);\n  --ten-toast-bg: rgba(5,15,29,.94);\n  --ten-toast-text: #eefaff;\n  --ten-toast-border: rgba(95,246,255,.3);\n  --ten-launcher-bg: \
+linear-gradient(145deg,rgba(28,72,108,.88),rgba(91,54,148,.86));\n  --ten-launcher-border: rgba(111,236,255,.48);\n  --ten-launcher-shadow: 0 12px 34px \
+rgba(4,14,30,.3),0 0 25px rgba(95,246,255,.2),inset 0 1px rgba(255,255,255,.18);\n  --ten-radius-launcher: 18px;\n  --ten-focus-ring: 0 0 0 3px \
+rgba(95,246,255,.1);\n  --ten-scroll-thumb: rgba(95,246,255,.3);\n  --ten-radius-panel: 24px;\n  --ten-radius-card: 15px;\n  --ten-radius-control: 11px;\n  \
+--ten-scale: 1;\n  position: fixed;\n  z-index: 2147483645;\n  inset: 0;\n  pointer-events: none;\n  color: var(--ten-text);\n  font: 13px/1.5 Inter, "PingFang \
+SC", "Microsoft YaHei", sans-serif; }\n#ten-comic-root *,\n#ten-comic-root *::before,\n#ten-comic-root *::after { box-sizing: border-box; }\n#ten-comic-root \
+#ten-comic-launcher {\nall: initial;\n  position: fixed;\n  z-index: 2147483646;\n  top: 50%;\n  right: 12px;\n  width: 52px;\n  height: 52px;\n  display: \
+grid;\n  place-items: center;\n  transform: translateY(-50%);\n  overflow: hidden;\n  color: #efffff;\n  font: 800 12px/1 Inter, "Segoe UI", sans-serif;\n  \
+letter-spacing: .06em;\n  cursor: pointer;\n  pointer-events: auto;\n  border: 1px solid var(--ten-launcher-border);\n  border-radius: \
+var(--ten-radius-launcher);\n  background: var(--ten-launcher-bg);\n  box-shadow: var(--ten-launcher-shadow);\n  backdrop-filter: blur(22px) saturate(1.4);\n  \
+-webkit-backdrop-filter: blur(22px) saturate(1.4);\n  transition: opacity .12s ease, transform .18s cubic-bezier(.22,1,.36,1), box-shadow .2s; \
+}\n#ten-comic-root #ten-comic-launcher::before { content: ""; position: absolute; inset: -65%; background: conic-gradient(from 90deg, transparent, \
+rgba(95,246,255,.52), transparent 30%); animation: ten-launcher-orbit 5s linear infinite; }\n#ten-comic-root #ten-comic-launcher span { position: relative; \
+z-index: 1; }\n#ten-comic-root #ten-comic-launcher:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 15px 40px rgba(4,14,30,.38), 0 0 34px \
+rgba(95,246,255,.28); }\n#ten-comic-root #ten-comic-launcher:active { transform: translateY(-50%) scale(.95); }\n#ten-comic-root #ten-comic-launcher.is-hidden { \
+opacity: 0; visibility: hidden; pointer-events: none; transform: translate(20px,-50%) scale(.72); }\n#ten-comic-root .ten-mini-task { position: fixed; z-index: \
+2147483646; top: 50%; right: 12px; width: min(292px,calc(100vw - 24px)); min-height: 58px; display: grid; grid-template-columns: minmax(0,1fr) 42px; \
+align-items: stretch; overflow: hidden; pointer-events: auto; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
+var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.3); transform: translateY(-50%); transition: opacity .2s \
+ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .2s; }\n#ten-comic-root .ten-mini-task.is-hidden { opacity: 0; visibility: hidden; pointer-events: \
+none; transform: translate(22px,-50%) scale(.9); }\n#ten-comic-root .ten-mini-open,\n#ten-comic-root .ten-mini-toggle { min-width: 0; padding: 0; color: \
+var(--ten-text); font: inherit; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root .ten-mini-open { display: grid; grid-template-columns: \
+32px minmax(0,1fr); align-items: center; gap: 8px; padding: 8px 5px 8px 10px; text-align: left; }\n#ten-comic-root .ten-mini-icon { width: 31px; height: 31px; \
+display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.22); border-radius: 10px; background: rgba(95,246,255,.08); \
+}\n#ten-comic-root .ten-mini-icon .ten-icon { width: 17px; height: 17px; }\n#ten-comic-root .ten-mini-copy { min-width: 0; display: grid; gap: 1px; \
+}\n#ten-comic-root .ten-mini-copy strong,\n#ten-comic-root .ten-mini-copy small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n#ten-comic-root .ten-mini-copy strong { font-size: 10px; }\n#ten-comic-root .ten-mini-copy small { color: var(--ten-muted); font-size: 9px; \
+}\n#ten-comic-root .ten-mini-progress { height: 3px; margin-top: 3px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.09); \
+}\n#ten-comic-root .ten-mini-progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: \
+linear-gradient(90deg,var(--ten-cyan),var(--ten-violet)); box-shadow: 0 0 8px rgba(95,246,255,.36); transition: width .35s ease; }\n#ten-comic-root \
+.ten-mini-toggle { display: grid; place-items: center; border-left: 1px solid var(--ten-line); transition: color .18s,background .18s; }\n#ten-comic-root \
+.ten-mini-toggle:hover { color: var(--ten-cyan); background: rgba(95,246,255,.08); }\n#ten-comic-root .ten-mini-toggle[hidden] { display: none; \
+}\n#ten-comic-root .ten-icon-tooltip { position: fixed; z-index: 2147483647; left: 0; top: 0; max-width: min(240px,calc(100vw - 16px)); padding: 5px 8px; \
+overflow: hidden; color: var(--ten-tooltip-text); font: 10px/1.4 Inter,"PingFang SC","Microsoft YaHei",sans-serif; white-space: nowrap; text-overflow: ellipsis; \
+pointer-events: none; opacity: 0; visibility: hidden; border: 1px solid var(--ten-tooltip-border); border-radius: 8px; background: var(--ten-tooltip-bg); \
+box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(14px) saturate(1.2); transform: translateY(3px) scale(.96); transition: opacity .14s ease,transform \
+.18s cubic-bezier(.22,1,.36,1),visibility .14s; }\n#ten-comic-root .ten-icon-tooltip.is-show { opacity: 1; visibility: visible; transform: translateY(0) \
+scale(1); }\n#ten-comic-root .ten-rule-pick-layer { position: fixed; z-index: 2147483647; inset: 0; pointer-events: none; }\n#ten-comic-root \
+.ten-rule-pick-layer.is-hidden { display: none; }\n#ten-comic-root .ten-rule-pick-box { position: fixed; border: 2px solid var(--ten-cyan); border-radius: 7px; \
+background: rgba(95,246,255,.1); box-shadow: 0 0 0 9999px rgba(2,8,18,.12),0 0 22px rgba(95,246,255,.42); transition: left .08s,top .08s,width .08s,height .08s; \
+}\n#ten-comic-root .ten-rule-pick-hud { position: fixed; top: 16px; left: 50%; width: min(420px,calc(100vw - 24px)); min-height: 56px; display: grid; \
+grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 9px; padding: 8px 9px; color: var(--ten-text); border: 1px solid \
+var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: \
+blur(22px); transform: translateX(-50%); }\n#ten-comic-root .ten-rule-pick-symbol { width: 32px; height: 32px; display: grid; place-items: center; color: \
+var(--ten-cyan); border: 1px solid rgba(95,246,255,.25); border-radius: 10px; background: rgba(95,246,255,.08); }\n#ten-comic-root .ten-rule-pick-hud > \
+span:nth-child(2) { min-width: 0; display: grid; }\n#ten-comic-root .ten-rule-pick-hud strong,\n#ten-comic-root .ten-rule-pick-hud small { overflow: hidden; \
+white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-pick-hud strong { font-size: 11px; }\n#ten-comic-root .ten-rule-pick-hud small { \
+color: var(--ten-muted); font: 9px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }\n#ten-comic-root .ten-rule-pick-hud button { min-height: 30px; padding: \
+4px 10px; color: var(--ten-text); font: inherit; font-size: 10px; cursor: pointer; pointer-events: auto; border: 1px solid rgba(255,97,116,.28); border-radius: \
+9px; background: rgba(255,97,116,.11); }\n#ten-comic-root.is-rule-picking #ten-panel { opacity: 0; pointer-events: none; transform: translate(34px,-50%) \
+scale(.94); }\n#ten-comic-root.is-rule-picking #ten-comic-launcher,\n#ten-comic-root.is-rule-picking .ten-mini-task { opacity: 0; visibility: hidden; \
+pointer-events: none; }\nhtml.ten-rule-picking-page,\nhtml.ten-rule-picking-page * { cursor: crosshair !important; user-select: none !important; \
+}\nhtml.ten-rule-picking-page #ten-rule-pick-cancel { cursor: pointer !important; }\n#ten-comic-root #ten-panel {\nposition: fixed;\n  top: 50%;\n  right: \
+14px;\n  width: min(430px, calc(100vw - 44px));\n  height: min(780px, calc(100vh - 28px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr) 66px;\n  \
+transform: translate(28px,-50%) scale(var(--ten-scale));\n  transform-origin: right center;\n  opacity: 0;\n  pointer-events: none;\n  overflow: hidden;\n  \
+isolation: isolate;\n  border: 1px solid var(--ten-panel-border);\n  border-radius: var(--ten-radius-panel);\n  background: var(--ten-panel-bg);\n  box-shadow: \
+var(--ten-panel-shadow);\n  backdrop-filter: blur(32px) saturate(1.45);\n  -webkit-backdrop-filter: blur(32px) saturate(1.45);\n  transition: transform .42s \
+cubic-bezier(.22,1,.36,1), opacity .22s ease; }\n#ten-comic-root #ten-panel.is-open { transform: translate(0,-50%) scale(var(--ten-scale)); opacity: 1; \
+pointer-events: auto; }\n#ten-comic-root #ten-panel::before {\ncontent: "";\n  position: absolute;\n  z-index: 1;\n  inset: 0;\n  pointer-events: none;\n  \
+background: radial-gradient(circle at 85% 0, rgba(95,246,255,.17), transparent 30%), radial-gradient(circle at 0 90%, rgba(156,108,255,.17), transparent 34%); \
+}\n#ten-comic-root #ten-particle-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }\n#ten-comic-root \
+#ten-particle-field i {\nposition: absolute;\n  left: var(--x);\n  top: var(--y);\n  width: var(--s);\n  height: var(--s);\n  border-radius: 50%;\n  opacity: \
+.45;\n  background: var(--c);\n  box-shadow: 0 0 10px var(--c);\n  animation: ten-particle var(--d) ease-in-out var(--delay) infinite alternate; \
+}\n#ten-comic-root[data-effects="0"] #ten-particle-field { display: none; }\n#ten-comic-root[data-effects="0"] #ten-comic-launcher::before { animation: none; \
+opacity: 0; }\n#ten-comic-root[data-effects="1"] #ten-particle-field i { opacity: .28; }\n#ten-comic-root[data-effects="1"] #ten-particle-field \
+i:nth-child(n+12) { display: none; }\n#ten-comic-root[data-effects="1"] #ten-comic-launcher::before { animation-duration: 8s; opacity: .6; }\n#ten-comic-root \
+#ten-search-panel {\nposition: fixed;\n  z-index: 2147483644;\n  top: 50%;\n  right: 456px;\n  width: min(680px, calc(100vw - 486px));\n  height: min(720px, \
+calc(100vh - 44px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr);\n  transform: translate(22px,-50%) scale(.98);\n  transform-origin: right \
+center;\n  overflow: hidden;\n  opacity: 0;\n  visibility: hidden;\n  pointer-events: none;\n  color: var(--ten-text);\n  border: 1px solid \
+rgba(133,233,255,.25);\n  border-radius: 22px;\n  background: radial-gradient(circle at 100% 0, rgba(95,246,255,.14), transparent 34%), linear-gradient(150deg, \
+rgba(20,42,67,.74), rgba(7,17,34,.84));\n  box-shadow: 0 26px 80px rgba(0,5,15,.44), inset 0 1px rgba(255,255,255,.07);\n  backdrop-filter: blur(30px) \
+saturate(1.4);\n  -webkit-backdrop-filter: blur(30px) saturate(1.4);\n  transition: transform .38s cubic-bezier(.22,1,.36,1), opacity .24s ease, visibility \
+.24s; }\n#ten-comic-root #ten-search-panel.is-open { transform: translate(0,-50%) scale(1); opacity: 1; visibility: visible; pointer-events: auto; \
+}\n#ten-comic-root .ten-search-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 0 13px 0 17px; border-bottom: 1px \
+solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root .ten-search-panel-content { min-height: 0; padding: 13px; overflow-y: auto; \
+scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n#ten-comic-root .ten-search-panel-content::-webkit-scrollbar { width: 6px; \
+}\n#ten-comic-root .ten-search-panel-content::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n#ten-comic-root \
+.ten-header,\n#ten-comic-root .ten-content,\n#ten-comic-root .ten-nav { position: relative; z-index: 2; }\n#ten-comic-root .ten-header { display: flex; \
+align-items: center; gap: 11px; padding: 0 14px 0 16px; border-bottom: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root \
+.ten-brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid rgba(95,246,255,.48); border-radius: 11px; color: \
+var(--ten-cyan); font-weight: 900; background: rgba(95,246,255,.08); box-shadow: 0 0 20px rgba(95,246,255,.14); }\n#ten-comic-root .ten-heading { min-width: 0; \
+flex: 1; }\n#ten-comic-root .ten-title { font-size: 14px; font-weight: 750; letter-spacing: .04em; }\n#ten-comic-root .ten-subtitle { color: var(--ten-muted); \
+font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }\n#ten-comic-root .ten-icon-btn { width: 34px; height: 34px; display: grid; place-items: \
+center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 11px; background: transparent; transition: .2s ease; \
+}\n#ten-comic-root .ten-icon-btn:hover { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-control-hover-bg); transform: \
+translateY(-1px); }\n#ten-comic-root .ten-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; \
+stroke-linejoin: round; }\n#ten-comic-root .ten-content { min-height: 0; overflow: hidden; font-size: inherit !important; }\n#ten-comic-root .ten-view { \
+display: none; height: 100%; padding: 13px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n#ten-comic-root \
+.ten-view.is-active { display: block; animation: ten-view-in .28s ease; }\n#ten-comic-root .ten-view::-webkit-scrollbar { width: 6px; }\n#ten-comic-root \
+.ten-view::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n#ten-comic-root .ten-nav { --tab: 1; display: grid; \
+grid-template-columns: repeat(4,1fr); padding: 7px; border-top: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root .ten-nav::before \
+{ content: ""; position: absolute; z-index: 0; top: 7px; bottom: 7px; left: 7px; width: calc((100% - 14px)/4); border: 1px solid rgba(95,246,255,.28); \
+border-radius: 14px; background: linear-gradient(145deg, rgba(95,246,255,.13), rgba(156,108,255,.12)); box-shadow: 0 7px 20px rgba(0,0,0,.18), inset 0 1px \
+rgba(255,255,255,.12); transform: translateX(calc(var(--tab)*100%)); transition: transform .38s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-tab { \
+position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--ten-muted); font: \
+inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; transition: color .2s, transform .2s; }\n#ten-comic-root .ten-tab:hover { color: \
+var(--ten-text); }\n#ten-comic-root .ten-tab.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-tab.is-active .ten-icon { transform: translateY(-1px) \
+scale(1.08); }\n#ten-comic-root .ten-toolbar,\n#ten-comic-root .ten-row { display: flex; align-items: center; gap: 8px; }\n#ten-comic-root .ten-toolbar { \
+margin-bottom: 11px; }\n#ten-comic-root .ten-spacer { flex: 1; }\n#ten-comic-root .ten-card { margin-bottom: 9px; padding: 11px; border: 1px solid \
+var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-card-bg); box-shadow: var(--ten-card-shadow); backdrop-filter: blur(18px); \
+}\n#ten-comic-root .ten-card-title { margin-bottom: 7px; color: var(--ten-cyan); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: \
+uppercase; }\n#ten-comic-root .ten-card-head { min-height: 30px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: \
+7px; }\n#ten-comic-root .ten-card-head .ten-card-title { margin-bottom: 0; }\n#ten-comic-root .ten-btn { position: relative; min-height: 35px; padding: 7px \
+12px; overflow: hidden; color: var(--ten-text); font: inherit; font-weight: 650; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: \
+var(--ten-radius-control); background: var(--ten-control-bg); background-size: 220% 100%; transition: transform .18s, border-color .18s, box-shadow .18s, \
+background-position .35s; }\n#ten-comic-root .ten-btn::before { content: ""; position: absolute; top: -70%; left: -35%; width: 26%; height: 240%; opacity: 0; \
+pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); transform: rotate(18deg); transition: left .45s \
+cubic-bezier(.22,1,.36,1), opacity .2s; }\n#ten-comic-root .ten-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: rgba(95,246,255,.5); \
+background-position: 100% 50%; box-shadow: 0 9px 24px rgba(29,117,165,.18); }\n#ten-comic-root .ten-btn:hover::before { left: 112%; opacity: .75; \
+}\n#ten-comic-root .ten-btn:active:not(:disabled) { transform: scale(.97); }\n#ten-comic-root .ten-btn:disabled { opacity: .38; cursor: not-allowed; \
+}\n#ten-comic-root .ten-btn.is-primary { color: var(--ten-primary-text); border-color: var(--ten-primary-border); background: var(--ten-primary-bg); \
+background-size: 260% 100%; }\n#ten-comic-root .ten-btn.is-danger { color: var(--ten-danger-text); border-color: var(--ten-danger-border); background: \
+var(--ten-danger-bg); }\n#ten-comic-root .ten-btn.is-small { min-height: 30px; padding: 5px 9px; font-size: 11px; }\n#ten-comic-root .ten-icon-label { display: \
+inline-flex; align-items: center; justify-content: center; gap: 6px; }\n#ten-comic-root .ten-icon-label span { white-space: nowrap; }\n#ten-comic-root \
+.ten-ripple { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,.36); transform: scale(0); animation: ten-ripple .62s \
+ease-out; }\n#ten-comic-root .ten-input,\n#ten-comic-root .ten-select,\n#ten-comic-root .ten-textarea { width: 100%; color: var(--ten-text); font: inherit; \
+border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); outline: 0; background: var(--ten-input-bg); transition: border-color .2s, \
+box-shadow .2s; }\n#ten-comic-root .ten-input,\n#ten-comic-root .ten-select { height: 36px; padding: 0 10px; }\n#ten-comic-root .ten-textarea { min-height: \
+110px; padding: 10px; resize: vertical; }\n#ten-comic-root input.ten-input[type="number"] { padding-right: 30px; appearance: textfield; -moz-appearance: \
+textfield; }\n#ten-comic-root input.ten-input[type="number"]::-webkit-inner-spin-button,\n#ten-comic-root \
+input.ten-input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }\n#ten-comic-root .ten-number-control { \
+position: relative; min-width: 0; width: 100%; }\n#ten-comic-root .ten-number-steps { position: absolute; top: 4px; right: 4px; bottom: 4px; width: 23px; \
+display: grid; grid-template-rows: 1fr 1fr; overflow: hidden; border: 1px solid rgba(95,246,255,.12); border-radius: 7px; opacity: .42; transition: opacity .2s, \
+border-color .2s, box-shadow .2s; }\n#ten-comic-root .ten-number-control:hover .ten-number-steps,\n#ten-comic-root .ten-number-control:focus-within \
+.ten-number-steps { opacity: 1; border-color: rgba(95,246,255,.38); box-shadow: 0 0 10px rgba(95,246,255,.08); }\n#ten-comic-root .ten-number-steps button { \
+position: relative; display: grid; place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 0; background: rgba(95,246,255,.035); \
+transition: color .16s, background .16s; }\n#ten-comic-root .ten-number-steps button + button { border-top: 1px solid rgba(95,246,255,.12); }\n#ten-comic-root \
+.ten-number-steps button:hover { color: var(--ten-cyan); background: rgba(95,246,255,.12); }\n#ten-comic-root .ten-number-steps i { width: 5px; height: 5px; \
+border-top: 1.5px solid currentColor; border-left: 1.5px solid currentColor; transform: translateY(1px) rotate(45deg); }\n#ten-comic-root .ten-number-steps \
+button:last-child i { transform: translateY(-1px) rotate(225deg); }\n#ten-comic-root .ten-view[data-view="settings"] .ten-settings-card { border-color: \
+rgba(137,225,255,.2); background: linear-gradient(145deg, rgba(61,77,98,.9), rgba(47,60,80,.9)); box-shadow: inset 0 1px rgba(255,255,255,.075), 0 8px 22px \
+rgba(1,9,20,.08); backdrop-filter: blur(18px) saturate(1.15); }\n#ten-comic-root .ten-view[data-view="settings"] .ten-input,\n#ten-comic-root \
+.ten-view[data-view="settings"] .ten-select,\n#ten-comic-root .ten-view[data-view="settings"] .ten-textarea { border-color: rgba(137,225,255,.18); background: \
+rgba(6,18,34,.42); }\n#ten-comic-root .ten-input:focus,\n#ten-comic-root .ten-select:focus,\n#ten-comic-root .ten-textarea:focus { border-color: \
+var(--ten-cyan); box-shadow: var(--ten-focus-ring); }\n#ten-comic-root .ten-select option { color: #eafaff; background: #0c1829; }\n#ten-comic-root .ten-source \
+{ --source: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); flex: 1; padding: 3px; border-radius: 12px; background: \
+rgba(2,10,22,.34); }\n#ten-comic-root .ten-source::before { content: ""; position: absolute; inset: 3px auto 3px 3px; width: calc(50% - 3px); border: 1px solid \
+rgba(95,246,255,.25); border-radius: 9px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.13)); transform: \
+translateX(calc(var(--source)*100%)); transition: transform .35s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-source button { position: relative; z-index: \
+1; min-height: 33px; color: var(--ten-muted); font: inherit; font-size: 11px; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root \
+.ten-source button.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-search-toolbar .ten-input { width: auto; min-width: 0; flex: 1 1 auto; \
+}\n#ten-comic-root .ten-search-site-picker { position: relative; z-index: 30; flex: 0 0 126px; width: 126px; min-width: 0; }\n#ten-comic-root \
+#ten-search-site-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 7px; padding: 0 10px 0 11px; overflow: hidden; color: \
+var(--ten-text); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid rgba(95,246,255,.24); border-radius: 11px; background: \
+linear-gradient(145deg, rgba(18,47,70,.76), rgba(36,38,76,.72)); box-shadow: inset 0 1px rgba(255,255,255,.08); transition: border-color .2s, box-shadow .2s; \
+}\n#ten-comic-root #ten-search-site-trigger:hover,\n#ten-comic-root .ten-search-site-picker.is-open #ten-search-site-trigger { border-color: \
+rgba(95,246,255,.58); box-shadow: 0 0 0 3px rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.1); }\n#ten-comic-root #ten-search-site-label { min-width: 0; \
+flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; }\n#ten-comic-root .ten-picker-arrow { width: 7px; height: 7px; flex: \
+0 0 7px; border-right: 1.5px solid var(--ten-cyan); border-bottom: 1.5px solid var(--ten-cyan); transform: rotate(45deg) translateY(-2px); transition: transform \
+.28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-search-site-picker.is-open .ten-picker-arrow { transform: rotate(225deg) translate(-1px,-1px); \
+}\n#ten-comic-root .ten-search-site-menu { position: absolute; z-index: 40; top: 43px; left: 0; width: 252px; max-height: 300px; padding: 6px; overflow-y: auto; \
+border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); \
+backdrop-filter: blur(26px) saturate(1.35); -webkit-backdrop-filter: blur(26px) saturate(1.35); animation: ten-picker-in .22s cubic-bezier(.22,1,.36,1); \
+scrollbar-width: thin; scrollbar-color: var(--ten-scroll-thumb) transparent; }\n#ten-comic-root .ten-search-site-menu[hidden] { display: none !important; \
+}\n#ten-comic-root .ten-search-site-menu::-webkit-scrollbar { width: 5px; }\n#ten-comic-root .ten-search-site-menu::-webkit-scrollbar-thumb { border-radius: \
+8px; background: rgba(95,246,255,.32); }\n#ten-comic-root .ten-search-site-option { width: 100%; min-height: 38px; display: grid; grid-template-columns: \
+minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px 9px; color: var(--ten-text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; \
+border: 1px solid transparent; border-radius: 9px; background: transparent; transition: color .18s, border-color .18s, background .18s, transform .18s; \
+}\n#ten-comic-root .ten-search-site-option + .ten-search-site-option { margin-top: 3px; }\n#ten-comic-root .ten-search-site-option span { min-width: 0; \
+overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-search-site-option small { color: var(--ten-muted); font-size: 9px; \
+}\n#ten-comic-root .ten-search-site-option:hover:not(:disabled) { color: var(--ten-cyan); border-color: rgba(95,246,255,.18); background: rgba(95,246,255,.07); \
+transform: translateX(2px); }\n#ten-comic-root .ten-search-site-option.is-selected { color: var(--ten-cyan); border-color: rgba(95,246,255,.28); background: \
+linear-gradient(100deg, rgba(95,246,255,.11), rgba(156,108,255,.08)); }\n#ten-comic-root .ten-search-site-option:disabled { opacity: .43; cursor: not-allowed; \
+}\n#ten-comic-root .ten-search-toolbar #ten-search-btn { flex: 0 0 76px; width: 76px; padding: 7px 10px; white-space: nowrap; }\n#ten-comic-root \
+.ten-search-toolbar #ten-search-btn .ten-icon { flex: 0 0 17px; width: 17px; height: 17px; }\n#ten-comic-root .ten-rule-manage { display: flex; align-items: \
+center; justify-content: space-between; gap: 8px; margin: -2px 0 10px; padding: 7px 8px 7px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid \
+var(--ten-line); border-radius: 12px; background: rgba(5,16,31,.3); }\n#ten-comic-root .ten-rule-manage[hidden] { display: none !important; }\n#ten-comic-root \
+.ten-rule-item { display: grid; grid-template-columns: minmax(0,1fr) 34px 34px; align-items: center; gap: 5px; }\n#ten-comic-root .ten-rule-item .ten-list-item \
+{ min-width: 0; }\n#ten-comic-root .ten-rule-edit { color: var(--ten-cyan); border-color: rgba(95,246,255,.16); background: rgba(95,246,255,.06); \
+}\n#ten-comic-root .ten-rule-delete { color: var(--ten-danger); border-color: rgba(255,97,116,.18); background: rgba(255,97,116,.07); }\n#ten-comic-root \
+.ten-list { display: grid; gap: 7px; }\n#ten-comic-root .ten-list-item { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 43px; padding: \
+9px 11px; color: var(--ten-text); text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: \
+var(--ten-list-bg); transition: .2s ease; }\n#ten-comic-root .ten-list-item:hover { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); \
+transform: translateX(2px); }\n#ten-comic-root .ten-list-item.is-disabled { opacity: .4; cursor: not-allowed; }\n#ten-comic-root .ten-list-item \
+input[type="checkbox"] { accent-color: var(--ten-cyan); }\n#ten-comic-root .ten-site-kind { flex: 0 0 auto; padding: 1px 6px; color: var(--ten-cyan); font-size: \
+9px; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; background: rgba(95,246,255,.06); }\n#ten-comic-root .ten-name { min-width: 0; flex: 1; \
+overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-meta { color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
+.ten-empty { display: grid; place-items: center; min-height: 250px; color: var(--ten-muted); text-align: center; }\n#ten-comic-root .ten-status { margin-bottom: \
+10px; padding: 9px 11px; color: var(--ten-muted); border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); \
+}\n#ten-comic-root .ten-status.is-ready { color: var(--ten-success); }\n#ten-comic-root .ten-options { max-height: 0; margin-bottom: 0; padding: 0 11px; \
+overflow: hidden; opacity: 0; border-width: 0; transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .2s, margin .2s, padding .2s, border-width .2s; \
+}\n#ten-comic-root .ten-options.is-open { max-height: 390px; margin-bottom: 10px; padding: 11px; opacity: 1; border-width: 1px; }\n#ten-comic-root \
+.ten-mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }\n#ten-comic-root .ten-mode { min-height: 36px; color: var(--ten-muted); font: \
+inherit; font-size: 11px; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 10px; background: rgba(4,13,27,.3); transition: .2s; \
+}\n#ten-comic-root .ten-mode.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.48); background: rgba(95,246,255,.1); box-shadow: 0 0 18px \
+rgba(95,246,255,.08); }\n#ten-comic-root .ten-chapter-tools { position: sticky; z-index: 8; top: -13px; display: grid; grid-template-columns: 1fr auto 1fr; gap: \
+8px; margin: 0 -5px 9px; padding: 7px 5px; border: 1px solid rgba(137,225,255,.16); border-radius: 13px; background: \
+linear-gradient(145deg,rgba(61,77,98,.94),rgba(47,60,80,.94)); box-shadow: 0 8px 20px rgba(1,9,20,.15), inset 0 1px rgba(255,255,255,.07); backdrop-filter: \
+blur(18px) saturate(1.15); }\n#ten-comic-root .ten-chapter-tools > :last-child { justify-self: end; }\n#ten-comic-root .ten-chapter-reload { position: relative; \
+display: grid; place-items: center; min-height: 34px; margin: 3px 0 9px; }\n#ten-comic-root .ten-chapter-reload::before { content: ""; position: absolute; left: \
+0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(95,246,255,.28), transparent); }\n#ten-comic-root .ten-chapter-reload button { \
+position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; color: var(--ten-cyan); font: inherit; font-size: 10px; cursor: \
+pointer; border: 1px solid rgba(95,246,255,.17); border-radius: 999px; background: rgba(9,24,44,.82); transition: .22s ease; }\n#ten-comic-root \
+.ten-chapter-reload button:hover { border-color: rgba(95,246,255,.42); box-shadow: 0 0 17px rgba(95,246,255,.1); }\n#ten-comic-root .ten-chapter-empty { \
+display: grid; justify-items: center; gap: 8px; padding: 26px 16px 17px; text-align: center; border: 1px solid var(--ten-line); border-radius: \
+var(--ten-radius-card); background: var(--ten-empty-bg); }\n#ten-comic-root .ten-chapter-empty[hidden],\n#ten-comic-root #ten-chapter-loaded[hidden] { display: \
+none !important; }\n#ten-comic-root .ten-empty-orbit { width: 52px; height: 52px; display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid \
+rgba(95,246,255,.28); border-radius: 17px; background: linear-gradient(145deg, rgba(95,246,255,.1), rgba(156,108,255,.1)); box-shadow: 0 0 24px \
+rgba(95,246,255,.1); }\n#ten-comic-root .ten-empty-orbit .ten-icon { width: 24px; height: 24px; }\n#ten-comic-root .ten-empty-title { font-weight: 700; \
+}\n#ten-comic-root .ten-chapter-empty .ten-btn { margin-top: 4px; }\n#ten-comic-root .ten-comic-info { width: min(290px,100%); display: grid; \
+grid-template-columns: 52px minmax(0,1fr); gap: 1px; margin-top: 6px; overflow: hidden; text-align: left; border: 1px solid var(--ten-line); border-radius: \
+var(--ten-radius-control); background: var(--ten-info-bg); }\n#ten-comic-root .ten-comic-info span,\n#ten-comic-root .ten-comic-info strong { padding: 7px 9px; \
+border-bottom: 1px solid rgba(95,246,255,.08); }\n#ten-comic-root .ten-comic-info span { color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
+.ten-comic-info strong { min-width: 0; overflow: hidden; color: var(--ten-text); font-size: 11px; font-weight: 600; white-space: nowrap; text-overflow: \
+ellipsis; }\n#ten-comic-root .ten-chapter-list-head { display: flex; align-items: center; justify-content: space-between; min-height: 39px; margin-bottom: 6px; \
+padding: 3px 5px 3px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: rgba(9,24,44,.38); \
+}\n#ten-comic-root .ten-chapter-list-head .ten-icon-btn.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.35); background: rgba(95,246,255,.1); \
+}\n#ten-comic-root .ten-chapter-list { display: grid; gap: 5px; max-height: none; overflow: visible; }\n#ten-comic-root .ten-progress { height: 5px; margin-top: \
+7px; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.08); }\n#ten-comic-root .ten-progress > i { position: relative; display: block; height: \
+100%; overflow: hidden; border-radius: inherit; background: linear-gradient(90deg, var(--ten-cyan), var(--ten-violet)); box-shadow: 0 0 12px \
+rgba(95,246,255,.4); transition: width .35s; }\n#ten-comic-root .ten-progress > i::after { content: ""; position: absolute; inset: 0; width: 42%; \
+pointer-events: none; opacity: 0; background: linear-gradient(90deg,transparent,rgba(255,255,255,.9),rgba(95,246,255,.45),transparent); transform: \
+translateX(-140%); }\n#ten-comic-root[data-effects="1"] .ten-progress > i::after { opacity: .34; animation: ten-energy-flow var(--ten-energy-duration,7s) linear \
+infinite; }\n#ten-comic-root[data-effects="2"] .ten-progress > i::after { opacity: .62; animation: ten-energy-flow var(--ten-energy-duration,5.8s) linear \
+infinite; }\n#ten-comic-root .ten-progress > i.is-paused::after { opacity: 0 !important; animation-play-state: paused !important; }\n#ten-comic-root \
+.ten-task-title { min-width: 0; overflow: hidden; font-weight: 650; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-task-group { \
+margin-bottom: 9px; overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-task-bg); \
+box-shadow: var(--ten-card-shadow); }\n#ten-comic-root .ten-task-header { min-height: 48px; display: flex; align-items: center; padding: 5px 8px 5px 13px; \
+}\n#ten-comic-root .ten-task-title-button { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 0; color: var(--ten-text); font: \
+inherit; font-weight: 700; text-align: left; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root .ten-task-bulk { flex: 0 0 auto; \
+min-height: 29px; margin-left: 4px; padding: 4px 9px; font-size: 9px; white-space: nowrap; }\n#ten-comic-root .ten-task-bulk[hidden] { display: none; \
+}\n#ten-comic-root .ten-task-control-group { flex: 0 0 auto; display: flex; align-items: center; gap: 5px; margin-left: 4px; }\n#ten-comic-root \
+.ten-task-control-group .ten-task-bulk { margin-left: 0; }\n#ten-comic-root .ten-task-arrow-button { width: 31px; height: 31px; flex: 0 0 31px; display: grid; \
+place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; \
+transition: color .2s, border-color .2s, background .2s; }\n#ten-comic-root .ten-task-arrow-button:hover { color: var(--ten-cyan); border-color: \
+rgba(95,246,255,.2); background: rgba(95,246,255,.07); }\n#ten-comic-root .ten-task-arrow-button .ten-task-arrow { margin: 0; }\n#ten-comic-root .ten-task-count \
+{ min-width: 22px; padding: 1px 7px; color: var(--ten-cyan); font-size: 10px; text-align: center; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; \
+background: rgba(95,246,255,.07); }\n#ten-comic-root .ten-task-arrow { width: 8px; height: 8px; margin-left: auto; margin-right: 5px; border-right: 1.5px solid \
+var(--ten-muted); border-bottom: 1.5px solid var(--ten-muted); transform: rotate(45deg) translateY(-2px); transition: transform .5s cubic-bezier(.22,1,.36,1); \
+}\n#ten-comic-root .ten-task-group.is-open .ten-task-arrow { transform: rotate(225deg) translate(-2px,-2px); }\n#ten-comic-root .ten-task-body { min-width: 0; \
+display: grid; grid-template-rows: 0fr; padding: 0 10px; overflow: hidden; opacity: 0; border-top: 0 solid var(--ten-line); transition: grid-template-rows .5s \
+cubic-bezier(.22,1,.36,1), opacity .5s ease, padding .5s ease, border-width .5s ease; }\n#ten-comic-root .ten-task-body > .ten-list { min-width: 0; width: 100%; \
+min-height: 0; overflow: hidden; }\n#ten-comic-root .ten-task-group.is-open .ten-task-body { grid-template-rows: 1fr; padding: 9px 10px 10px; opacity: 1; \
+border-top-width: 1px; }\n#ten-comic-root .ten-task-group.is-open .ten-task-body > .ten-list { max-height: none; overflow: visible; }\n#ten-comic-root \
+.ten-task-group.is-open.has-scroll .ten-task-body > .ten-list { max-height: 400px; overflow-y: auto; }\n#ten-comic-root .ten-task-body .ten-empty { min-height: \
+72px; }\n#ten-comic-root .ten-task-meta { min-width: 0; display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: var(--ten-muted); \
+font-size: 10px; }\n#ten-comic-root .ten-task-meta > span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n#ten-comic-root .ten-task-meta > span:last-child { flex: 0 0 auto; white-space: nowrap; }\n#ten-comic-root .ten-task-performance { min-width: 0; display: \
+flex; justify-content: space-between; gap: 8px; margin-top: 3px; color: rgba(190,216,231,.72); font-size: 9px; font-variant-numeric: tabular-nums; \
+}\n#ten-comic-root .ten-task-performance > span:first-child { color: rgba(95,246,255,.86); }\n#ten-comic-root .ten-task-performance > span:last-child { \
+overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right; }\n#ten-comic-root .ten-effect-level { position: relative; display: grid; \
+gap: 3px; padding: 3px; border-radius: 11px; background: rgba(3,14,28,.38); }\n#ten-comic-root .ten-effect-level { grid-template-columns: \
+repeat(3,minmax(0,1fr)); }\n#ten-comic-root .ten-effect-level button { min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; \
+font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, \
+background .18s, box-shadow .18s; }\n#ten-comic-root .ten-effect-level button.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.28); \
+background: linear-gradient(145deg,rgba(95,246,255,.12),rgba(156,108,255,.11)); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n#ten-comic-root \
+.ten-state-animate { --ten-state-rgb: 95,246,255; position: relative; }\n#ten-comic-root .ten-state-animate.is-state-pause { --ten-state-rgb: 156,108,255; \
+}\n#ten-comic-root .ten-state-animate.is-state-resume { --ten-state-rgb: 95,246,255; }\n#ten-comic-root .ten-state-animate.is-state-success { --ten-state-rgb: \
+85,239,182; }\n#ten-comic-root .ten-state-animate.is-state-danger { --ten-state-rgb: 255,97,116; }\n#ten-comic-root .ten-state-animate::after { content: ""; \
+position: absolute; z-index: 4; top: 0; bottom: 0; left: -42%; width: 38%; pointer-events: none; opacity: 0; border-radius: inherit; background: \
+linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.38),transparent); }\n#ten-comic-root[data-effects="1"] .ten-state-animate { animation: \
+ten-state-border .9s ease-out 1; }\n#ten-comic-root[data-effects="1"] .ten-state-animate::after { animation: ten-state-scan .86s cubic-bezier(.22,1,.36,1) 1; \
+}\n#ten-comic-root[data-effects="2"] .ten-state-animate { animation: ten-state-border .68s ease-out 1; }\n#ten-comic-root[data-effects="2"] \
+.ten-state-animate::after { background: linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.62),transparent); animation: ten-state-scan .62s \
+cubic-bezier(.22,1,.36,1) 1; }\n#ten-comic-root .ten-setting { display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,1fr); align-items: center; gap: \
+10px; margin-bottom: 9px; }\n#ten-comic-root .ten-setting label { color: #c9dce8; }\n#ten-comic-root .ten-setting label,\n#ten-comic-root .ten-rule-fields label \
+{ position: static !important; inset: auto !important; transform: none !important; }\n#ten-comic-root .ten-appearance-card { padding-bottom: 7px; \
+}\n#ten-comic-root .ten-appearance-setting { margin-bottom: 7px; }\n#ten-comic-root .ten-appearance-axis { display: grid; grid-template-columns: \
+repeat(3,minmax(0,1fr)); gap: 3px; padding: 3px; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: \
+var(--ten-input-bg); }\n#ten-comic-root .ten-appearance-axis button { min-width: 0; min-height: 29px; padding: 3px 4px; color: var(--ten-muted); font: inherit; \
+font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, \
+background .18s, transform .18s; }\n#ten-comic-root .ten-appearance-axis button:hover { color: var(--ten-text); background: var(--ten-control-hover-bg); \
+}\n#ten-comic-root .ten-appearance-axis button.is-active { color: var(--ten-cyan); border-color: var(--ten-control-border); background: \
+var(--ten-control-hover-bg); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n#ten-comic-root .ten-settings-download .ten-setting { min-height: 36px; \
+margin-bottom: 10px; }\n#ten-comic-root .ten-settings-download .ten-setting > label { font-size: 11px; line-height: 1.5; }\n#ten-comic-root \
+.ten-settings-download .ten-setting-check { min-height: 30px; margin-top: 2px; margin-bottom: 11px; }\n#ten-comic-root .ten-direct-flow-setting { display: block \
+!important; min-height: 0 !important; }\n#ten-comic-root .ten-direct-flow-setting > label { display: block; margin-bottom: 6px; }\n#ten-comic-root \
+.ten-direct-flow-options { display: grid; gap: 6px; }\n#ten-comic-root .ten-direct-flow-options button { width: 100%; padding: 8px 10px; color: var(--ten-text); \
+font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: 10px; background: var(--ten-input-bg); transition: \
+border-color .18s, background .18s, transform .18s; }\n#ten-comic-root .ten-direct-flow-options button:hover { transform: translateY(-1px); background: \
+var(--ten-control-hover-bg); }\n#ten-comic-root .ten-direct-flow-options button.is-active { border-color: var(--ten-cyan); box-shadow: 0 0 0 3px \
+rgba(95,246,255,.08); }\n#ten-comic-root .ten-direct-flow-options strong,\n#ten-comic-root .ten-direct-flow-options small { display: block; }\n#ten-comic-root \
+.ten-direct-flow-options small { margin-top: 3px; color: var(--ten-muted); font-size: 10px; line-height: 1.45; }\n#ten-comic-root .ten-path-sanitize-setting { \
+align-items: center; }\n#ten-comic-root .ten-path-sanitize-setting > div { min-width: 0; }\n#ten-comic-root .ten-path-sanitize-setting label,\n#ten-comic-root \
+.ten-path-sanitize-setting small { display: block; }\n#ten-comic-root .ten-path-sanitize-setting small { margin-top: 3px; color: var(--ten-muted); font-size: \
+9px; line-height: 1.4; }\n#ten-comic-root .ten-setting .ten-input { text-align: center; font-variant-numeric: tabular-nums; }\n#ten-comic-root .ten-setting \
+.ten-select { text-align: center; text-align-last: center; }\n#ten-comic-root .ten-setting-select { position: relative; z-index: 12; min-width: 0; width: 100%; \
+}\n#ten-comic-root #ten-default-mode-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 11px; color: var(--ten-text); \
+font: inherit; cursor: pointer; border: 1px solid rgba(137,225,255,.2); border-radius: 11px; background: rgba(6,18,34,.42); box-shadow: inset 0 1px \
+rgba(255,255,255,.045); transition: border-color .2s, box-shadow .2s, background .2s; }\n#ten-comic-root #ten-default-mode-trigger:hover,\n#ten-comic-root \
+.ten-setting-select.is-open #ten-default-mode-trigger { border-color: rgba(95,246,255,.55); background: rgba(9,27,46,.58); box-shadow: 0 0 0 3px \
+rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.07); }\n#ten-comic-root #ten-default-mode-label { min-width: 0; flex: 1; text-align: center; \
+}\n#ten-comic-root .ten-setting-select.is-open .ten-picker-arrow { transform: rotate(225deg) translate(-1px,-1px); }\n#ten-comic-root .ten-setting-select-menu { \
+position: absolute; z-index: 45; top: 42px; right: 0; left: 0; padding: 6px; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); \
+background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.35); animation: ten-picker-in .22s \
+cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-setting-select-menu[hidden] { display: none !important; }\n#ten-comic-root .ten-setting-select-menu button { \
+width: 100%; min-height: 43px; display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: center; gap: 8px; padding: 6px 8px; color: \
+var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; transition: \
+border-color .18s, background .18s, transform .18s; }\n#ten-comic-root .ten-setting-select-menu button + button { margin-top: 3px; }\n#ten-comic-root \
+.ten-setting-select-menu button:hover { border-color: rgba(95,246,255,.2); background: rgba(95,246,255,.08); transform: translateX(2px); }\n#ten-comic-root \
+.ten-setting-select-menu button.is-selected { border-color: rgba(95,246,255,.28); background: linear-gradient(100deg, rgba(95,246,255,.13), \
+rgba(156,108,255,.09)); }\n#ten-comic-root .ten-setting-select-menu button > span:last-child { min-width: 0; display: grid; gap: 1px; }\n#ten-comic-root \
+.ten-setting-select-menu strong { font-size: 11px; font-weight: 700; }\n#ten-comic-root .ten-setting-select-menu small { color: var(--ten-muted); font-size: \
+9px; }\n#ten-comic-root .ten-mode-option-mark { width: 10px; height: 10px; border: 1px solid rgba(137,225,255,.35); border-radius: 50%; box-shadow: inset 0 0 0 \
+2px rgba(7,18,34,.9); transition: background .18s, box-shadow .18s; }\n#ten-comic-root .ten-setting-select-menu button.is-selected .ten-mode-option-mark { \
+background: var(--ten-cyan); box-shadow: 0 0 10px rgba(95,246,255,.48), inset 0 0 0 2px rgba(7,18,34,.82); }\n#ten-comic-root .ten-setting \
+input[type="checkbox"] { justify-self: end; accent-color: var(--ten-cyan); width: 18px; height: 18px; }\n#ten-comic-root .ten-setting input[type="range"] { \
+width: 100%; accent-color: var(--ten-cyan); }\n#ten-comic-root .ten-setting-value { color: var(--ten-cyan); font-variant-numeric: tabular-nums; text-align: \
+right; }\n#ten-comic-root .ten-grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }\n#ten-comic-root .ten-toast { position: \
+absolute; z-index: 20; left: 50%; bottom: 78px; max-width: 86%; display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 13px; color: \
+var(--ten-toast-text); border: 1px solid var(--ten-toast-border); border-radius: var(--ten-radius-control); background: var(--ten-toast-bg); box-shadow: \
+var(--ten-tooltip-shadow); transform: translate(-50%,12px); opacity: 0; pointer-events: none; transition: .22s; }\n#ten-comic-root .ten-toast.is-show { \
+transform: translate(-50%,0); opacity: 1; }\n#ten-comic-root #ten-toast-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n#ten-comic-root .ten-toast button { flex: 0 0 auto; min-height: 27px; padding: 4px 9px; color: var(--ten-cyan); font: inherit; font-size: 10px; font-weight: \
+700; cursor: pointer; pointer-events: auto; border: 1px solid var(--ten-control-border); border-radius: 8px; background: var(--ten-control-hover-bg); \
+}\n#ten-comic-root .ten-toast button[hidden] { display: none; }\n#ten-comic-root .ten-confirm { position: absolute; z-index: 50; inset: 0; display: grid; \
+place-items: center; padding: 22px; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity .24s ease, visibility .24s; }\n#ten-comic-root \
+.ten-confirm.is-open { visibility: visible; opacity: 1; pointer-events: auto; }\n#ten-comic-root .ten-confirm-backdrop { position: absolute; inset: 0; padding: \
+0; cursor: default; border: 0; background: var(--ten-overlay-bg); backdrop-filter: blur(7px); }\n#ten-comic-root .ten-confirm-dialog { position: relative; \
+width: min(310px,100%); padding: 18px; text-align: center; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
+var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.96); transition: transform .28s cubic-bezier(.22,1,.36,1); \
+}\n#ten-comic-root .ten-confirm.is-open .ten-confirm-dialog { transform: translateY(0) scale(1); }\n#ten-comic-root .ten-confirm-icon { width: 42px; height: \
+42px; display: grid; place-items: center; margin: 0 auto 10px; color: #ff9aac; border: 1px solid rgba(255,97,116,.3); border-radius: 14px; background: \
+rgba(255,97,116,.11); box-shadow: 0 0 22px rgba(255,97,116,.1); }\n#ten-comic-root .ten-confirm-title { margin-bottom: 6px; font-size: 14px; font-weight: 750; \
+}\n#ten-comic-root .ten-confirm-message { min-height: 34px; color: #c5d8e5; font-size: 11px; line-height: 1.55; word-break: break-word; }\n#ten-comic-root \
+.ten-confirm-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; }\n#ten-comic-root .ten-diagnostic { position: \
+absolute; z-index: 51; inset: 0; display: grid; place-items: center; padding: 18px; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity \
+.24s ease, visibility .24s; }\n#ten-comic-root .ten-diagnostic.is-open { visibility: visible; opacity: 1; pointer-events: auto; }\n#ten-comic-root \
+.ten-diagnostic-dialog { position: relative; width: 100%; max-height: 78%; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 11px; padding: 15px; \
+border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); \
+transform: translateY(10px) scale(.97); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-diagnostic.is-open .ten-diagnostic-dialog \
+{ transform: translateY(0) scale(1); }\n#ten-comic-root .ten-diagnostic-head { display: grid; grid-template-columns: 42px minmax(0,1fr) 34px; align-items: \
+center; gap: 10px; text-align: left; }\n#ten-comic-root .ten-diagnostic-head .ten-confirm-icon { margin: 0; }\n#ten-comic-root .ten-confirm-icon.is-info { \
+color: var(--ten-cyan); border-color: rgba(95,246,255,.3); background: rgba(95,246,255,.1); box-shadow: 0 0 22px rgba(95,246,255,.1); }\n#ten-comic-root \
+#ten-diagnostic-content { min-height: 140px; margin: 0; padding: 11px; overflow: auto; color: #c9dce8; font: 10px/1.65 ui-monospace, SFMono-Regular, Consolas, \
+monospace; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(137,225,255,.16); border-radius: 12px; background: rgba(3,13,27,.52); \
+scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n#ten-comic-root .ten-diagnostic-actions { display: grid; grid-template-columns: \
+repeat(auto-fit,minmax(88px,1fr)); gap: 8px; }\n#ten-comic-root .ten-rule-guide-dialog { position: absolute; inset: 18px; width: auto; max-height: none; \
+overflow: hidden; }\n#ten-comic-root .ten-rule-guide-content { min-height: 0; padding-right: 4px; overflow-y: auto; color: #c9dce8; font-size: 10px; \
+line-height: 1.65; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n#ten-comic-root .ten-rule-guide-content section { padding: 9px \
+10px; border: 1px solid rgba(137,225,255,.13); border-radius: 11px; background: rgba(3,13,27,.34); }\n#ten-comic-root .ten-rule-guide-content section + section \
+{ margin-top: 7px; }\n#ten-comic-root .ten-rule-guide-content h3 { margin: 0 0 5px; color: var(--ten-cyan); font-size: 10px; letter-spacing: .04em; \
+}\n#ten-comic-root .ten-rule-guide-content ol,\n#ten-comic-root .ten-rule-guide-content ul { margin: 0; padding-left: 18px; }\n#ten-comic-root \
+.ten-rule-guide-content li + li { margin-top: 3px; }\n#ten-comic-root .ten-rule-guide-content dl { display: grid; grid-template-columns: 78px minmax(0,1fr); \
+gap: 4px 7px; margin: 0; }\n#ten-comic-root .ten-rule-guide-content dt { color: var(--ten-text); font-weight: 700; }\n#ten-comic-root .ten-rule-guide-content dd \
+{ margin: 0; }\n#ten-comic-root .ten-rule-guide-content code { padding: 1px 4px; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.13); border-radius: \
+5px; background: rgba(95,246,255,.06); font: 9px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }\n#ten-comic-root .ten-rule-guide-example > code { \
+display: block; padding: 7px 8px; color: #bffbff; border-radius: 8px; background: rgba(2,10,22,.46); }\n#ten-comic-root .ten-rule-guide-warning { margin-top: \
+8px; padding: 7px 9px; color: #ffd0d9; border: 1px solid rgba(255,97,116,.24); border-radius: 9px; background: rgba(255,97,116,.08); }\n#ten-comic-root \
+.ten-task-card,\n#ten-comic-root .ten-history-card { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; contain: paint; cursor: \
+default; transform: none !important; transition: border-color .24s ease, background-color .24s ease, box-shadow .24s ease; }\n#ten-comic-root \
+.ten-task-card:hover,\n#ten-comic-root .ten-history-card:hover { border-color: rgba(95,246,255,.3); background: rgba(27,46,70,.52); box-shadow: inset 0 1px \
+rgba(255,255,255,.04); transform: none; }\n#ten-comic-root .ten-task-card .ten-name,\n#ten-comic-root .ten-history-card .ten-name { min-width: 0; width: 100%; \
+}\n#ten-comic-root .ten-task-actions { min-width: max-content; flex: 0 0 auto; display: flex; align-items: center; gap: 1px; }\n#ten-comic-root \
+.ten-task-actions .ten-icon-btn { width: 29px; height: 29px; border-radius: 9px; }\n#ten-comic-root .ten-task-actions .ten-icon-btn.is-danger { color: #ff9aac; \
+}\n#ten-comic-root .ten-task-actions .ten-icon-btn:focus-visible { outline: 2px solid var(--ten-cyan); outline-offset: 1px; }\n#ten-comic-root .ten-task-actions \
+.ten-icon-btn:disabled { opacity: .24; cursor: default; }\n#ten-comic-root .ten-history-card .ten-task-actions .ten-icon-btn { width: 27px; height: 27px; \
+}\n#ten-comic-root .ten-history-wrap { gap: 7px; }\n#ten-comic-root .ten-history-filter { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: \
+4px; padding: 3px; border: 1px solid rgba(137,225,255,.12); border-radius: 11px; background: rgba(3,14,28,.3); }\n#ten-comic-root .ten-history-filter button { \
+min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; font-size: 9px; cursor: pointer; border: 1px solid transparent; \
+border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, background .18s; }\n#ten-comic-root .ten-history-filter button:hover { \
+color: var(--ten-text); background: rgba(95,246,255,.05); }\n#ten-comic-root .ten-history-filter button.is-active { color: var(--ten-cyan); border-color: \
+rgba(95,246,255,.24); background: linear-gradient(145deg,rgba(95,246,255,.11),rgba(156,108,255,.09)); }\n#ten-comic-root .ten-recovery { margin-bottom: 9px; \
+padding: 10px 11px; display: flex; align-items: center; justify-content: space-between; gap: 9px; border: 1px solid rgba(95,246,255,.28); border-radius: 14px; \
+background: linear-gradient(145deg,rgba(35,73,91,.72),rgba(59,48,91,.68)); box-shadow: inset 0 1px rgba(255,255,255,.08); }\n#ten-comic-root \
+.ten-recovery[hidden] { display: none; }\n#ten-comic-root .ten-recovery > div:first-child { min-width: 0; display: grid; gap: 2px; }\n#ten-comic-root \
+.ten-recovery strong { color: var(--ten-text); font-size: 11px; }\n#ten-comic-root .ten-recovery span { color: var(--ten-muted); font-size: 9px; \
+}\n#ten-comic-root .ten-recovery .ten-btn { min-height: 30px; padding: 5px 9px; }\n#ten-comic-root .ten-task-state { padding: 1px 6px; border: 1px solid \
+rgba(137,225,255,.18); border-radius: 999px; font-size: 9px; }\n#ten-comic-root .ten-task-state.is-failed,\n#ten-comic-root .ten-task-state.is-partial { color: \
+#ff9aac; border-color: rgba(255,97,116,.25); background: rgba(255,97,116,.08); }\n#ten-comic-root .ten-task-state.is-cancelled { color: #b4c2ce; \
+}\n#ten-comic-root .ten-task-state.is-completed { color: var(--ten-cyan); }\n#ten-comic-root .ten-search-results { margin-top: 10px; }\n#ten-comic-root \
+.ten-result-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(100px,1fr)); gap: 8px; }\n#ten-comic-root .ten-result { padding: 6px; overflow: \
+hidden; color: var(--ten-text); cursor: pointer; border: 1px solid var(--ten-line); border-radius: 12px; background: var(--ten-surface); }\n#ten-comic-root \
+.ten-result img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; background: rgba(255,255,255,.05); }\n#ten-comic-root .ten-result span \
+{ display: block; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }\n#ten-comic-root .ten-section-title { \
+margin: 13px 2px 7px; color: var(--ten-muted); font-size: 10px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }\n#ten-comic-root \
+.ten-file-name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
+.ten-dir-control { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }\n#ten-comic-root .ten-dir-control .ten-btn { flex: 0 \
+0 auto; margin: 0; }\n#ten-comic-root .ten-dir-control .ten-file-name { flex: 1 1 auto; max-width: 92px; text-align: left; }\n#ten-comic-root .ten-settings-hint \
+{ color: var(--ten-muted); font-size: 9px; line-height: 1.5; text-align: right; }\n#ten-comic-root .ten-rule-fields { display: grid; gap: 8px; \
+}\n#ten-comic-root .ten-rule-fields label { min-width: 0; display: grid; gap: 4px; color: #c9dce8; font-size: 10px; }\n#ten-comic-root .ten-rule-fields \
+.ten-input { height: 34px; text-align: left; }\n#ten-comic-root .ten-rule-intro { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; \
+margin-bottom: 9px; padding: 8px 10px; color: var(--ten-muted); font-size: 9px; line-height: 1.45; border: 1px solid var(--ten-card-border); border-radius: \
+var(--ten-radius-control); background: var(--ten-list-bg); }\n#ten-comic-root .ten-rule-intro strong { color: var(--ten-cyan); font-size: 10px; white-space: \
+nowrap; }\n#ten-comic-root .ten-rule-pick-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin: 0 0 8px; }\n#ten-comic-root \
+.ten-rule-templates { margin: 0 0 8px; overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: \
+var(--ten-list-bg); }\n#ten-comic-root .ten-rule-templates summary { display: flex; align-items: center; gap: 8px; padding: 9px 10px; color: var(--ten-text); \
+font-size: 10px; cursor: pointer; list-style: none; }\n#ten-comic-root .ten-rule-templates summary::-webkit-details-marker { display: none; }\n#ten-comic-root \
+.ten-rule-templates summary::after { content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid \
+currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .2s; }\n#ten-comic-root .ten-rule-templates summary span { margin-left: auto; \
+overflow: hidden; color: var(--ten-muted); font-size: 9px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-templates[open] summary { \
+color: var(--ten-cyan); border-bottom: 1px solid var(--ten-card-border); }\n#ten-comic-root .ten-rule-templates[open] summary::after { transform: rotate(225deg) \
+translate(-1px,-1px); }\n#ten-comic-root .ten-rule-template-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; padding: 8px; \
+animation: ten-picker-in .22s ease both; }\n#ten-comic-root .ten-rule-template-grid button { min-width: 0; min-height: 48px; display: grid; align-content: \
+center; gap: 2px; padding: 7px 8px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); \
+border-radius: var(--ten-radius-control); background: var(--ten-input-bg); transition: border-color .18s, background .18s, transform .18s; }\n#ten-comic-root \
+.ten-rule-template-grid button:hover,\n#ten-comic-root .ten-rule-template-grid button.is-active { color: var(--ten-cyan); border-color: var(--ten-cyan); \
+background: var(--ten-control-hover-bg); transform: translateY(-1px); }\n#ten-comic-root .ten-rule-template-grid strong { overflow: hidden; font-size: 10px; \
+white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-template-grid small { overflow: hidden; color: var(--ten-muted); font-size: 8px; \
+white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-mobile-drawer { display: none; }\n#ten-comic-root .ten-rule-pick-actions button { \
+min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 7px; color: var(--ten-text); font: inherit; \
+font-size: 9px; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); \
+}\n#ten-comic-root .ten-rule-pick-actions button .ten-icon { width: 14px; height: 14px; color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-pick-actions \
+button:hover { color: var(--ten-cyan); border-color: rgba(95,246,255,.42); background: rgba(95,246,255,.09); box-shadow: inset 0 1px rgba(255,255,255,.06); \
+}\n#ten-comic-root .ten-rule-guide-open { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; color: var(--ten-cyan); font: \
+inherit; font-size: 9px; cursor: pointer; border: 1px solid rgba(95,246,255,.2); border-radius: 9px; background: rgba(95,246,255,.07); transition: transform \
+.18s, border-color .18s, background .18s, box-shadow .18s; }\n#ten-comic-root .ten-rule-guide-open .ten-icon { width: 15px; height: 15px; }\n#ten-comic-root \
+.ten-rule-guide-open:hover { transform: translateY(-1px); border-color: rgba(95,246,255,.5); background: rgba(95,246,255,.12); box-shadow: 0 6px 16px \
+rgba(5,25,43,.14); }\n#ten-comic-root .ten-rule-simple-hint { margin-top: -3px; color: var(--ten-muted); font-size: 9px; line-height: 1.45; }\n#ten-comic-root \
+.ten-rule-advanced { overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); \
+}\n#ten-comic-root .ten-rule-advanced summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; color: #c9dce8; \
+font-size: 10px; cursor: pointer; list-style: none; }\n#ten-comic-root .ten-rule-advanced summary::-webkit-details-marker { display: none; }\n#ten-comic-root \
+.ten-rule-advanced summary::after { content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid \
+currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .25s ease; }\n#ten-comic-root .ten-rule-advanced[open] summary { color: \
+var(--ten-cyan); border-bottom: 1px solid rgba(137,225,255,.12); }\n#ten-comic-root .ten-rule-advanced[open] summary::after { transform: rotate(225deg) \
+translate(-1px,-1px); }\n#ten-comic-root .ten-rule-advanced summary span,\n#ten-comic-root .ten-rule-json summary span { margin-left: auto; color: \
+var(--ten-muted); font-size: 9px; font-weight: 400; }\n#ten-comic-root .ten-rule-advanced-body { display: grid; gap: 8px; padding: 9px; animation: ten-picker-in \
+.24s ease both; }\n#ten-comic-root .ten-rule-frame { min-height: 34px; padding: 0 2px; }\n#ten-comic-root .ten-rule-function { min-height: 96px; font: 9px/1.55 \
+ui-monospace, SFMono-Regular, Consolas, monospace; }\n#ten-comic-root .ten-rule-label { display: block; margin-bottom: 4px; color: #c9dce8; font-size: 10px; \
+}\n#ten-comic-root .ten-rule-readtype { --rule-type: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); padding: 3px; border-radius: \
+11px; background: rgba(3,14,28,.38); }\n#ten-comic-root .ten-rule-readtype::before { content: ""; position: absolute; inset: 3px 50% 3px 3px; border: 1px solid \
+rgba(95,246,255,.25); border-radius: 8px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.12)); transform: \
+translateX(calc(var(--rule-type)*100%)); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-rule-readtype button { position: \
+relative; z-index: 1; min-height: 30px; color: var(--ten-muted); font: inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; \
+}\n#ten-comic-root .ten-rule-readtype button.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-test-result { margin-top: 9px; padding: 9px; \
+color: #c9dce8; font: 9px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; border: 1px solid rgba(137,225,255,.18); border-radius: \
+10px; background: rgba(3,14,28,.4); }\n#ten-comic-root .ten-rule-test-result.is-success { color: #a9fff0; border-color: rgba(95,246,255,.3); }\n#ten-comic-root \
+.ten-rule-test-result.is-error { color: #ffc0cb; border-color: rgba(255,97,116,.3); }\n#ten-comic-root .ten-rule-actions { display: grid; grid-template-columns: \
+repeat(auto-fit,minmax(88px,1fr)); gap: 7px; margin-top: 9px; }\n#ten-comic-root .ten-backup-actions { display: grid; grid-template-columns: \
+repeat(2,minmax(0,1fr)); gap: 7px; margin-bottom: 7px; }\n#ten-comic-root .ten-rule-json { margin-top: 10px; border-top: 1px solid rgba(137,225,255,.13); \
+}\n#ten-comic-root .ten-rule-json summary { padding: 9px 2px 7px; color: var(--ten-muted); font-size: 10px; cursor: pointer; }\n#ten-comic-root \
+.ten-rule-json[open] summary { color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-json .ten-textarea { min-height: 96px; }\n#ten-comic-root .ten-rule-json \
+.ten-btn { width: 100%; margin-top: 7px; }\n@keyframes ten-particle { from { transform: translate3d(0,0,0) scale(.7); opacity: .15; } to { transform: \
+translate3d(var(--tx),var(--ty),0) scale(1.2); opacity: .7; } }\n@keyframes ten-launcher-orbit { to { transform: rotate(360deg); } }\n@keyframes ten-view-in { \
+from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }\n@keyframes ten-ripple { to { transform: scale(4); opacity: 0; } \
+}\n@keyframes ten-picker-in { from { opacity: 0; transform: translateY(-7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }\n@keyframes \
+ten-energy-flow { to { transform: translateX(340%); } }\n@keyframes ten-state-scan { from { left: -42%; opacity: 0; } 24% { opacity: 1; } to { left: 108%; \
+opacity: 0; } }\n@keyframes ten-state-border { 0% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } 35% { box-shadow: 0 0 18px rgba(var(--ten-state-rgb),.18), \
+inset 0 0 12px rgba(var(--ten-state-rgb),.06); } 100% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } }\n@media (max-width: 560px), (max-height: 720px) \
+{\n\n  #ten-comic-root #ten-panel { right: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n  #ten-comic-root \
+#ten-comic-launcher { right: 8px; }\n  #ten-comic-root .ten-mobile-drawer { position: fixed; z-index: 2147483647; inset: 0; display: block; visibility: hidden; \
+pointer-events: none; }\n  #ten-comic-root .ten-mobile-drawer.is-open { visibility: visible; pointer-events: auto; }\n  #ten-comic-root \
+.ten-mobile-drawer-backdrop { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: var(--ten-overlay-bg); backdrop-filter: blur(5px); \
+opacity: 0; transition: opacity .22s; }\n  #ten-comic-root .ten-mobile-drawer.is-open .ten-mobile-drawer-backdrop { opacity: 1; }\n  #ten-comic-root \
+.ten-mobile-drawer-sheet { position: absolute; right: 0; bottom: 0; left: 0; max-height: min(78vh,620px); display: grid; grid-template-rows: auto auto \
+minmax(0,1fr); padding: 7px 12px 14px; overflow: hidden; border: 1px solid var(--ten-panel-border); border-radius: 22px 22px 0 0; background: \
+var(--ten-popover-bg); box-shadow: 0 -18px 48px rgba(0,5,15,.28); transform: translateY(104%); transition: transform .3s cubic-bezier(.22,1,.36,1); }\n  \
+#ten-comic-root .ten-mobile-drawer.is-open .ten-mobile-drawer-sheet { transform: translateY(0); }\n  #ten-comic-root .ten-mobile-drawer-handle { width: 34px; \
+height: 4px; margin: 0 auto 5px; border-radius: 999px; background: var(--ten-scroll-thumb); }\n  #ten-comic-root .ten-mobile-drawer-sheet header { min-height: \
+38px; display: flex; align-items: center; justify-content: space-between; color: var(--ten-text); font-size: 12px; font-weight: 750; }\n  #ten-comic-root \
+#ten-mobile-drawer-content { min-height: 0; overflow-y: auto; padding: 2px 1px; }\n  #ten-comic-root #ten-mobile-drawer-content .ten-options { max-height: none; \
+margin: 0; padding: 10px; opacity: 1; border-width: 1px; }\n  #ten-comic-root #ten-mobile-drawer-content .ten-options.is-mobile-drawer-content { background: \
+var(--ten-card-bg); }\n  #ten-comic-root #ten-mobile-drawer-content .ten-rule-advanced-body { padding: 10px; border: 1px solid var(--ten-card-border); \
+border-radius: var(--ten-radius-card); background: var(--ten-card-bg); }\n  \n}\n@media (min-width: 561px) {\n\n  #ten-comic-root .ten-mobile-drawer { display: \
+none; }\n  \n}\n@media (max-width: 1000px) {\n\n  #ten-comic-root #ten-search-panel { z-index: 2147483647; right: 8px; width: calc(100vw - 16px); height: \
+calc(100vh - 16px); border-radius: 19px; }\n  \n}\n@media (prefers-reduced-motion: reduce) {\n\n  #ten-comic-root *,\n  #ten-comic-root *::before,\n  \
+#ten-comic-root *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }\n  #ten-comic-root #ten-particle-field { display: \
+none; }\n  \n}\n#ten-comic-root .ten-theme-presets { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }\n#ten-comic-root \
+.ten-theme-choice { min-width: 0; min-height: 58px; display: grid; align-content: center; gap: 2px; padding: 8px 10px; color: var(--ten-text); font: inherit; \
+text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 13px; background: rgba(4,14,28,.36); transition: border-color .2s, \
+box-shadow .2s, transform .18s, background .2s; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="glass"] { box-shadow: inset 3px 0 #5ff6ff; \
+}\n#ten-comic-root .ten-theme-choice[data-theme-choice="mist"] { box-shadow: inset 3px 0 #78bfe8; }\n#ten-comic-root \
+.ten-theme-choice[data-theme-choice="porcelain"] { box-shadow: inset 3px 0 #b9835e; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="expressive"] { \
+box-shadow: inset 3px 0 #aa71ff; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="carbon"] { box-shadow: inset 3px 0 #ff4f96; }\n#ten-comic-root \
+.ten-theme-choice[data-theme-choice="ink"] { box-shadow: inset 3px 0 #a18558; }\n#ten-comic-root .ten-theme-choice:hover { border-color: rgba(95,246,255,.46); \
+transform: translateY(-1px); }\n#ten-comic-root .ten-theme-choice[aria-pressed="true"] { color: var(--ten-cyan); border-color: var(--ten-cyan); background: \
+rgba(95,246,255,.09); box-shadow: 0 0 0 3px rgba(95,246,255,.07), inset 0 1px rgba(255,255,255,.08); }\n#ten-comic-root .ten-theme-choice strong { overflow: \
+hidden; font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-theme-choice small { overflow: hidden; color: var(--ten-muted); \
+font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root[data-theme="mist"] { --ten-bg: rgba(241,248,253,.76); --ten-surface: \
+rgba(255,255,255,.5); --ten-surface-strong: rgba(255,255,255,.74); --ten-line: rgba(67,112,148,.18); --ten-text: #183247; --ten-muted: #667d90; --ten-cyan: \
+#168eaf; --ten-blue: #4d7edc; --ten-violet: #7c69ca; --ten-pink: #c45e91; --ten-danger: #ce4f6d; --ten-success: #278768; }\n#ten-comic-root[data-theme="mist"] \
+#ten-comic-launcher { color: #183247; border-color: rgba(255,255,255,.84); border-radius: 20px; background: \
+linear-gradient(145deg,rgba(255,255,255,.82),rgba(219,237,250,.68)); box-shadow: 0 14px 38px rgba(49,91,123,.2),0 0 24px rgba(86,168,213,.16),inset 0 1px \
+rgba(255,255,255,.96); }\n#ten-comic-root[data-theme="mist"] #ten-panel { border-color: rgba(255,255,255,.86); border-radius: 27px; background: \
+radial-gradient(circle at 90% 2%,rgba(151,129,232,.17),transparent 31%),radial-gradient(circle at 2% 88%,rgba(66,177,218,.14),transparent \
+32%),linear-gradient(155deg,rgba(244,250,255,.78),rgba(224,236,248,.7)); box-shadow: 0 30px 86px rgba(43,73,99,.24),inset 0 1px rgba(255,255,255,.96); \
+backdrop-filter: blur(38px) saturate(1.28); }\n#ten-comic-root[data-theme="mist"] #ten-panel::before { opacity: .5; background: radial-gradient(circle at 86% \
+4%,rgba(117,95,214,.14),transparent 28%),radial-gradient(circle at 6% 90%,rgba(37,155,198,.13),transparent 32%); }\n#ten-comic-root[data-theme="mist"] \
+.ten-header,\n#ten-comic-root[data-theme="mist"] .ten-nav { border-color: rgba(70,111,143,.14); background: rgba(248,252,255,.58); backdrop-filter: blur(23px) \
+saturate(1.2); }\n#ten-comic-root[data-theme="mist"] .ten-card,\n#ten-comic-root[data-theme="mist"] .ten-task-group { border-color: rgba(255,255,255,.76); \
+border-radius: 18px; background: linear-gradient(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); box-shadow: 0 10px 25px rgba(54,88,112,.1),inset 0 1px \
+rgba(255,255,255,.88); backdrop-filter: blur(18px) saturate(1.18); }\n#ten-comic-root[data-theme="mist"] .ten-list-item,\n#ten-comic-root[data-theme="mist"] \
+.ten-status,\n#ten-comic-root[data-theme="mist"] .ten-chapter-list-head { border-color: rgba(78,119,150,.16); border-radius: 14px; background: \
+rgba(255,255,255,.46); box-shadow: inset 0 1px rgba(255,255,255,.8); }\n#ten-comic-root[data-theme="mist"] .ten-list-item:hover { border-color: \
+rgba(22,142,175,.4); background: rgba(255,255,255,.68); }\n#ten-comic-root[data-theme="mist"] .ten-btn { color: #183247; border-color: rgba(77,126,174,.2); \
+border-radius: 13px; background: linear-gradient(115deg,rgba(208,235,248,.86),rgba(228,220,249,.8),rgba(213,240,242,.82)); box-shadow: inset 0 1px \
+rgba(255,255,255,.9); }\n#ten-comic-root[data-theme="mist"] .ten-btn.is-danger { color: #a53e5c; background: rgba(255,232,239,.72); \
+}\n#ten-comic-root[data-theme="mist"] .ten-input,\n#ten-comic-root[data-theme="mist"] .ten-select,\n#ten-comic-root[data-theme="mist"] \
+.ten-textarea,\n#ten-comic-root[data-theme="mist"] .ten-setting-select > button,\n#ten-comic-root[data-theme="mist"] \
+.ten-source,\n#ten-comic-root[data-theme="mist"] .ten-effect-level,\n#ten-comic-root[data-theme="mist"] .ten-history-filter,\n#ten-comic-root[data-theme="mist"] \
+.ten-rule-readtype { color: #183247; border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.45); }\n#ten-comic-root[data-theme="mist"] .ten-setting \
+label,\n#ten-comic-root[data-theme="mist"] .ten-rule-fields label,\n#ten-comic-root[data-theme="mist"] .ten-rule-label { color: #29455a; \
+}\n#ten-comic-root[data-theme="mist"] .ten-setting-select-menu,\n#ten-comic-root[data-theme="mist"] .ten-search-site-menu,\n#ten-comic-root[data-theme="mist"] \
+.ten-confirm-dialog,\n#ten-comic-root[data-theme="mist"] .ten-diagnostic-dialog { color: #183247; border-color: rgba(77,126,174,.2); background: \
+linear-gradient(145deg,rgba(250,253,255,.96),rgba(226,237,247,.96)); box-shadow: 0 22px 55px rgba(44,76,102,.22),inset 0 1px rgba(255,255,255,.9); \
+}\n#ten-comic-root[data-theme="mist"] #ten-diagnostic-content { color: #29455a; background: rgba(255,255,255,.52); }\n#ten-comic-root[data-theme="mist"] \
+.ten-select option { color: #183247; background: #f4f9fc; }\n#ten-comic-root[data-theme="mist"] .ten-progress { background: rgba(50,85,111,.12); \
+}\n#ten-comic-root[data-theme="mist"] .ten-progress > i { background: linear-gradient(90deg,#48b9d2,#65a4ea,#9c7cdd); box-shadow: 0 0 10px rgba(62,157,203,.25); \
+}\n#ten-comic-root[data-theme="mist"] .ten-nav::before { border-color: rgba(45,140,184,.24); border-radius: 17px; background: \
+linear-gradient(145deg,rgba(181,229,246,.56),rgba(213,198,246,.52)); box-shadow: 0 7px 19px rgba(57,102,132,.1),inset 0 1px rgba(255,255,255,.88); \
+}\n#ten-comic-root[data-theme="mist"] .ten-chapter-tools { border-color: rgba(255,255,255,.76); border-radius: 16px; background: \
+linear-gradient(145deg,rgba(255,255,255,.84),rgba(226,238,248,.76)); box-shadow: 0 8px 20px rgba(54,88,112,.1),inset 0 1px rgba(255,255,255,.9); \
+}\n#ten-comic-root[data-theme="mist"] #ten-search-panel { color: #183247; border-color: rgba(255,255,255,.82); background: \
+linear-gradient(155deg,rgba(246,251,255,.94),rgba(225,237,247,.95)); box-shadow: 0 26px 70px rgba(43,73,99,.23),inset 0 1px rgba(255,255,255,.9); \
+}\n#ten-comic-root[data-theme="mist"] #ten-particle-field { opacity: .22; filter: saturate(.65); }\n#ten-comic-root[data-theme="mist"] .ten-theme-choice { \
+color: #183247; border-color: rgba(70,111,143,.17); background: rgba(255,255,255,.56); }\n#ten-comic-root[data-theme="mist"] .ten-theme-choice:hover { \
+border-color: rgba(22,142,175,.4); background: rgba(255,255,255,.74); }\n#ten-comic-root[data-theme="mist"] .ten-theme-choice[aria-pressed="true"] { color: \
+#126f8b; border-color: #168eaf; background: rgba(225,244,252,.8); }\n#ten-comic-root[data-theme="mist"] .ten-rule-intro { border-color: rgba(70,111,143,.16); \
+background: linear-gradient(145deg,rgba(255,255,255,.58),rgba(218,235,246,.46)); box-shadow: inset 0 1px rgba(255,255,255,.78); \
+}\n#ten-comic-root[data-theme="mist"] .ten-rule-advanced { border-color: rgba(70,111,143,.17); background: rgba(250,253,255,.5); box-shadow: inset 0 1px \
+rgba(255,255,255,.72); }\n#ten-comic-root[data-theme="mist"] .ten-rule-advanced summary { color: #29455a; }\n#ten-comic-root[data-theme="mist"] \
+.ten-rule-advanced[open] summary { color: #126f8b; border-bottom-color: rgba(70,111,143,.14); background: rgba(223,241,249,.46); \
+}\n#ten-comic-root[data-theme="mist"] .ten-rule-guide-open { color: #126f8b; border-color: rgba(22,142,175,.24); background: rgba(225,244,252,.7); box-shadow: \
+inset 0 1px rgba(255,255,255,.84); }\n#ten-comic-root[data-theme="mist"] #ten-search-site-trigger { color: #29455a; border-color: rgba(70,111,143,.18); \
+background: linear-gradient(145deg,rgba(255,255,255,.72),rgba(220,238,248,.62)); box-shadow: inset 0 1px rgba(255,255,255,.9),0 5px 14px rgba(54,88,112,.08); \
+}\n#ten-comic-root[data-theme="mist"] .ten-rule-manage { border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.46); \
+}\n#ten-comic-root[data-theme="mist"] .ten-chapter-reload button { border-color: rgba(22,142,175,.2); background: rgba(247,252,255,.82); box-shadow: inset 0 1px \
+rgba(255,255,255,.9); }\n#ten-comic-root[data-theme="mist"] .ten-chapter-empty { border-color: rgba(255,255,255,.78); background: \
+linear-gradient(145deg,rgba(255,255,255,.62),rgba(222,237,247,.48)); box-shadow: 0 9px 23px rgba(54,88,112,.09),inset 0 1px rgba(255,255,255,.9); \
+}\n#ten-comic-root[data-theme="mist"] .ten-empty-orbit { border-color: rgba(22,142,175,.22); background: \
+linear-gradient(145deg,rgba(230,248,253,.82),rgba(231,226,250,.7)); box-shadow: 0 8px 20px rgba(54,110,142,.1),inset 0 1px rgba(255,255,255,.9); \
+}\n#ten-comic-root[data-theme="mist"] .ten-comic-info { border-color: rgba(70,111,143,.16); background: rgba(255,255,255,.5); box-shadow: inset 0 1px \
+rgba(255,255,255,.82); }\n#ten-comic-root[data-theme="mist"] .ten-comic-info span,\n#ten-comic-root[data-theme="mist"] .ten-comic-info strong { \
+border-bottom-color: rgba(70,111,143,.1); }\n#ten-comic-root[data-theme="mist"] .ten-mini-task,\n#ten-comic-root[data-theme="mist"] .ten-rule-pick-hud { color: \
+#183247; border-color: rgba(255,255,255,.86); background: linear-gradient(145deg,rgba(250,253,255,.94),rgba(222,237,248,.92)); box-shadow: 0 16px 42px \
+rgba(43,73,99,.2),inset 0 1px rgba(255,255,255,.94); }\n#ten-comic-root[data-theme="mist"] .ten-mini-icon,\n#ten-comic-root[data-theme="mist"] \
+.ten-rule-pick-symbol { border-color: rgba(22,142,175,.2); background: rgba(225,244,252,.74); }\n#ten-comic-root[data-theme="mist"] .ten-mini-progress { \
+background: rgba(50,85,111,.12); }\n#ten-comic-root[data-theme="mist"] .ten-rule-pick-actions button { color: #29455a; border-color: rgba(70,111,143,.16); \
+background: rgba(255,255,255,.5); }\n#ten-comic-root[data-theme="porcelain"] { --ten-bg: #f4f0e8; --ten-surface: #fffdf9; --ten-surface-strong: #f8f3ea; \
+--ten-line: rgba(91,82,70,.2); --ten-text: #28323b; --ten-muted: #74746f; --ten-cyan: #315f88; --ten-blue: #3f6f9d; --ten-violet: #8e6f57; --ten-pink: #b86a5c; \
+--ten-danger: #b94f49; --ten-success: #4f7f64; }\n#ten-comic-root[data-theme="porcelain"] #ten-comic-launcher { color: #28323b; border-color: #d9d1c4; \
+border-radius: 15px; background: #fffdf8; box-shadow: 0 11px 28px rgba(62,54,44,.18),inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] #ten-panel { \
+border-color: #d6cfc4; border-radius: 20px; background: #f5f1e9; box-shadow: 0 28px 72px rgba(55,48,40,.24),inset 0 1px #fff; backdrop-filter: none; \
+}\n#ten-comic-root[data-theme="porcelain"] #ten-panel::before { opacity: 0; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-header,\n#ten-comic-root[data-theme="porcelain"] .ten-nav { border-color: #d9d2c7; background: #f0ebe2; backdrop-filter: none; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-card,\n#ten-comic-root[data-theme="porcelain"] .ten-task-group { border-color: #ddd6ca; border-radius: 13px; \
+background: #fffdf9; box-shadow: 0 7px 18px rgba(65,55,43,.08),inset 0 1px #fff; backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-list-item,\n#ten-comic-root[data-theme="porcelain"] .ten-status,\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-list-head { border-color: #e0d9cf; \
+border-radius: 10px; background: #faf7f1; box-shadow: none; backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] .ten-list-item:hover { \
+border-color: #8da5b8; background: #f5f8fa; }\n#ten-comic-root[data-theme="porcelain"] .ten-btn { color: #28323b; border-color: #d2c8bb; border-radius: 9px; \
+background: #eee8de; box-shadow: inset 0 1px rgba(255,255,255,.8); }\n#ten-comic-root[data-theme="porcelain"] .ten-btn.is-primary { color: #f7fbff; \
+border-color: #315f88; background: #315f88; }\n#ten-comic-root[data-theme="porcelain"] .ten-btn.is-danger { color: #9c403b; border-color: #dfb8b1; background: \
+#fae9e5; }\n#ten-comic-root[data-theme="porcelain"] .ten-input,\n#ten-comic-root[data-theme="porcelain"] .ten-select,\n#ten-comic-root[data-theme="porcelain"] \
+.ten-textarea,\n#ten-comic-root[data-theme="porcelain"] .ten-setting-select > button,\n#ten-comic-root[data-theme="porcelain"] \
+.ten-source,\n#ten-comic-root[data-theme="porcelain"] .ten-effect-level,\n#ten-comic-root[data-theme="porcelain"] \
+.ten-history-filter,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-readtype { color: #28323b; border-color: #ddd6ca; background: #fffdf9; box-shadow: none; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-setting label,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-fields \
+label,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-label { color: #3d4650; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-setting-select-menu,\n#ten-comic-root[data-theme="porcelain"] .ten-search-site-menu,\n#ten-comic-root[data-theme="porcelain"] \
+.ten-confirm-dialog,\n#ten-comic-root[data-theme="porcelain"] .ten-diagnostic-dialog { color: #28323b; border-color: #d8d0c4; background: #fffdf9; box-shadow: 0 \
+20px 50px rgba(65,55,43,.2); }\n#ten-comic-root[data-theme="porcelain"] #ten-diagnostic-content { color: #3d4650; border-color: #ded7cc; background: #f8f4ed; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-select option { color: #28323b; background: #fffdf9; }\n#ten-comic-root[data-theme="porcelain"] .ten-progress { \
+background: #e5e1da; }\n#ten-comic-root[data-theme="porcelain"] .ten-progress > i { background: linear-gradient(90deg,#315f88,#6286a5,#b57d56); box-shadow: \
+none; }\n#ten-comic-root[data-theme="porcelain"] .ten-nav::before { border-color: #b7c7d4; border-radius: 11px; background: #dde7ee; box-shadow: inset 0 1px \
+#f8fbfd; }\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-tools { border-color: #d9d2c7; border-radius: 11px; background: #fffdf9; box-shadow: 0 7px 18px \
+rgba(65,55,43,.09); backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] #ten-search-panel { color: #28323b; border-color: #d6cfc4; background: \
+#f5f1e9; box-shadow: 0 24px 64px rgba(55,48,40,.22); backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] #ten-particle-field { display: none; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-theme-choice { color: #28323b; border-color: #ddd6ca; background: #fffdf9; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-theme-choice:hover { border-color: #8da5b8; background: #f7f8f7; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-theme-choice[aria-pressed="true"] { color: #315f88; border-color: #315f88; background: #e8eff4; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-intro \
+{ border-color: #ddd6ca; background: #faf7f1; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced { border-color: \
+#ddd6ca; background: #fffdf9; box-shadow: inset 0 1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced summary { color: #3d4650; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-advanced[open] summary { color: #315f88; border-bottom-color: #e0d9cf; background: #f7f2ea; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-open { color: #315f88; border-color: #c8d5df; background: #e8eff4; box-shadow: inset 0 1px #fff; \
+}\n#ten-comic-root[data-theme="porcelain"] #ten-search-site-trigger { color: #3d4650; border-color: #ddd6ca; background: #fffdf9; box-shadow: inset 0 1px #fff,0 \
+4px 12px rgba(65,55,43,.06); }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-manage { border-color: #e0d9cf; background: #faf7f1; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-reload button { border-color: #d8d0c4; background: #fffdf9; box-shadow: inset 0 1px #fff; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-chapter-empty { border-color: #ddd6ca; background: #fffdf9; box-shadow: 0 7px 18px rgba(65,55,43,.08),inset 0 \
+1px #fff; }\n#ten-comic-root[data-theme="porcelain"] .ten-empty-orbit { border-color: #c8d5df; background: #e8eff4; box-shadow: inset 0 1px #fff; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info { border-color: #e0d9cf; background: #faf7f1; box-shadow: inset 0 1px #fff; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info span,\n#ten-comic-root[data-theme="porcelain"] .ten-comic-info strong { border-bottom-color: #e6dfd5; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-mini-task,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-pick-hud { color: #28323b; border-color: #d8d0c4; \
+background: #fffdf9; box-shadow: 0 15px 38px rgba(65,55,43,.2),inset 0 1px #fff; backdrop-filter: none; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-mini-icon,\n#ten-comic-root[data-theme="porcelain"] .ten-rule-pick-symbol { border-color: #c8d5df; background: #e8eff4; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-mini-progress { background: #e5e1da; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-pick-actions button { \
+color: #3d4650; border-color: #ddd6ca; background: #faf7f1; }\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-content { color: #625f59; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-content section { border-color: #e0d9cf; background: #faf7f1; \
+}\n#ten-comic-root[data-theme="porcelain"] .ten-rule-guide-content code { border-color: #ded7cc; background: #f0ebe2; }\n#ten-comic-root[data-theme="porcelain"] \
+.ten-rule-guide-example > code { color: #3d4650; background: #f0ebe2; }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-mode { color: \
+var(--ten-muted); border-color: var(--ten-line); background: rgba(255,255,255,.48); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) \
+.ten-mode.is-active { color: var(--ten-cyan); border-color: var(--ten-cyan); background: rgba(72,133,174,.1); \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-confirm-message,\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) \
+.ten-rule-test-result,\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-task-performance { color: #53697a; \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-toast { color: #f3f9fc; border-color: rgba(67,112,148,.32); background: \
+rgba(30,48,63,.94); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-confirm-backdrop { background: rgba(34,48,60,.36); \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-task-actions .ten-icon-btn.is-danger { color: #bc4d66; \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content { color: #53697a; \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content section { border-color: var(--ten-line); background: \
+rgba(255,255,255,.5); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content dt { color: var(--ten-text); \
+}\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-content code { color: var(--ten-cyan); border-color: var(--ten-line); \
+background: rgba(66,112,148,.07); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-example > code { color: #29455a; \
+background: rgba(232,241,247,.7); }\n#ten-comic-root:is([data-theme="mist"],[data-theme="porcelain"]) .ten-rule-guide-warning { color: #a53e5c; border-color: \
+rgba(190,77,103,.22); background: rgba(255,232,239,.68); }\n#ten-comic-root[data-theme="expressive"] { --ten-bg: rgba(22,20,58,.86); --ten-surface: \
+rgba(52,48,105,.58); --ten-surface-strong: rgba(61,56,122,.78); --ten-line: rgba(178,173,255,.24); --ten-text: #f7f4ff; --ten-muted: #aaa7cb; --ten-cyan: \
+#61ddff; --ten-blue: #7c98ff; --ten-violet: #aa71ff; --ten-pink: #ff75c7; --ten-danger: #ff7697; --ten-success: #74efc7; \
+}\n#ten-comic-root[data-theme="expressive"] #ten-comic-launcher { border-radius: 22px; background: \
+linear-gradient(145deg,rgba(55,164,221,.94),rgba(132,75,226,.94)); box-shadow: 0 14px 36px rgba(40,23,103,.42),0 0 27px rgba(121,113,255,.27),inset 0 1px \
+rgba(255,255,255,.22); }\n#ten-comic-root[data-theme="expressive"] #ten-panel { border-color: rgba(174,183,255,.3); border-radius: 30px; background: \
+radial-gradient(circle at 90% 4%,rgba(120,85,255,.22),transparent 34%),radial-gradient(circle at 8% 92%,rgba(44,190,245,.15),transparent \
+34%),linear-gradient(155deg,rgba(31,29,79,.94),rgba(13,17,47,.96)); box-shadow: 0 30px 90px rgba(17,9,58,.55),inset 0 1px rgba(255,255,255,.07); \
+}\n#ten-comic-root[data-theme="expressive"] .ten-header { background: rgba(27,27,72,.48); }\n#ten-comic-root[data-theme="expressive"] \
+.ten-card,\n#ten-comic-root[data-theme="expressive"] .ten-task-group { border-color: rgba(180,178,255,.2); border-radius: 21px; background: \
+linear-gradient(145deg,rgba(69,64,128,.48),rgba(31,31,79,.48)); box-shadow: inset 0 1px rgba(255,255,255,.07),0 9px 24px rgba(13,9,50,.14); \
+}\n#ten-comic-root[data-theme="expressive"] .ten-list-item { border-radius: 17px; background: rgba(24,27,71,.55); }\n#ten-comic-root[data-theme="expressive"] \
+.ten-btn { border-radius: 14px; background: linear-gradient(115deg,rgba(48,119,174,.78),rgba(107,69,190,.78),rgba(44,129,151,.74)); \
+}\n#ten-comic-root[data-theme="expressive"] .ten-icon-btn,\n#ten-comic-root[data-theme="expressive"] .ten-task-arrow-button { border-radius: 50%; \
+}\n#ten-comic-root[data-theme="expressive"] .ten-progress { height: 6px; }\n#ten-comic-root[data-theme="expressive"] .ten-progress > i { background: \
+linear-gradient(90deg,#53dffc,#7597ff,#a970ff); }\n#ten-comic-root[data-theme="expressive"] .ten-nav { background: rgba(13,17,47,.76); \
+}\n#ten-comic-root[data-theme="expressive"] .ten-nav::before { border-radius: 19px; background: \
+linear-gradient(145deg,rgba(72,189,239,.25),rgba(147,91,239,.3)); }\n#ten-comic-root[data-theme="expressive"] #ten-search-panel { border-color: \
+rgba(174,183,255,.28); background: linear-gradient(155deg,rgba(37,34,91,.96),rgba(15,18,51,.98)); }\n#ten-comic-root[data-theme="expressive"] .ten-chapter-tools \
+{ border-radius: 17px; background: linear-gradient(145deg,rgba(69,64,128,.9),rgba(31,31,79,.92)); }\n#ten-comic-root[data-theme="expressive"] \
+.ten-mini-task,\n#ten-comic-root[data-theme="expressive"] .ten-rule-pick-hud { border-color: rgba(174,183,255,.3); border-radius: 21px; background: \
+linear-gradient(145deg,rgba(69,64,128,.96),rgba(25,27,72,.97)); box-shadow: 0 18px 46px rgba(17,9,58,.4),inset 0 1px rgba(255,255,255,.08); \
+}\n#ten-comic-root[data-theme="expressive"] .ten-rule-pick-actions button { border-color: rgba(180,178,255,.2); background: rgba(31,31,79,.5); \
+}\n#ten-comic-root[data-theme="carbon"] { --ten-bg: rgba(5,8,13,.94); --ten-surface: rgba(15,20,29,.78); --ten-surface-strong: rgba(20,27,39,.9); --ten-line: \
+rgba(85,145,190,.3); --ten-text: #edf5ff; --ten-muted: #7f8b9e; --ten-cyan: #2c9cff; --ten-blue: #287fff; --ten-violet: #8b4cff; --ten-pink: #ff4f96; \
+--ten-danger: #ff5d83; --ten-success: #55e5bb; }\n#ten-comic-root[data-theme="carbon"] #ten-comic-launcher { border-color: rgba(45,157,255,.72); border-radius: \
+15px; background: linear-gradient(145deg,#111824,#080b11); box-shadow: -4px 0 22px rgba(41,143,255,.3),4px 0 22px rgba(255,66,144,.2),inset 0 0 0 1px \
+rgba(255,255,255,.05); }\n#ten-comic-root[data-theme="carbon"] #ten-panel { border-color: rgba(49,153,230,.55); border-radius: 17px; background: \
+linear-gradient(155deg,#111821,#070a0f 76%); box-shadow: -2px 0 25px rgba(37,137,238,.22),2px 0 25px rgba(255,57,139,.15),0 30px 80px rgba(0,0,0,.58),inset -1px \
+0 rgba(255,65,143,.45),inset 1px 0 rgba(45,157,255,.55); }\n#ten-comic-root[data-theme="carbon"] #ten-panel::before { opacity: .45; background: \
+linear-gradient(90deg,rgba(41,148,255,.08),transparent 24%,transparent 76%,rgba(255,64,145,.07)); }\n#ten-comic-root[data-theme="carbon"] \
+.ten-header,\n#ten-comic-root[data-theme="carbon"] .ten-nav { background: rgba(5,8,13,.82); }\n#ten-comic-root[data-theme="carbon"] \
+.ten-card,\n#ten-comic-root[data-theme="carbon"] .ten-task-group { border-color: rgba(83,119,149,.38); border-radius: 14px; background: \
+linear-gradient(145deg,rgba(24,31,42,.9),rgba(8,12,18,.88)); box-shadow: inset 1px 0 rgba(44,156,255,.15),inset -1px 0 rgba(255,79,150,.09),0 8px 20px \
+rgba(0,0,0,.24); }\n#ten-comic-root[data-theme="carbon"] .ten-list-item { border-color: rgba(79,112,142,.34); border-radius: 11px; background: \
+rgba(7,11,17,.77); box-shadow: inset 2px 0 rgba(44,156,255,.6); }\n#ten-comic-root[data-theme="carbon"] [data-task-group="waiting"] .ten-list-item { box-shadow: \
+inset 2px 0 rgba(255,79,150,.56); }\n#ten-comic-root[data-theme="carbon"] .ten-btn { border-radius: 10px; background: \
+linear-gradient(110deg,rgba(23,82,133,.75),rgba(46,35,94,.72),rgba(116,27,71,.62)); }\n#ten-comic-root[data-theme="carbon"] .ten-progress > i { background: \
+linear-gradient(90deg,#208dff,#2fa6ff,#9d4cff); box-shadow: 0 0 13px rgba(44,156,255,.48); }\n#ten-comic-root[data-theme="carbon"] .ten-nav { border-top-color: \
+rgba(61,112,151,.38); }\n#ten-comic-root[data-theme="carbon"] .ten-nav::before { border-color: rgba(40,142,255,.65); border-radius: 12px; background: \
+rgba(16,28,43,.78); box-shadow: -4px 0 14px rgba(39,143,255,.18),4px 0 14px rgba(255,65,143,.12),inset 0 0 0 1px rgba(255,255,255,.04); \
+}\n#ten-comic-root[data-theme="carbon"] #ten-search-panel { border-color: rgba(49,153,230,.48); background: linear-gradient(155deg,#111821,#070a0f 78%); \
+box-shadow: -2px 0 22px rgba(37,137,238,.18),2px 0 22px rgba(255,57,139,.12),0 25px 70px rgba(0,0,0,.55); }\n#ten-comic-root[data-theme="carbon"] \
+.ten-chapter-tools { border-color: rgba(49,153,230,.4); border-radius: 11px; background: linear-gradient(145deg,rgba(24,31,42,.96),rgba(8,12,18,.96)); \
+}\n#ten-comic-root[data-theme="carbon"] .ten-mini-task,\n#ten-comic-root[data-theme="carbon"] .ten-rule-pick-hud { border-color: rgba(49,153,230,.48); \
+border-radius: 14px; background: linear-gradient(145deg,#111821,#070a0f); box-shadow: -2px 0 18px rgba(37,137,238,.18),2px 0 18px rgba(255,57,139,.12),0 18px \
+46px rgba(0,0,0,.48); }\n#ten-comic-root[data-theme="carbon"] .ten-rule-pick-actions button { border-color: rgba(83,119,149,.38); background: rgba(7,11,17,.78); \
+}\n#ten-comic-root[data-theme="ink"] { --ten-bg: rgba(24,20,15,.94); --ten-surface: rgba(38,32,24,.78); --ten-surface-strong: rgba(47,39,29,.9); --ten-line: \
+rgba(206,178,125,.24); --ten-text: #f1e2c5; --ten-muted: #a6977c; --ten-cyan: #83a875; --ten-blue: #668c6f; --ten-violet: #a18558; --ten-pink: #d06a52; \
+--ten-danger: #e16d53; --ten-success: #91b67b; font-family: "Noto Serif SC","Songti SC","Microsoft YaHei",serif; }\n#ten-comic-root[data-theme="ink"] \
+#ten-comic-launcher { color: #f0d6a6; border-color: rgba(194,151,82,.48); border-radius: 17px; background: \
+linear-gradient(145deg,rgba(48,48,31,.96),rgba(24,22,17,.96)); box-shadow: 0 12px 30px rgba(20,12,5,.4),inset 0 1px rgba(255,232,192,.08); \
+}\n#ten-comic-root[data-theme="ink"] #ten-panel { border-color: rgba(203,171,112,.3); border-radius: 24px; background: radial-gradient(circle at 12% \
+88%,rgba(68,94,59,.13),transparent 27%),linear-gradient(155deg,#2b261d,#15130f 76%); box-shadow: 0 30px 88px rgba(15,9,4,.62),inset 0 1px rgba(255,238,207,.05); \
+}\n#ten-comic-root[data-theme="ink"] #ten-panel::before { opacity: .45; background: radial-gradient(circle at 88% 4%,rgba(173,128,67,.12),transparent \
+28%),radial-gradient(circle at 2% 92%,rgba(67,104,64,.12),transparent 30%); }\n#ten-comic-root[data-theme="ink"] .ten-header,\n#ten-comic-root[data-theme="ink"] \
+.ten-nav { background: rgba(20,17,13,.72); }\n#ten-comic-root[data-theme="ink"] .ten-card,\n#ten-comic-root[data-theme="ink"] .ten-task-group { border-color: \
+rgba(202,174,123,.2); border-radius: 19px; background: linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); box-shadow: inset 0 1px \
+rgba(255,231,191,.04),0 8px 22px rgba(12,8,4,.18); }\n#ten-comic-root[data-theme="ink"] .ten-list-item { border-color: rgba(195,169,119,.18); border-radius: \
+14px; background: rgba(17,16,12,.68); }\n#ten-comic-root[data-theme="ink"] .ten-btn { color: #f1dfbd; border-color: rgba(190,151,87,.24); border-radius: 12px; \
+background: linear-gradient(110deg,rgba(72,73,45,.72),rgba(85,58,34,.68)); }\n#ten-comic-root[data-theme="ink"] .ten-progress > i { background: \
+linear-gradient(90deg,#668d64,#90ad75,#c29455); box-shadow: 0 0 10px rgba(135,170,106,.25); }\n#ten-comic-root[data-theme="ink"] .ten-task-state.is-completed { \
+color: #9fbe82; }\n#ten-comic-root[data-theme="ink"] .ten-nav::before { border-color: rgba(193,154,91,.3); border-radius: 15px; background: rgba(89,66,38,.4); \
+box-shadow: inset 0 1px rgba(255,232,190,.05); }\n#ten-comic-root[data-theme="ink"] #ten-particle-field { opacity: .22; filter: sepia(1) hue-rotate(45deg); \
+}\n#ten-comic-root[data-theme="ink"] #ten-search-panel { color: #f1e2c5; border-color: rgba(203,171,112,.28); background: linear-gradient(155deg,#2b261d,#15130f \
+78%); }\n#ten-comic-root[data-theme="ink"] .ten-chapter-tools { border-color: rgba(202,174,123,.2); border-radius: 15px; background: \
+linear-gradient(145deg,rgba(50,43,33,.94),rgba(25,22,17,.94)); }\n#ten-comic-root[data-theme="ink"] .ten-mini-task,\n#ten-comic-root[data-theme="ink"] \
+.ten-rule-pick-hud { border-color: rgba(203,171,112,.28); border-radius: 18px; background: linear-gradient(145deg,rgba(50,43,33,.97),rgba(25,22,17,.98)); \
+box-shadow: 0 18px 46px rgba(15,9,4,.48),inset 0 1px rgba(255,238,207,.05); }\n#ten-comic-root[data-theme="ink"] .ten-rule-pick-actions button { border-color: \
+rgba(195,169,119,.2); background: rgba(17,16,12,.68); }\n#ten-comic-root[data-theme="glass"] { \
+--ten-panel-bg:linear-gradient(150deg,rgba(20,42,67,.68),rgba(9,18,36,.78)); --ten-panel-border:rgba(133,233,255,.28); --ten-panel-shadow:0 30px 90px \
+rgba(0,5,15,.5),0 0 0 1px rgba(255,255,255,.05) inset,0 0 42px rgba(91,140,255,.12); --ten-header-bg:rgba(4,12,25,.48); --ten-card-bg:rgba(23,38,62,.55); \
+--ten-card-border:rgba(137,225,255,.2); --ten-card-shadow:inset 0 1px rgba(255,255,255,.06); --ten-task-bg:rgba(10,25,46,.52); --ten-list-bg:rgba(23,38,62,.46); \
+--ten-list-hover-bg:rgba(36,61,91,.6); --ten-control-bg:linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72)); \
+--ten-control-hover-bg:rgba(95,246,255,.09); --ten-control-border:rgba(111,220,255,.2); \
+--ten-primary-bg:linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff); --ten-primary-text:#04131c; --ten-primary-border:rgba(160,255,255,.72); \
+--ten-danger-bg:rgba(255,97,116,.12); --ten-danger-text:#ffdfe5; --ten-danger-border:rgba(255,97,116,.3); --ten-input-bg:rgba(2,10,22,.42); \
+--ten-popover-bg:linear-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98)); --ten-empty-bg:rgba(11,27,49,.38); --ten-info-bg:rgba(2,10,22,.25); \
+--ten-mini-bg:linear-gradient(145deg,rgba(28,51,75,.94),rgba(20,28,52,.95)); --ten-overlay-bg:rgba(2,8,19,.62); --ten-tooltip-bg:rgba(5,15,29,.97); \
+--ten-tooltip-text:#eefaff; --ten-tooltip-border:rgba(95,246,255,.28); --ten-tooltip-shadow:0 10px 28px rgba(0,5,15,.38),inset 0 1px rgba(255,255,255,.08); \
+--ten-focus-ring:0 0 0 3px rgba(95,246,255,.1); --ten-scroll-thumb:rgba(95,246,255,.3); --ten-radius-panel:24px; --ten-radius-card:15px; \
+--ten-radius-control:11px; }\n#ten-comic-root[data-theme="mist"] { --ten-panel-bg:radial-gradient(circle at 90% 2%,rgba(151,129,232,.17),transparent \
+31%),radial-gradient(circle at 2% 88%,rgba(66,177,218,.14),transparent 32%),linear-gradient(155deg,rgba(244,250,255,.78),rgba(224,236,248,.7)); \
+--ten-panel-border:rgba(255,255,255,.86); --ten-panel-shadow:0 30px 86px rgba(43,73,99,.24),inset 0 1px rgba(255,255,255,.96); \
+--ten-header-bg:rgba(248,252,255,.58); --ten-card-bg:linear-gradient(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); \
+--ten-card-border:rgba(255,255,255,.76); --ten-card-shadow:0 10px 25px rgba(54,88,112,.1),inset 0 1px rgba(255,255,255,.88); \
+--ten-task-bg:linear-gradient(145deg,rgba(255,255,255,.58),rgba(224,237,247,.42)); --ten-list-bg:rgba(255,255,255,.46); \
+--ten-list-hover-bg:rgba(255,255,255,.68); --ten-control-bg:linear-gradient(115deg,rgba(208,235,248,.86),rgba(228,220,249,.8),rgba(213,240,242,.82)); \
+--ten-control-hover-bg:rgba(225,244,252,.8); --ten-control-border:rgba(77,126,174,.2); --ten-primary-bg:linear-gradient(115deg,#8de7ef,#9bbdf4,#c5b3ef); \
+--ten-primary-text:#183247; --ten-primary-border:rgba(22,142,175,.3); --ten-danger-bg:rgba(255,232,239,.72); --ten-danger-text:#a53e5c; \
+--ten-danger-border:rgba(206,79,109,.24); --ten-input-bg:rgba(255,255,255,.45); --ten-popover-bg:linear-gradient(145deg,rgba(250,253,255,.97),rgba(226,237,247,.97)); \
+--ten-empty-bg:linear-gradient(145deg,rgba(255,255,255,.62),rgba(222,237,247,.48)); --ten-info-bg:rgba(255,255,255,.5); \
+--ten-mini-bg:linear-gradient(145deg,rgba(250,253,255,.94),rgba(222,237,248,.92)); --ten-overlay-bg:rgba(34,48,60,.36); --ten-tooltip-bg:rgba(250,253,255,.98); \
+--ten-tooltip-text:#183247; --ten-tooltip-border:rgba(77,126,174,.24); --ten-tooltip-shadow:0 10px 28px rgba(43,73,99,.2),inset 0 1px rgba(255,255,255,.92); \
+--ten-focus-ring:0 0 0 3px rgba(22,142,175,.12); --ten-scroll-thumb:rgba(22,142,175,.28); --ten-radius-panel:27px; --ten-radius-card:18px; \
+--ten-radius-control:13px; }\n#ten-comic-root[data-theme="porcelain"] { --ten-panel-bg:#f5f1e9; --ten-panel-border:#d6cfc4; --ten-panel-shadow:0 28px 72px \
+rgba(55,48,40,.24),inset 0 1px #fff; --ten-header-bg:#f0ebe2; --ten-card-bg:#fffdf9; --ten-card-border:#ddd6ca; --ten-card-shadow:0 7px 18px \
+rgba(65,55,43,.08),inset 0 1px #fff; --ten-task-bg:#fffdf9; --ten-list-bg:#faf7f1; --ten-list-hover-bg:#f5f8fa; --ten-control-bg:#eee8de; \
+--ten-control-hover-bg:#e8eff4; --ten-control-border:#d2c8bb; --ten-primary-bg:#315f88; --ten-primary-text:#f7fbff; --ten-primary-border:#315f88; \
+--ten-danger-bg:#fae9e5; --ten-danger-text:#9c403b; --ten-danger-border:#dfb8b1; --ten-input-bg:#fffdf9; --ten-popover-bg:#fffdf9; --ten-empty-bg:#fffdf9; \
+--ten-info-bg:#faf7f1; --ten-mini-bg:#fffdf9; --ten-overlay-bg:rgba(55,48,40,.28); --ten-tooltip-bg:#fffdf9; --ten-tooltip-text:#28323b; \
+--ten-tooltip-border:#d8d0c4; --ten-tooltip-shadow:0 10px 26px rgba(65,55,43,.18),inset 0 1px #fff; --ten-focus-ring:0 0 0 3px rgba(49,95,136,.1); \
+--ten-scroll-thumb:rgba(49,95,136,.25); --ten-radius-panel:20px; --ten-radius-card:13px; --ten-radius-control:9px; }\n#ten-comic-root[data-theme="expressive"] { \
+--ten-panel-bg:radial-gradient(circle at 90% 4%,rgba(120,85,255,.22),transparent 34%),radial-gradient(circle at 8% 92%,rgba(44,190,245,.15),transparent \
+34%),linear-gradient(155deg,rgba(31,29,79,.94),rgba(13,17,47,.96)); --ten-panel-border:rgba(174,183,255,.3); --ten-panel-shadow:0 30px 90px \
+rgba(17,9,58,.55),inset 0 1px rgba(255,255,255,.07); --ten-header-bg:rgba(27,27,72,.58); \
+--ten-card-bg:linear-gradient(145deg,rgba(69,64,128,.48),rgba(31,31,79,.48)); --ten-card-border:rgba(180,178,255,.2); --ten-card-shadow:inset 0 1px \
+rgba(255,255,255,.07),0 9px 24px rgba(13,9,50,.14); --ten-task-bg:linear-gradient(145deg,rgba(69,64,128,.48),rgba(31,31,79,.48)); \
+--ten-list-bg:rgba(24,27,71,.55); --ten-list-hover-bg:rgba(56,52,112,.62); --ten-control-bg:linear-gradient(115deg,rgba(48,119,174,.78),rgba(107,69,190,.78),rgba(44,129,151,.74)); \
+--ten-control-hover-bg:rgba(97,221,255,.1); --ten-control-border:rgba(178,173,255,.24); --ten-primary-bg:linear-gradient(115deg,#61ddff,#7c98ff,#aa71ff); \
+--ten-primary-text:#16152f; --ten-primary-border:rgba(174,183,255,.45); --ten-danger-bg:rgba(255,117,199,.12); --ten-danger-text:#ffdff3; \
+--ten-danger-border:rgba(255,117,199,.3); --ten-input-bg:rgba(19,22,63,.52); --ten-popover-bg:linear-gradient(155deg,rgba(69,64,128,.98),rgba(20,22,61,.98)); \
+--ten-empty-bg:rgba(31,31,79,.46); --ten-info-bg:rgba(20,23,64,.48); --ten-mini-bg:linear-gradient(145deg,rgba(69,64,128,.96),rgba(25,27,72,.97)); \
+--ten-overlay-bg:rgba(13,10,45,.64); --ten-tooltip-bg:rgba(25,23,68,.98); --ten-tooltip-text:#f7f4ff; --ten-tooltip-border:rgba(174,183,255,.3); \
+--ten-tooltip-shadow:0 12px 30px rgba(17,9,58,.42),inset 0 1px rgba(255,255,255,.08); --ten-focus-ring:0 0 0 3px rgba(97,221,255,.11); \
+--ten-scroll-thumb:rgba(97,221,255,.28); --ten-radius-panel:30px; --ten-radius-card:21px; --ten-radius-control:14px; }\n#ten-comic-root[data-theme="carbon"] { \
+--ten-panel-bg:linear-gradient(155deg,#111821,#070a0f 76%); --ten-panel-border:rgba(49,153,230,.55); --ten-panel-shadow:-2px 0 25px rgba(37,137,238,.22),2px 0 \
+25px rgba(255,57,139,.15),0 30px 80px rgba(0,0,0,.58),inset -1px 0 rgba(255,65,143,.45),inset 1px 0 rgba(45,157,255,.55); --ten-header-bg:rgba(5,8,13,.82); \
+--ten-card-bg:linear-gradient(145deg,rgba(24,31,42,.9),rgba(8,12,18,.88)); --ten-card-border:rgba(83,119,149,.38); --ten-card-shadow:inset 1px 0 \
+rgba(44,156,255,.15),inset -1px 0 rgba(255,79,150,.09),0 8px 20px rgba(0,0,0,.24); --ten-task-bg:linear-gradient(145deg,rgba(24,31,42,.9),rgba(8,12,18,.88)); \
+--ten-list-bg:rgba(7,11,17,.77); --ten-list-hover-bg:rgba(15,25,37,.88); --ten-control-bg:linear-gradient(110deg,rgba(23,82,133,.75),rgba(46,35,94,.72),rgba(116,27,71,.62)); \
+--ten-control-hover-bg:rgba(44,156,255,.1); --ten-control-border:rgba(85,145,190,.3); --ten-primary-bg:linear-gradient(110deg,#208dff,#9d4cff,#ff4f96); \
+--ten-primary-text:#f6fbff; --ten-primary-border:rgba(44,156,255,.55); --ten-danger-bg:rgba(255,79,150,.12); --ten-danger-text:#ffddea; \
+--ten-danger-border:rgba(255,79,150,.3); --ten-input-bg:rgba(4,8,13,.8); --ten-popover-bg:linear-gradient(155deg,#111821,#070a0f); \
+--ten-empty-bg:rgba(8,13,20,.78); --ten-info-bg:rgba(7,11,17,.8); --ten-mini-bg:linear-gradient(145deg,#111821,#070a0f); --ten-overlay-bg:rgba(0,0,0,.7); \
+--ten-tooltip-bg:#070a0f; --ten-tooltip-text:#edf5ff; --ten-tooltip-border:rgba(49,153,230,.48); --ten-tooltip-shadow:-2px 0 14px rgba(37,137,238,.18),2px 0 \
+14px rgba(255,57,139,.12),0 12px 28px rgba(0,0,0,.48); --ten-focus-ring:0 0 0 3px rgba(44,156,255,.1); --ten-scroll-thumb:rgba(44,156,255,.32); \
+--ten-radius-panel:17px; --ten-radius-card:14px; --ten-radius-control:10px; }\n#ten-comic-root[data-theme="ink"] { --ten-panel-bg:radial-gradient(circle at 12% \
+88%,rgba(68,94,59,.13),transparent 27%),linear-gradient(155deg,#2b261d,#15130f 76%); --ten-panel-border:rgba(203,171,112,.3); --ten-panel-shadow:0 30px 88px \
+rgba(15,9,4,.62),inset 0 1px rgba(255,238,207,.05); --ten-header-bg:rgba(20,17,13,.72); \
+--ten-card-bg:linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); --ten-card-border:rgba(202,174,123,.2); --ten-card-shadow:inset 0 1px \
+rgba(255,231,191,.04),0 8px 22px rgba(12,8,4,.18); --ten-task-bg:linear-gradient(145deg,rgba(50,43,33,.72),rgba(25,22,17,.72)); \
+--ten-list-bg:rgba(17,16,12,.68); --ten-list-hover-bg:rgba(50,43,33,.82); --ten-control-bg:linear-gradient(110deg,rgba(72,73,45,.72),rgba(85,58,34,.68)); \
+--ten-control-hover-bg:rgba(131,168,117,.1); --ten-control-border:rgba(190,151,87,.24); --ten-primary-bg:linear-gradient(110deg,#83a875,#a18558); \
+--ten-primary-text:#17140f; --ten-primary-border:rgba(194,151,82,.42); --ten-danger-bg:rgba(208,106,82,.12); --ten-danger-text:#f3c9b8; \
+--ten-danger-border:rgba(208,106,82,.3); --ten-input-bg:rgba(17,15,11,.64); --ten-popover-bg:linear-gradient(155deg,rgba(50,43,33,.98),rgba(22,19,14,.99)); \
+--ten-empty-bg:rgba(31,27,20,.68); --ten-info-bg:rgba(17,15,11,.55); --ten-mini-bg:linear-gradient(145deg,rgba(50,43,33,.97),rgba(25,22,17,.98)); \
+--ten-overlay-bg:rgba(15,9,4,.68); --ten-tooltip-bg:rgba(28,24,18,.98); --ten-tooltip-text:#f1e2c5; --ten-tooltip-border:rgba(203,171,112,.28); \
+--ten-tooltip-shadow:0 12px 28px rgba(15,9,4,.48),inset 0 1px rgba(255,238,207,.05); --ten-focus-ring:0 0 0 3px rgba(131,168,117,.1); \
+--ten-scroll-thumb:rgba(161,133,88,.32); --ten-radius-panel:24px; --ten-radius-card:19px; --ten-radius-control:12px; }\n#ten-comic-root[data-theme="glass"] { \
+--ten-toast-bg:rgba(5,15,29,.94); --ten-toast-text:#eefaff; --ten-toast-border:rgba(95,246,255,.3); \
+--ten-launcher-bg:linear-gradient(145deg,rgba(28,72,108,.88),rgba(91,54,148,.86)); --ten-launcher-border:rgba(111,236,255,.48); --ten-launcher-shadow:0 12px \
+34px rgba(4,14,30,.3),0 0 25px rgba(95,246,255,.2),inset 0 1px rgba(255,255,255,.18); --ten-radius-launcher:18px; }\n#ten-comic-root[data-theme="mist"] { \
+--ten-toast-bg:rgba(250,253,255,.98); --ten-toast-text:#183247; --ten-toast-border:rgba(77,126,174,.24); \
+--ten-launcher-bg:linear-gradient(145deg,rgba(255,255,255,.82),rgba(219,237,250,.68)); --ten-launcher-border:rgba(255,255,255,.84); --ten-launcher-shadow:0 14px \
+38px rgba(49,91,123,.2),0 0 24px rgba(86,168,213,.16),inset 0 1px rgba(255,255,255,.96); --ten-radius-launcher:20px; }\n#ten-comic-root[data-theme="porcelain"] \
+{ --ten-toast-bg:#fffdf9; --ten-toast-text:#28323b; --ten-toast-border:#d8d0c4; --ten-launcher-bg:#fffdf8; --ten-launcher-border:#d9d1c4; \
+--ten-launcher-shadow:0 11px 28px rgba(62,54,44,.18),inset 0 1px #fff; --ten-radius-launcher:15px; }\n#ten-comic-root[data-theme="expressive"] { \
+--ten-toast-bg:rgba(25,23,68,.98); --ten-toast-text:#f7f4ff; --ten-toast-border:rgba(174,183,255,.3); \
+--ten-launcher-bg:linear-gradient(145deg,rgba(55,164,221,.94),rgba(132,75,226,.94)); --ten-launcher-border:rgba(174,183,255,.34); --ten-launcher-shadow:0 14px \
+36px rgba(40,23,103,.42),0 0 27px rgba(121,113,255,.27),inset 0 1px rgba(255,255,255,.22); --ten-radius-launcher:22px; }\n#ten-comic-root[data-theme="carbon"] { \
+--ten-toast-bg:#070a0f; --ten-toast-text:#edf5ff; --ten-toast-border:rgba(49,153,230,.48); --ten-launcher-bg:linear-gradient(145deg,#111824,#080b11); \
+--ten-launcher-border:rgba(45,157,255,.72); --ten-launcher-shadow:-4px 0 22px rgba(41,143,255,.3),4px 0 22px rgba(255,66,144,.2),inset 0 0 0 1px \
+rgba(255,255,255,.05); --ten-radius-launcher:15px; }\n#ten-comic-root[data-theme="ink"] { --ten-toast-bg:rgba(28,24,18,.98); --ten-toast-text:#f1e2c5; \
+--ten-toast-border:rgba(203,171,112,.28); --ten-launcher-bg:linear-gradient(145deg,rgba(48,48,31,.96),rgba(24,22,17,.96)); \
+--ten-launcher-border:rgba(194,151,82,.48); --ten-launcher-shadow:0 12px 30px rgba(20,12,5,.4),inset 0 1px rgba(255,232,192,.08); --ten-radius-launcher:17px; \
+}\n#ten-comic-root[data-theme] #ten-panel,\n#ten-comic-root[data-theme] #ten-search-panel { border-color:var(--ten-panel-border); \
+border-radius:var(--ten-radius-panel); background:var(--ten-panel-bg); box-shadow:var(--ten-panel-shadow); }\n#ten-comic-root[data-theme] \
+.ten-header,\n#ten-comic-root[data-theme] .ten-nav,\n#ten-comic-root[data-theme] .ten-search-panel-header { background:var(--ten-header-bg); \
+}\n#ten-comic-root[data-theme] .ten-card { border-color:var(--ten-card-border); border-radius:var(--ten-radius-card); background:var(--ten-card-bg); \
+box-shadow:var(--ten-card-shadow); }\n#ten-comic-root[data-theme] .ten-task-group { border-color:var(--ten-card-border); border-radius:var(--ten-radius-card); \
+background:var(--ten-task-bg); box-shadow:var(--ten-card-shadow); }\n#ten-comic-root[data-theme] .ten-list-item,\n#ten-comic-root[data-theme] \
+.ten-status,\n#ten-comic-root[data-theme] .ten-chapter-list-head { background:var(--ten-list-bg); }\n#ten-comic-root[data-theme] .ten-list-item:hover { \
+background:var(--ten-list-hover-bg); }\n#ten-comic-root[data-theme] .ten-btn:not(.is-primary):not(.is-danger) { color:var(--ten-text); \
+border-color:var(--ten-control-border); border-radius:var(--ten-radius-control); background:var(--ten-control-bg); }\n#ten-comic-root[data-theme] \
+.ten-btn.is-primary { color:var(--ten-primary-text); border-color:var(--ten-primary-border); background:var(--ten-primary-bg); }\n#ten-comic-root[data-theme] \
+.ten-btn.is-danger { color:var(--ten-danger-text); border-color:var(--ten-danger-border); background:var(--ten-danger-bg); }\n#ten-comic-root[data-theme] \
+.ten-input,\n#ten-comic-root[data-theme] .ten-select,\n#ten-comic-root[data-theme] .ten-textarea,\n#ten-comic-root[data-theme] .ten-setting-select > button { \
+background:var(--ten-input-bg); }\n#ten-comic-root[data-theme] .ten-setting-select-menu,\n#ten-comic-root[data-theme] \
+.ten-search-site-menu,\n#ten-comic-root[data-theme] .ten-confirm-dialog,\n#ten-comic-root[data-theme] .ten-diagnostic-dialog { color:var(--ten-text); \
+border-color:var(--ten-panel-border); background:var(--ten-popover-bg); box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] .ten-chapter-empty \
+{ border-color:var(--ten-card-border); background:var(--ten-empty-bg); box-shadow:var(--ten-card-shadow); }\n#ten-comic-root[data-theme] .ten-comic-info { \
+border-color:var(--ten-card-border); background:var(--ten-info-bg); }\n#ten-comic-root[data-theme] .ten-mini-task,\n#ten-comic-root[data-theme] \
+.ten-rule-pick-hud { color:var(--ten-text); border-color:var(--ten-panel-border); border-radius:var(--ten-radius-card); background:var(--ten-mini-bg); \
+box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] .ten-rule-intro { border-color:var(--ten-card-border); \
+border-radius:var(--ten-radius-control); background:var(--ten-list-bg); }\n#ten-comic-root[data-theme] .ten-rule-advanced,\n#ten-comic-root[data-theme] \
+.ten-rule-pick-actions button { color:var(--ten-text); border-color:var(--ten-control-border); border-radius:var(--ten-radius-control); \
+background:var(--ten-input-bg); }\n#ten-comic-root[data-theme] .ten-icon-tooltip { color:var(--ten-tooltip-text); border-color:var(--ten-tooltip-border); \
+background:var(--ten-tooltip-bg); box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] .ten-toast { color:var(--ten-toast-text); \
+border-color:var(--ten-toast-border); background:var(--ten-toast-bg); box-shadow:var(--ten-tooltip-shadow); }\n#ten-comic-root[data-theme] #ten-comic-launcher { \
+border-color:var(--ten-launcher-border); border-radius:var(--ten-radius-launcher); background:var(--ten-launcher-bg); box-shadow:var(--ten-launcher-shadow); \
+}\n#ten-comic-root[data-shape="sharp"] { --ten-radius-panel: 14px; --ten-radius-card: 10px; --ten-radius-control: 7px; --ten-radius-launcher: 10px; \
+}\n#ten-comic-root[data-shape="round"] { --ten-radius-panel: 30px; --ten-radius-card: 22px; --ten-radius-control: 15px; --ten-radius-launcher: 22px; \
+}\n#ten-comic-root[data-density="compact"] #ten-panel { grid-template-rows: 52px minmax(0,1fr) 58px; }\n#ten-comic-root[data-density="compact"] .ten-view { \
+padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-card { margin-bottom: 6px; padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-list { \
+gap: 5px; }\n#ten-comic-root[data-density="compact"] .ten-list-item { min-height: 38px; padding: 7px 9px; }\n#ten-comic-root[data-density="comfortable"] \
+.ten-view { padding: 16px; }\n#ten-comic-root[data-density="comfortable"] .ten-card { margin-bottom: 12px; padding: 13px; \
+}\n#ten-comic-root[data-density="comfortable"] .ten-list { gap: 9px; }\n#ten-comic-root[data-density="comfortable"] .ten-list-item { min-height: 47px; padding: \
+11px 13px; }\n#ten-comic-root[data-motion="calm"] #ten-panel { transition-duration: .25s; }\n#ten-comic-root[data-motion="calm"] .ten-task-body { \
+transition-duration: .32s; }\n#ten-comic-root[data-motion="spring"] #ten-panel { transition-timing-function: cubic-bezier(.16,1.35,.3,1); \
+}\n#ten-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: cubic-bezier(.16,1.25,.3,1); }\n@media (max-width: 380px) {\n\n  \
+#ten-comic-root .ten-theme-presets { grid-template-columns: 1fr; }\n  \n}\n\n#ten-comic-root #ten-panel { width: min(430px, calc((100vw - 28px) / \
+var(--ten-scale))); height: min(780px, calc((100vh - 28px) / var(--ten-scale))); }\n/* Shared interaction and layout refinements. Theme values remain \
+authoritative. */\n#ten-comic-root {\n  --ten-space-1: 4px;\n  --ten-space-2: 8px;\n  --ten-space-3: 12px;\n  --ten-space-4: 16px;\n  \
+--ten-readable-line-height: 1.6;\n  -webkit-tap-highlight-color: transparent;\n}\n#ten-comic-root .ten-confirm,\n#ten-comic-root .ten-diagnostic { transition: \
+opacity .2s ease; }\n#ten-comic-root :is(button, input, select, textarea, summary):focus-visible {\n  outline: 2px solid var(--ten-cyan);\n  outline-offset: \
+3px;\n}\n#ten-comic-root .ten-card-title { line-height: 1.5; letter-spacing: .02em; }\n#ten-comic-root .ten-meta,\n#ten-comic-root \
+.ten-settings-hint,\n#ten-comic-root .ten-rule-simple-hint { line-height: var(--ten-readable-line-height); }\n#ten-comic-root .ten-chapter-label { min-width: 0; \
+overflow: hidden; }\n#ten-comic-root .ten-chapter-label .ten-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; \
+}\n#ten-comic-root .ten-chapter-label .ten-input { width: 100%; min-width: 0; }\n#ten-comic-root .ten-list-item { transition: background-color .16s, \
+border-color .16s; }\n#ten-comic-root .ten-list-item.is-selected { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); }\n#ten-comic-root \
+.ten-list-item:focus-within { box-shadow: var(--ten-focus-ring); }\n#ten-comic-root input[type="checkbox"] { accent-color: var(--ten-cyan); }\n#ten-comic-root \
+.ten-result { min-width: 0; }\n#ten-comic-root .ten-result > span { overflow-wrap: anywhere; }\n#ten-comic-root .ten-task-title { line-height: 1.55; \
+}\n#ten-comic-root .ten-settings-card { scroll-margin-block: var(--ten-space-3); }\n#ten-comic-root .ten-settings-card .ten-card-title { margin-bottom: \
+var(--ten-space-3); }\n#ten-comic-root .ten-setting > label { min-width: 0; overflow-wrap: anywhere; }\n#ten-comic-root #ten-rule-guide .ten-rule-guide-content \
+{ min-height: 0; overscroll-behavior: contain; }\n#ten-comic-root .ten-view,\n#ten-comic-root .ten-search-panel-content,\n#ten-comic-root \
+#ten-mobile-drawer-content { overscroll-behavior: contain; scrollbar-gutter: stable; }\n#ten-comic-root #ten-panel:not(.is-open) *,\n#ten-comic-root \
+#ten-panel:not(.is-open) *::before,\n#ten-comic-root #ten-panel:not(.is-open) *::after,\n#ten-comic-root.is-page-hidden *,\n#ten-comic-root.is-page-hidden \
+*::before,\n#ten-comic-root.is-page-hidden *::after { animation-play-state: paused !important; }\n@supports (height: 100dvh) {\n  #ten-comic-root #ten-panel { \
+height: min(780px, calc((100dvh - 28px) / var(--ten-scale))); }\n}\n@media (max-width: 560px), (max-height: 720px) {\n  #ten-comic-root #ten-panel { width: \
+calc((100vw - 16px) / var(--ten-scale)); max-width: calc(100vw - 16px); height: calc((100vh - 16px) / var(--ten-scale)); }\n  @supports (height: 100dvh) {\n    \
+#ten-comic-root #ten-panel { height: calc((100dvh - 16px) / var(--ten-scale)); }\n    #ten-comic-root #ten-search-panel { height: calc(100dvh - 16px); }\n  \
+}\n}\n@media (max-width: 560px) {\n  #ten-comic-root .ten-icon-btn { min-width: 40px; min-height: 40px; }\n  #ten-comic-root .ten-btn { min-height: 40px; }\n  \
+#ten-comic-root .ten-list-item { min-height: 44px; }\n  #ten-comic-root .ten-list-item input[type="checkbox"] { width: 18px; height: 18px; }\n  #ten-comic-root \
+.ten-search-toolbar { min-width: 0; }\n  #ten-comic-root .ten-search-toolbar > * { min-width: 0; }\n  #ten-comic-root .ten-setting { grid-template-columns: \
+minmax(0, 1fr) minmax(100px, 1fr); gap: 8px; }\n  #ten-comic-root .ten-mobile-drawer-sheet { padding-bottom: max(14px, env(safe-area-inset-bottom)); }\n  \
+#ten-comic-root .ten-nav { padding-bottom: env(safe-area-inset-bottom); }\n  #ten-comic-root .ten-diagnostic { padding: 10px; }\n  #ten-comic-root \
+.ten-diagnostic-dialog { max-height: 94%; }\n}\n@media (max-width: 360px) {\n  #ten-comic-root .ten-grid-2 { grid-template-columns: minmax(0, 1fr); }\n  \
+#ten-comic-root .ten-rule-pick-actions { grid-template-columns: minmax(0, 1fr); }\n}\n@media (max-height: 500px) {\n  #ten-comic-root #ten-panel { \
+grid-template-rows: 48px minmax(0, 1fr) 50px; }\n  #ten-comic-root .ten-view { padding: 8px; }\n  #ten-comic-root .ten-diagnostic-dialog { max-height: 100%; \
+gap: 8px; padding: 10px; }\n  #ten-comic-root #ten-diagnostic-content { min-height: 0; }\n  #ten-comic-root .ten-mobile-drawer-sheet { max-height: calc(100vh - \
+16px); }\n}\n\n#ten-comic-root #ten-chapter-list { grid-template-columns: minmax(0, 1fr); }\n#ten-comic-root #ten-chapter-list .ten-list-item { min-width: 0; \
+}\n#ten-comic-root .ten-chapter-label { flex: 1 1 0; }\n#ten-comic-root .ten-btn { white-space: nowrap; }\n#ten-comic-root .ten-icon-btn { transition: color \
+.18s, background-color .18s, border-color .18s, transform .18s; }\n@media (max-width: 560px) {\n  #ten-comic-root .ten-chapter-tools { grid-template-columns: \
+minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-chapter-tools > :last-child { grid-column: 1 / -1; width: 100%; justify-self: stretch; }\n  #ten-comic-root \
+.ten-chapter-select-group { flex-wrap: nowrap; }\n}\n\n@media (max-width: 560px) {\n  #ten-comic-root .ten-search-toolbar { display: grid; \
+grid-template-columns: minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-search-site-picker { grid-column: 1 / -1; width: 100%; }\n  #ten-comic-root \
+.ten-search-toolbar .ten-input { width: 100%; }\n}\n', 
+                (document.head || document.documentElement).appendChild(e);
+            }(), (0, siteRules.HL)(window.location.href);
+            const t = document.createElement("div");
+            t.id = ROOT_ID, t.innerHTML = renderShell(), document.body.appendChild(t), state.historyRenderKey = "", 
+            state.miniNodes = null, createParticles(), function() {
+                const e = one(".ten-rule-intro");
+                e && !byId("ten-rule-pick-actions") && e.insertAdjacentHTML("afterend", `<details id="ten-rule-template-library" class="ten-rule-templates"><summary>规则模板库 <span>先选类型，再点选网页元素</span></summary><div class="ten-rule-template-grid"><button \
+type="button" data-rule-template="basic"><strong>基础卷轴</strong><small>普通图片列表</small></button><button type="button" \
+data-rule-template="lazy"><strong>懒加载阅读</strong><small>data-src 等属性</small></button><button type="button" \
+data-rule-template="frame"><strong>隐藏页面</strong><small>等待网页脚本渲染</small></button><button type="button" \
+data-rule-template="paged"><strong>翻页阅读</strong><small>需要高级解析函数</small></button></div></details><div id="ten-rule-pick-actions" class="ten-rule-pick-actions" \
+role="group" aria-label="可视化规则选择"><button type="button" data-rule-pick="title">${icon("target")}<span>选择标题</span></button><button type="button" data-rule-pick="chapters">${icon("target")}<span>选择章节</span></button><button type="button" data-rule-pick="images">${icon("target")}<span>选择图片</span></button></div>`);
+            }(), byId(LAUNCHER_ID).addEventListener("click", showUI), byId("ten-mini-open").addEventListener("click", () => {
+                showUI(), activateTab("tasks");
+            }), byId("ten-mini-toggle").addEventListener("click", toggleMiniTasks), byId("ten-rule-pick-cancel").addEventListener("click", cancelRulePicking), 
+            all("[data-rule-pick]").forEach(e => e.addEventListener("click", () => function(e) {
+                const t = RULE_PICK_CONFIG[e];
+                if (!t || state.rulePicking) return;
+                closeRuleGuide(), state.rulePicking = t, state.rulePickElement = null, document.documentElement.classList.add("ten-rule-picking-page"), 
+                byId(ROOT_ID).classList.add("is-rule-picking");
+                const n = byId("ten-rule-pick-layer");
+                n.classList.remove("is-hidden"), n.setAttribute("aria-hidden", "false"), byId("ten-rule-pick-title").textContent = `请选择${t.label}`, 
+                byId("ten-rule-pick-selector").textContent = "移动鼠标并点击，Esc 取消", document.addEventListener("pointermove", handleRulePickMove, !0), 
+                document.addEventListener("click", handleRulePickClick, !0), document.addEventListener("keydown", handleRulePickKey, !0), 
+                window.addEventListener("scroll", refreshRulePickBox, !0), window.addEventListener("resize", refreshRulePickBox, !0), 
+                syncMiniTaskBar();
+            }(e.dataset.rulePick))), all("[data-rule-template]").forEach(e => e.addEventListener("click", () => function(e) {
+                const t = RULE_TEMPLATES[e];
+                t && (t.imageCss && (byId("ten-rule-image-selector").value = t.imageCss), byId("ten-rule-use-frame").checked = t.useFrame, 
+                setRuleReadType(t.readtype), byId("ten-rule-advanced").open = 0 === t.readtype || t.useFrame, 
+                all("[data-rule-template]").forEach(t => t.classList.toggle("is-active", t.dataset.ruleTemplate === e)), 
+                toast(0 === t.readtype ? "已应用翻页模板，请在高级设置填写图片解析函数" : `已应用${t.name}模板`));
+            }(e.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
+            byId(ROOT_ID).addEventListener("pointerout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("focusin", showIconTooltip), 
+            byId(ROOT_ID).addEventListener("focusout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("click", hideIconTooltip), 
+            window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", hideIconTooltip), 
+            byId("ten-close").addEventListener("click", hideUI), byId("ten-toast-action").addEventListener("click", runToastUndo), 
+            all("[data-drawer-close]").forEach(e => e.addEventListener("click", closeMobileDrawer)), 
+            one("summary", byId("ten-rule-advanced")).addEventListener("click", openRuleAdvancedDrawer), 
+            all(".ten-tab").forEach(e => e.addEventListener("click", () => activateTab(e.dataset.tab))), 
+            all(".ten-source button").forEach(e => e.addEventListener("click", () => {
+                state.sourceMode = Number(e.dataset.source), renderSites();
+            })), byId("ten-site-list").addEventListener("click", deleteImportedRule), byId("ten-rule-clear-all").addEventListener("click", clearRules), 
+            byId("ten-search-site-trigger").addEventListener("click", toggleSearchSiteMenu), 
+            byId("ten-search-site-menu").addEventListener("click", handleSearchSiteChoice), 
+            document.addEventListener("click", closeSearchSiteMenuOnOutsideClick), byId("ten-search-btn").addEventListener("click", searchComics), 
+            byId("ten-search-close").addEventListener("click", closeSearchPanel), byId("ten-search-input").addEventListener("keydown", e => {
+                "Enter" === e.key && searchComics();
+            }), byId("ten-load-chapters").addEventListener("click", loadChapters), byId("ten-reload-chapters").addEventListener("click", reloadChapters), 
+            byId("ten-select-all").addEventListener("click", () => selectAllChapters(!0)), byId("ten-clear-select").addEventListener("click", () => selectAllChapters(!1)), 
+            byId("ten-reverse-list").addEventListener("click", reverseChapters), byId("ten-edit-list").addEventListener("click", toggleChapterEdit), 
+            byId("ten-toggle-options").addEventListener("click", toggleOptions), byId("ten-download-selected").addEventListener("click", downloadSelected), 
+            byId("ten-download-current").addEventListener("click", downloadCurrentChapter), 
+            all(".ten-mode").forEach(e => e.addEventListener("click", () => setDownloadMode(Number(e.dataset.mode)))), 
+            byId("ten-add-sequence").addEventListener("change", updateChapterSequence), byId("ten-reverse-sequence").addEventListener("change", updateChapterSequence), 
+            byId("ten-clear-history").addEventListener("click", clearHistory), byId("ten-toggle-all-active").addEventListener("click", toggleAllActiveTasks), 
+            byId("ten-cancel-all-active").addEventListener("click", cancelAllActiveTasks), byId("ten-remove-all-waiting").addEventListener("click", removeAllWaitingTasks), 
+            byId("ten-recovery-restore").addEventListener("click", restorePendingTasks), byId("ten-recovery-discard").addEventListener("click", discardPendingTasks), 
+            byId("ten-active-tasks").addEventListener("click", handleTaskAction), byId("ten-waiting-tasks").addEventListener("click", handleTaskAction), 
+            byId("ten-history").addEventListener("click", handleHistoryClick), byId("ten-history-filter").addEventListener("click", handleHistoryFilter), 
+            byId("ten-confirm-ok").addEventListener("click", () => closeConfirm(!0)), all("[data-confirm-cancel]").forEach(e => e.addEventListener("click", () => closeConfirm(!1))), 
+            all("[data-diagnostic-close]").forEach(e => e.addEventListener("click", closeDiagnostic)), 
+            byId("ten-rule-guide-open").addEventListener("click", openRuleGuide), all("[data-rule-guide-close]").forEach(e => e.addEventListener("click", closeRuleGuide)), 
+            byId("ten-diagnostic-copy").addEventListener("click", copyDiagnostic), byId("ten-copy-failures").addEventListener("click", () => copyFailureList(state.diagnosticItem)), 
+            all(".ten-task-title-button").forEach(e => e.addEventListener("click", () => toggleTaskGroup(e))), 
+            all(".ten-task-arrow-button").forEach(e => e.addEventListener("click", e => toggleTaskGroup(e.currentTarget))), 
+            all('.ten-setting input[type="number"]').forEach(e => {
+                if (e.parentElement.classList.contains("ten-number-control")) return;
+                const t = document.createElement("div");
+                t.className = "ten-number-control", e.before(t), t.appendChild(e);
+                const n = document.createElement("span");
+                n.className = "ten-number-steps", n.innerHTML = '<button type="button" data-number-step="1" aria-label="增加数值"><i></i></button><button type="button" data-number-step="-1" aria-label="减少数值"><i></i></button>', 
+                t.appendChild(n), n.addEventListener("click", t => {
+                    const n = t.target.closest("[data-number-step]");
+                    n && (Number(n.dataset.numberStep) > 0 ? e.stepUp() : e.stepDown(), e.dispatchEvent(new Event("change", {
+                        bubbles: !0
+                    })));
+                });
+            }), all("[data-theme-choice]").forEach(e => e.addEventListener("click", () => setThemePreset(e.dataset.themeChoice, !0))), 
+            all("[data-appearance-axis]").forEach(e => e.addEventListener("click", () => function(e, t) {
+                const n = {
+                    density: [ "compact", "standard", "comfortable" ],
+                    shape: [ "sharp", "standard", "round" ],
+                    motion: [ "calm", "standard", "spring" ]
+                };
+                n[e] && n[e].includes(t) && (state.settings.appearance[e] = t, applyAppearance(state.settings.appearance), 
+                (0, configModule.po)("appearanceAxes", state.settings.appearance), toast("主题外观已更新"));
+            }(e.dataset.appearanceAxis, e.dataset.appearanceValue))), bindChange("ten-auto-open", e => saveLoadSetting("isShowUI", e.target.checked)), 
+            bindChange("ten-hotkey", e => {
+                const t = String(e.target.value || "V").slice(-1).toUpperCase();
+                e.target.value = t, state.settings.hotkey = t, saveLoadSetting("loadHotKey", t);
+            }), byId("ten-scale").addEventListener("input", e => applyScale(Number(e.target.value), !1)), 
+            byId("ten-scale").addEventListener("change", e => applyScale(Number(e.target.value), !0)), 
+            all("[data-effect-level]").forEach(e => e.addEventListener("click", () => setEffectLevel(Number(e.dataset.effectLevel), !0))), 
+            bindNumber("ten-max-chapters", "maxChapterNum", 1, 3, e => {
+                state.settings.maxChapters = e, syncQueueLimits();
+            }), bindNumber("ten-concurrent-images", "maxPictureNum", 1, 5, e => {
+                state.settings.concurrentImages = e, syncQueueLimits();
+            }), byId("ten-default-mode-trigger").addEventListener("click", toggleDefaultModeMenu), 
+            byId("ten-default-mode-menu").addEventListener("click", chooseDefaultMode), all("[data-direct-flow]").forEach(e => e.addEventListener("click", () => setDirectFlow(Number(e.dataset.directFlow), !0))), 
+            document.addEventListener("click", closeDefaultModeMenuOnOutsideClick), bindNumber("ten-max-height", "maxSplicingHeight", 1e4, 65530, e => {
+                state.settings.maxSplicingHeight = e;
+            }), bindNumber("ten-digits", "imgIndexBitNum", 1, 8, e => {
+                state.settings.digits = e;
+            }), bindNumber("ten-history-limit", "historyLimit", 10, 500, e => {
+                state.settings.historyLimit = e, trimHistory();
+            }), bindChange("ten-range-start", saveImageRange), bindChange("ten-range-end", saveImageRange), 
+            bindChange("ten-splice-page", e => {
+                state.settings.splicePage = e.target.checked, (0, configModule.po)("imgSplicingFlag", state.settings.splicePage), 
+                applyPageSplicing();
+            }), bindChange("ten-notify-complete", e => {
+                state.settings.notifyComplete = e.target.checked, (0, configModule.po)("downloadNotification", state.settings.notifyComplete);
+            }), bindChange("ten-sanitize-paths", e => {
+                state.settings.sanitizePaths = e.target.checked, (0, configModule.po)("sanitizePathNames", state.settings.sanitizePaths);
+            }), byId("ten-choose-dir").addEventListener("click", chooseDirectory), all("[data-rule-readtype]").forEach(e => e.addEventListener("click", () => setRuleReadType(Number(e.dataset.ruleReadtype)))), 
+            byId("ten-rule-test").addEventListener("click", testRuleEditor), byId("ten-rule-save").addEventListener("click", saveRuleEditor), 
+            byId("ten-rule-cancel-edit").addEventListener("click", resetRuleEditor), byId("ten-import-rules").addEventListener("click", importRules), 
+            byId("ten-backup-export").addEventListener("click", exportSettingsBackup), byId("ten-backup-import").addEventListener("click", () => byId("ten-backup-file").click()), 
+            byId("ten-backup-file").addEventListener("change", importSettingsBackup), byId("ten-reset").addEventListener("click", resetSettings), 
+            byId(ROOT_ID).addEventListener("click", addRipple), applySettingsToUI(), detectComicInfo(), 
+            renderSites(), renderChapters(), renderTasks(), async function() {
+                if ("function" != typeof window.showDirectoryPicker) return void (byId("ten-dir-name").textContent = "浏览器默认下载目录");
+                const e = await (0, downloadUtils.oZ)();
+                if (e) try {
+                    "granted" === await e.queryPermission({
+                        mode: "readwrite"
+                    }) && (state.dirHandle = e, window.__tenComicDirectoryHandle = e, byId("ten-dir-name").textContent = e.name);
+                } catch (e) {
+                    byId("ten-dir-name").textContent = "请重新选择目录";
+                }
+            }(), state.ready = !0, function() {
+                const e = safeGet(PENDING_TASKS_KEY, []), t = window.location.hostname.toLowerCase();
+                state.recoveryTasks = uniqueTaskSnapshots(Array.isArray(e) ? e : []).filter(e => taskHost(e) === t), 
+                renderRecoveryTasks();
+            }(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
+        }
+        function icon(e) {
+            return `<svg class="ten-icon" aria-hidden="true"><use href="#ten-i-${e}"></use></svg>`;
+        }
+        function navButton(e, t, n) {
+            return `<button class="ten-tab" type="button" data-tab="${e}">${icon(t)}<span>${n}</span></button>`;
+        }
+        function appearanceAxesCard() {
+            const e = (e, t, n) => `<div class="ten-setting ten-appearance-setting"><label>${t}</label><div class="ten-appearance-axis" role="group" aria-label="${t}">${n.map(([t, n]) => `<button type="button" data-appearance-axis="${e}" data-appearance-value="${t}">${n}</button>`).join("")}</div></div>`;
+            return `<div class="ten-card ten-settings-card ten-appearance-card"><div class="ten-card-title">主题外观</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</div>`;
+        }
+        function settingCheck(e, t) {
+            return `<div class="ten-setting ten-setting-check"><label for="${e}">${t}</label><input id="${e}" type="checkbox"></div>`;
+        }
+        function bindChange(e, t) {
+            byId(e).addEventListener("change", t);
+        }
+        function bindNumber(e, t, n, a, i) {
+            bindChange(e, e => {
+                const o = Math.max(n, Math.min(a, Number(e.target.value)));
+                e.target.value = o, (0, configModule.po)(t, o), i(o);
+            });
+        }
+        function setDirectFlow(e, t = !1) {
+            const n = 1 === Number(e) ? 1 : 0;
+            state.settings.directFlow = n, all("[data-direct-flow]").forEach(e => {
+                const t = Number(e.dataset.directFlow) === n;
+                e.classList.toggle("is-active", t), e.setAttribute("aria-pressed", String(t));
+            }), t && (0, configModule.po)("directDownloadFlow", n);
+        }
+        function syncQueueLimits() {
+            state.queue && state.queue.updateLimits(state.settings.maxChapters, state.settings.concurrentImages);
+        }
+        function toggleDefaultModeMenu(e) {
+            e.stopPropagation();
+            const t = byId("ten-default-mode"), n = byId("ten-default-mode-menu"), r = n.hidden;
+            n.hidden = !r, t.classList.toggle("is-open", r), byId("ten-default-mode-trigger").setAttribute("aria-expanded", String(r)), 
+            r && closeSearchSiteMenu();
+        }
+        function chooseDefaultMode(e) {
+            const t = e.target.closest("[data-default-mode]");
+            t && (setDownloadMode(Number(t.dataset.defaultMode), !0), closeDefaultModeMenu());
+        }
+        function closeDefaultModeMenuOnOutsideClick(e) {
+            const t = byId("ten-default-mode");
+            t && !t.contains(e.target) && closeDefaultModeMenu();
+        }
+        function closeDefaultModeMenu() {
+            const e = byId("ten-default-mode-menu");
+            e && (e.hidden = !0, byId("ten-default-mode").classList.remove("is-open"), byId("ten-default-mode-trigger").setAttribute("aria-expanded", "false"));
+        }
+        function applySettingsToUI() {
+            const e = state.settings;
+            setThemePreset(e.themePreset, !1), applyAppearance(e.appearance), byId("ten-auto-open").checked = e.autoOpen, 
+            byId("ten-hotkey").value = e.hotkey, byId("ten-scale").value = e.scale, byId("ten-scale-value").textContent = `${e.scale}%`, 
+            byId("ten-max-chapters").value = e.maxChapters, byId("ten-concurrent-images").value = e.concurrentImages, 
+            byId("ten-max-height").value = e.maxSplicingHeight, byId("ten-digits").value = e.digits, 
+            byId("ten-history-limit").value = e.historyLimit, byId("ten-range-start").value = e.imageRange[0], 
+            byId("ten-range-end").value = e.imageRange[1], byId("ten-splice-page").checked = e.splicePage, 
+            byId("ten-notify-complete").checked = e.notifyComplete, byId("ten-sanitize-paths").checked = e.sanitizePaths;
+            byId("ten-rule-text").value = "", resetRuleEditor(), applyScale(e.scale, !1), setEffectLevel(e.effectLevel, !1), 
+            setDownloadMode(e.downloadType, !1), setDirectFlow(e.directFlow, !1), applyPageSplicing();
+        }
+        function showUI() {
+            state.ready && (state.visible = !0, byId(PANEL_ID).inert = false, byId(PANEL_ID).classList.add("is-open"), 
+            byId(PANEL_ID).setAttribute("aria-hidden", "false"), byId(LAUNCHER_ID).classList.add("is-hidden"), 
+            syncMiniTaskBar(), refreshQueueOnVisibility(), state.recoveryTasks.length && toast(`发现 ${state.recoveryTasks.length} 个未完成任务`));
+        }
+        function hideUI() {
+            state.ready && (state.rulePicking && finishRulePicking(), state.visible = !1, byId(PANEL_ID).inert = true, 
+            byId(PANEL_ID).classList.remove("is-open"), byId(PANEL_ID).setAttribute("aria-hidden", "true"), 
+            byId(LAUNCHER_ID).classList.toggle("is-hidden", !state.launcherVisible), closeSearchPanel(), 
+            closeDefaultModeMenu(), closeDiagnostic(), closeRuleGuide(), closeMobileDrawer(), 
+            state.confirmResolve && closeConfirm(!1), syncMiniTaskBar(), refreshQueueOnVisibility());
+        }
+        function toggleUI() {
+            return state.ready && !byId(PANEL_ID) && (state.ready = !1), state.ready ? state.visible ? (state.launcherVisible = !1, 
+            void hideUI()) : void (state.launcherVisible ? state.ready && (state.launcherVisible = !1, 
+            byId(LAUNCHER_ID).classList.add("is-hidden"), syncMiniTaskBar()) : showLauncher()) : (state.pendingLauncher = !0, 
+            void injectStyle());
+        }
+        function showLauncher() {
+            state.ready && (state.launcherVisible = !0, state.pendingLauncher = !1, byId(LAUNCHER_ID).classList.remove("is-hidden"), 
+            syncMiniTaskBar());
+        }
+        function activateTab(e) {
+            if (!TAB_ORDER.includes(e)) return;
+            state.activeTab = e, all(".ten-view").forEach(t => t.classList.toggle("is-active", t.dataset.view === e)), 
+            all(".ten-tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === e));
+            const t = TAB_ORDER.indexOf(e);
+            one(".ten-nav").style.setProperty("--tab", t), byId("ten-title").textContent = TAB_TITLES[e][0], 
+            byId("ten-subtitle").textContent = TAB_TITLES[e][1], "tasks" === e && renderTasks();
+        }
+        function toggleOptions() {
+            isNarrowLayout() ? byId("ten-mobile-drawer").classList.contains("is-open") ? closeMobileDrawer() : openMobileDrawer("下载选项", byId("ten-options")) : (state.optionsOpen = !state.optionsOpen, 
+            byId("ten-options").classList.toggle("is-open", state.optionsOpen));
+        }
+        function isNarrowLayout() {
+            return window.matchMedia("(max-width: 560px)").matches;
+        }
+        function openMobileDrawer(e, t) {
+            if (!t || state.drawerContent) return;
+            const n = byId("ten-mobile-drawer"), r = document.createComment("ten-mobile-drawer-anchor");
+            t.before(r), byId("ten-mobile-drawer-content").appendChild(t), state.drawerAnchor = r, 
+            state.drawerContent = t, "ten-options" === t.id && (state.optionsOpen = !0), t.classList.add("is-open", "is-mobile-drawer-content"), 
+            byId("ten-mobile-drawer-title").textContent = e, n.classList.add("is-open"), n.setAttribute("aria-hidden", "false"), 
+            activateModalFocus(n.id), setTimeout(() => {
+                byId("ten-mobile-drawer-content").scrollTop = 0;
+            }, 0);
+        }
+        function closeMobileDrawer() {
+            const e = byId("ten-mobile-drawer");
+            if (!e) return;
+            e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true");
+            const t = state.drawerContent;
+            t && state.drawerAnchor?.parentNode && (t.classList.remove("is-open", "is-mobile-drawer-content"), 
+            state.drawerAnchor.replaceWith(t)), "ten-options" === t?.id && (state.optionsOpen = !1), 
+            t?.classList.contains("ten-rule-advanced-body") && (byId("ten-rule-advanced").open = !1), 
+            state.drawerContent = null, state.drawerAnchor = null;
+            releaseModalFocus("ten-mobile-drawer");
+        }
+        function openRuleAdvancedDrawer(e) {
+            if (!isNarrowLayout()) return;
+            e.preventDefault();
+            const t = byId("ten-rule-advanced");
+            t.open = !0, openMobileDrawer("复杂站点设置", one(".ten-rule-advanced-body", t));
+        }
+        function setDownloadMode(e, t = !1) {
+            state.settings.downloadType = e, all(".ten-mode").forEach(t => t.classList.toggle("is-active", Number(t.dataset.mode) === e));
+            const n = [ "直接下载", "压缩下载", "图片拼接" ];
+            byId("ten-default-mode-label") && (byId("ten-default-mode-label").textContent = n[e] || n[0]), 
+            all("[data-default-mode]").forEach(t => t.classList.toggle("is-selected", Number(t.dataset.defaultMode) === e)), 
+            t && (0, configModule.po)("downType", e);
+        }
+        function updateChapterSequence() {
+            const e = byId("ten-add-sequence").checked, t = byId("ten-reverse-sequence").checked, r = state.chapters.length;
+            state.chapters.forEach((a, i) => {
+                a.chapterNumStr = e ? (0, downloadUtils.xo)(t ? r - i : i + 1, 3) : "";
+            }), renderChapters();
+        }
+        function showChapterName(e) {
+            return e.chapterNumStr ? `${e.chapterNumStr}${e.chapterName ? `-${e.chapterName}` : ""}` : e.chapterName;
+        }
+        function downloadSelected() {
+            const e = state.chapters.filter(e => e.isSelect && canSelectChapter(e)).map(e => function(e) {
+                const t = Object.assign({}, e);
+                return t.downChapterName = showChapterName(t), t.downType = state.settings.downloadType, 
+                t.downHeaders = siteRules.Po && siteRules.Po.downHeaders, t.batchDelay = siteRules.Po && siteRules.Po.batchDelay, 
+                t.directFlow = state.settings.directFlow, t.directRemoteDownload = Boolean(siteRules.Po && siteRules.Po.directRemoteDownload), 
+                t.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport), t;
+            }(e));
+            e.length ? (enqueueDownloads(e), state.chapters.forEach(e => {
+                e.isSelect = !1;
+            }), renderChapters()) : toast("请先选择章节");
+        }
+        function downloadCurrentChapter() {
+            if (!siteRules.Po) return void toast("当前网站没有匹配规则");
+            const e = byId("ten-current-comic").value.trim(), t = byId("ten-current-chapter").value.trim();
+            e && t ? (enqueueDownloads([ {
+                comicName: e,
+                chapterName: t,
+                downChapterName: t,
+                url: window.location.href,
+                characterType: "one",
+                readtype: siteRules.Po.readtype,
+                isPay: Boolean(siteRules.Po.hasSpend),
+                downType: state.settings.downloadType,
+                downHeaders: siteRules.Po.downHeaders,
+                batchDelay: siteRules.Po.batchDelay,
+                directFlow: state.settings.directFlow,
+                directRemoteDownload: Boolean(siteRules.Po.directRemoteDownload),
+                heavyCanvasExport: Boolean(siteRules.Po.heavyCanvasExport)
+            } ]), state.optionsOpen = !1, byId("ten-options").classList.remove("is-open")) : toast("请输入漫画名和章节名");
+        }
+        async function enqueueDownloads(e) {
+            siteRules.Po && void 0 !== siteRules.Po.batchDelay && e.forEach(e => {
+                void 0 === e.batchDelay && (e.batchDelay = siteRules.Po.batchDelay);
+            }), e.forEach(e => {
+                void 0 === e.directFlow && (e.directFlow = state.settings.directFlow), void 0 === e.directRemoteDownload && (e.directRemoteDownload = Boolean(siteRules.Po && siteRules.Po.directRemoteDownload)), 
+                void 0 === e.heavyCanvasExport && (e.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport));
+            }), "function" != typeof window.showDirectoryPicker || await (0, downloadUtils.Oh)() || toast("未选择保存目录，将使用浏览器默认下载目录"), 
+            e.forEach(e => {
+                e.useDirectory = Boolean(window.__tenComicDirectoryHandle || window.__ylDirectoryHandle);
+            }), state.queue || (state.queue = new DownloadQueue(state.settings.maxChapters, state.settings.concurrentImages, state.settings.digits, {
+                getHistoryData: renderTasks,
+                $forceUpdate: scheduleTaskRender,
+                persistTasks: scheduleTaskPersist,
+                notifyTask: notifyDownloadTask
+            })), state.queue, state.queue.addList(e), state.queue.run(), activateTab("tasks"), 
+            renderTasks();
+        }
+        function taskHost(e) {
+            if (e && e.originHost) return String(e.originHost).toLowerCase();
+            try {
+                return new URL(e && e.url || "", window.location.href).hostname.toLowerCase();
+            } catch (e) {
+                return window.location.hostname.toLowerCase();
+            }
+        }
+        function uniqueTaskSnapshots(e) {
+            const t = new Set;
+            return e.filter(e => {
+                if (!e || !e.url) return !1;
+                const n = JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url ]);
+                return !t.has(n) && (t.add(n), !0);
+            });
+        }
+        function renderRecoveryTasks() {
+            state.ready && (byId("ten-recovery").hidden = 0 === state.recoveryTasks.length, 
+            byId("ten-recovery-count").textContent = state.recoveryTasks.length ? `${state.recoveryTasks.length} 个任务可恢复` : "");
+        }
+        async function restorePendingTasks() {
+            const e = state.recoveryTasks.slice();
+            e.length && (state.recoveryTasks = [], renderRecoveryTasks(), await enqueueDownloads(e), 
+            toast(`已恢复 ${e.length} 个任务`));
+        }
+        async function discardPendingTasks() {
+            state.recoveryTasks.length && await showConfirm("放弃未完成任务", `将删除当前站点的 ${state.recoveryTasks.length} 个恢复点。`, "放弃任务") && (state.recoveryTasks = [], 
+            persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
+        }
+        function scheduleTaskPersist() {
+            clearTimeout(state.persistTimer), state.persistTimer = setTimeout(persistQueueState, 750);
+        }
+        function persistQueueState() {
+            clearTimeout(state.persistTimer), state.persistTimer = null;
+            const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
+            (0, configModule.po)(PENDING_TASKS_KEY, uniqueTaskSnapshots(n.concat(a)));
+        }
+        function handlePageHide() {
+            (state.queue || state.recoveryTasks.length) && persistQueueState();
+        }
+        function initializeAppStorage() {
+            try {
+                (0, configModule.Iq)();
+            } catch (e) {
+                console.warn("10漫画：初始化存储失败。", e);
+            }
+        }
+        !function() {
+            (0, siteRules.HL)(window.location.href), siteRules.Po ? (initializeAppStorage(), 
+            state.settings = readSettings(), window.addEventListener("keydown", handleGlobalHotkey, {
+                capture: !0,
+                passive: !1
+            }), window.addEventListener("pageshow", injectStyle), window.addEventListener("pagehide", handlePageHide), 
+            document.addEventListener("visibilitychange", refreshQueueOnVisibility), function() {
+                try {
+                    GM_registerMenuCommand("显示/隐藏 10漫画入口", toggleUI, {
+                        accessKey: "v",
+                        autoClose: !0
+                    }), GM_registerMenuCommand("重置 10漫画设置", resetSettings);
+                } catch (e) {
+                    console.warn("10漫画：菜单注册失败。", e);
+                }
+            }(), "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", injectStyle, {
+                once: !0
+            }) : injectStyle()) : function() {
+                try {
+                    GM_registerMenuCommand("为当前网站添加自定义规则", openUnsupportedRuleEditor);
+                } catch (e) {
+                    console.warn("10漫画：自定义规则菜单注册失败。", e);
+                }
+            }();
+        }();
+        function showConfirm(e, t, n = "确认") {
+            state.confirmResolve && closeConfirm(!1), byId("ten-confirm-title").textContent = e, 
+            byId("ten-confirm-message").textContent = t, byId("ten-confirm-ok").textContent = n;
+            const r = byId("ten-confirm");
+            return r.classList.add("is-open"), r.setAttribute("aria-hidden", "false"), activateModalFocus(r.id, "#ten-confirm-cancel"), 
+            new Promise(e => {
+                state.confirmResolve = e;
+            });
+        }
+        function closeConfirm(e) {
+            const t = state.confirmResolve;
+            state.confirmResolve = null;
+            const n = byId("ten-confirm");
+            n && (n.classList.remove("is-open"), n.setAttribute("aria-hidden", "true")), releaseModalFocus("ten-confirm"), 
+            t && t(e);
+        }
+        function openRuleGuide() {
+            const e = byId("ten-rule-guide");
+            e && (e.classList.add("is-open"), e.setAttribute("aria-hidden", "false"), activateModalFocus(e.id));
+        }
+        function closeRuleGuide() {
+            releaseModalFocus("ten-rule-guide");
+            const e = byId("ten-rule-guide");
+            e && (e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true"));
+        }
+        function openDiagnostic(e) {
+            if (!e) return;
+            state.diagnosticItem = e;
+            const t = Array.isArray(e.diagnostics) ? e.diagnostics : [], n = Array.isArray(e.failedImages) ? e.failedImages : Array.isArray(e.failures) ? e.failures : [], r = e.stage || (e.hasError ? "存在下载错误" : "没有发现错误"), a = [ `漫画：${e.comicName || "未知"}`, `章节：${e.downChapterName || e.chapterName || "未知"}`, `状态：${r}`, `页面：${e.comicPageUrl || e.url || window.location.href}`, `失败图片：${n.length} 张`, "" ];
+            t.length ? (a.push("诊断详情："), t.forEach((e, t) => {
+                const n = e.time ? new Date(e.time).toLocaleString() : "未知时间";
+                a.push(`${t + 1}. [${n}] ${e.stage || "下载"}：${e.message || "未知错误"}`), e.imgIndex && a.push(`   图片序号：${e.imgIndex}`), 
+                e.url && a.push(`   地址：${e.url}`);
+            })) : a.push(e.hasError ? "这是旧版记录，没有保存详细错误信息。" : "当前没有错误详情。"), byId("ten-diagnostic-summary").textContent = `${e.comicName || "未知漫画"} · ${e.downChapterName || e.chapterName || "未知章节"}`, 
+            byId("ten-diagnostic-content").textContent = a.join("\n");
+            const i = byId("ten-diagnostic");
+            i.classList.add("is-open"), i.setAttribute("aria-hidden", "false"), activateModalFocus(i.id);
+        }
+        function closeDiagnostic() {
+            releaseModalFocus("ten-diagnostic");
+            const e = byId("ten-diagnostic");
+            e && (e.classList.remove("is-open"), e.setAttribute("aria-hidden", "true"));
+        }
+        function copyDiagnostic() {
+            copyText(byId("ten-diagnostic-content").textContent, "诊断信息已复制");
+        }
+        function copyFailureList(e) {
+            const t = Array.isArray(e && e.failedImages) ? e.failedImages : Array.isArray(e && e.failures) ? e.failures : [];
+            if (!t.length) return toast("没有失败图片可复制");
+            const n = [ `漫画：${e.comicName || "未知"}`, `章节：${e.downChapterName || e.chapterName || "未知"}`, `失败图片：${t.length} 张`, "" ];
+            t.forEach((e, t) => n.push(`${t + 1}. 序号：${e.imgIndex || "未知"}\n   原因：${e.reason || "未知错误"}\n   地址：${e.url || "无"}`)), 
+            copyText(n.join("\n"), "失败清单已复制");
+        }
+        function copyText(e, t) {
+            try {
+                GM_setClipboard(e, "text"), toast(t);
+            } catch (n) {
+                navigator.clipboard && "function" == typeof navigator.clipboard.writeText ? navigator.clipboard.writeText(e).then(() => toast(t)).catch(() => toast("复制失败")) : toast("复制失败");
+            }
+        }
+        function saveLoadSetting(e, t) {
+            const n = safeGet("appLoadDefault", {}), a = n && "object" == typeof n ? n : {};
+            a[e] = t, (0, configModule.po)("appLoadDefault", a), "isShowUI" === e && (state.settings.autoOpen = t);
+        }
+        function applyScale(e, t) {
+            state.settings.scale = e, byId(PANEL_ID).style.setProperty("--ten-scale", e / 100), 
+            byId("ten-scale-value").textContent = `${e}%`, t && saveLoadSetting("rightSize", e);
+        }
+        function setEffectLevel(e, t) {
+            const n = Math.max(0, Math.min(2, Number(e) || 0));
+            state.settings.effectLevel = n, byId(ROOT_ID).dataset.effects = String(n), createParticles(n), 
+            all("[data-effect-level]").forEach(e => {
+                const t = Number(e.dataset.effectLevel) === n;
+                e.classList.toggle("is-active", t), e.setAttribute("aria-pressed", String(t));
+            }), t && ((0, configModule.po)("effectLevel", n), toast([ "特效已关闭", "已切换为轻量特效", "已切换为标准特效" ][n]));
+        }
+        function setThemePreset(e, t) {
+            const n = Object.prototype.hasOwnProperty.call(THEMES, e) ? e : "glass";
+            state.settings.themePreset = n, byId(ROOT_ID).dataset.theme = n, all("[data-theme-choice]").forEach(e => e.setAttribute("aria-pressed", String(e.dataset.themeChoice === n))), 
+            t && ((0, configModule.po)("themePreset", n), toast(`已切换为${THEMES[n][0]}`));
+        }
+        function applyAppearance(e) {
+            const t = byId(ROOT_ID), n = e || {};
+            t.dataset.density = n.density || "standard", t.dataset.shape = n.shape || "standard", 
+            t.dataset.motion = n.motion || "standard", all("[data-appearance-axis]").forEach(e => {
+                const t = e.dataset.appearanceValue === n[e.dataset.appearanceAxis];
+                e.classList.toggle("is-active", t), setAttribute(e, "aria-pressed", String(t));
+            });
+        }
+        function saveImageRange() {
+            const e = Math.max(1, Math.trunc(Number(byId("ten-range-start").value) || 1)), t = Math.trunc(Number(byId("ten-range-end").value) || -1), n = -1 === t ? -1 : Math.max(e, t);
+            state.settings.imageRange = [ e, n ], byId("ten-range-start").value = e, byId("ten-range-end").value = n, 
+            (0, configModule.po)("imgDownRange", state.settings.imageRange);
+        }
+        function exportSettingsBackup() {
+            const e = Object.fromEntries(BACKUP_KEYS.map(e => [ e, safeGet(e, null) ])), n = {
+                format: "10Comic-settings-backup",
+                version: 1,
+                exportedAt: (new Date).toISOString(),
+                settings: e,
+                rules: Array.isArray(safeGet("userWebInfo", [])) ? safeGet("userWebInfo", []) : []
+            }, r = (new Date).toISOString().slice(0, 10);
+            !function(e, t) {
+                const n = URL.createObjectURL(e);
+                let r = !1, a = !1;
+                const i = () => {
+                    r || (r = !0, URL.revokeObjectURL(n));
+                }, o = () => {
+                    if (r || a) return;
+                    a = !0;
+                    const e = document.createElement("a");
+                    e.href = n, e.download = t, e.hidden = !0, document.body.appendChild(e), e.click(), 
+                    e.remove(), setTimeout(i, 1e3), toast("设置与规则备份已导出");
+                };
+                try {
+                    GM_download({
+                        url: n,
+                        name: t,
+                        saveAs: !0,
+                        onload: () => {
+                            i(), toast("设置与规则备份已导出");
+                        },
+                        onerror: o,
+                        ontimeout: o
+                    });
+                } catch (e) {
+                    o();
+                }
+            }(new Blob([ JSON.stringify(n, null, 2) ], {
+                type: "application/json"
+            }), `10Comic-设置与规则备份-${r}.json`);
+        }
+        async function importSettingsBackup(e) {
+            const t = e.target.files && e.target.files[0];
+            if (e.target.value = "", t) try {
+                const e = JSON.parse(await t.text());
+                if (!e || "10Comic-settings-backup" !== e.format || !e.settings || !Array.isArray(e.rules)) throw new Error("不是有效的 10漫画备份文件");
+                const n = e => (Array.isArray(e) ? e : [ e ]).some(e => String(e || "").trim());
+                if (e.rules.some(e => !e || !n(e.domain))) throw new Error("备份中的规则域名无效");
+                if (!await showConfirm("导入设置与规则", `将使用备份中的设置和 ${e.rules.length} 条规则覆盖当前配置。`, "确认导入")) return;
+                BACKUP_KEYS.forEach(t => {
+                    void 0 !== e.settings[t] && null !== e.settings[t] && (0, configModule.po)(t, e.settings[t]);
+                }), (0, configModule.po)("userWebInfo", e.rules), state.settings = readSettings(), 
+                applySettingsToUI(), trimHistory(), renderSites(), toast(`备份已导入，共 ${e.rules.length} 条规则`);
+            } catch (e) {
+                toast(e.message || "备份文件读取失败");
+            }
+        }
+        function applyPageSplicing() {
+            let e = document.getElementById("ten-comic-page-style");
+            e || (e = document.createElement("style"), e.id = "ten-comic-page-style", document.head.appendChild(e)), 
+            e.textContent = state.settings.splicePage && siteRules.Po && siteRules.Po.readCssText ? siteRules.Po.readCssText : "";
+        }
+        async function chooseDirectory() {
+            if ("function" == typeof window.showDirectoryPicker) try {
+                const e = await (0, downloadUtils.IJ)();
+                e && (state.dirHandle = e, byId("ten-dir-name").textContent = e.name, toast("保存目录已更新"));
+            } catch (e) {
+                e && "AbortError" !== e.name && toast("目录选择失败");
+            } else toast("当前浏览器将使用默认下载目录");
+        }
+        function refreshQueueOnVisibility() {
+            byId(ROOT_ID)?.classList.toggle("is-page-hidden", document.hidden);
+            document.hidden || state.queue && state.queue.refresh();
         }
         async function resetSettings() {
             await showConfirm("重置全部设置", "界面、下载和规则设置都将恢复默认值。", "确认重置") && (await (0, configModule.zU)(), 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         10漫画—重制版
 // @namespace    urn:10comic:remastered
-// @version      2.0.11
+// @version      2.0.12
 // @description  漫画章节下载、搜索与自定义规则工具（液体玻璃 UI 重制版）
 // @run-at       document-start
 // @grant        GM_getValue

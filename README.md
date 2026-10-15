@@ -1,5 +1,9 @@
 # 10漫画—重制版
 
+当前版本 **2.0.12**，基于用户提供的 2.0.11 做保持功能的优化。安装文件仍为根目录的 `10漫画—重制版.user.js`；六套主题、站点规则、下载方式和旧配置继续兼容。
+
+本次优化包括章节列表局部更新、UI 源码拆分、样式隔离、弹窗键盘操作、窄屏及缩放适配、移除未使用的 ZIP 依赖。详见 [优化说明和验证范围](./docs/优化说明.md)。原版快照保存在 `baseline/`。
+
 用于腾讯动漫、哔哩哔哩等多个网站漫画分章节下载，支持自定义规则导入。
 
 > 本项目是基于 [journey3510/10Comic](https://github.com/journey3510/10Comic) 的重制/派生版本。请保留来源链接与致谢；对上游代码、规则或其他受版权保护内容的使用，仍须遵守其适用的授权条件。
@@ -29,11 +33,16 @@
 
 ```sh
 npm ci
+npx playwright install chromium
 npm run build
 npm test
+npm run check:build
+npm run verify:browser
 ```
 
 生成文件为仓库根目录的 [`10漫画—重制版.user.js`](./10漫画—重制版.user.js)。
+
+`npm test` 包括离线 Chromium 行为测试；`verify:browser` 检查五种视口、六套主题与减弱动态效果，并将截图和报告写入 `dist/verification/`。`npm run benchmark:chapters` 可复现原版与优化版的 3000 章节勾选开销对比。源码中的 UI 插槽由构建工具组合，`npm run format:ui` 只格式化完整 UI 片段。
 
 ## 内置站点
 

@@ -8,7 +8,6 @@ const root = path.resolve(__dirname, '..')
 test('editable application modules parse independently', () => {
   for (const file of [
     'runtime.source.js',
-    'modules/vendor.js',
     'modules/config.js',
     'modules/comics.js',
     'modules/downloads.js',

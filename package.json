@@ -1,18 +1,24 @@
 {
   "name": "10comic-remastered-userscript",
   "private": true,
-  "version": "2.0.11",
+  "version": "2.0.12",
   "scripts": {
     "build": "node scripts/build-vertical-userscript.cjs",
     "build:vertical": "node scripts/build-vertical-userscript.cjs --dist",
     "check:build": "node scripts/build-vertical-userscript.cjs --check",
-    "verify:migration": "node scripts/check-migration-parity.cjs",
-    "test": "node scripts/run-tests.cjs"
+    "verify:migration": "node --test tests/compatibility.test.cjs",
+    "test": "node scripts/run-tests.cjs",
+    "verify:browser": "node scripts/verify-browser.cjs",
+    "verify:compat": "node --test tests/compatibility.test.cjs",
+    "test:browser": "node --test tests/ui-browser.test.cjs tests/download-browser.test.cjs",
+    "benchmark:chapters": "node scripts/benchmark-chapters.cjs",
+    "format:ui": "node scripts/format-ui.cjs"
   },
   "devDependencies": {
     "@babel/generator": "7.29.8",
     "@babel/parser": "7.29.8",
     "@babel/traverse": "7.29.8",
-    "terser": "5.44.0"
+    "terser": "5.44.0",
+    "playwright": "1.62.1"
   }
 }

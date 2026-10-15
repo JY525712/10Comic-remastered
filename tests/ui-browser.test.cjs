@@ -174,3 +174,46 @@ test('recreating a root removed by the host page discards obsolete modal focus t
     assert.equal(await page.locator('.ten-rule-guide-dialog').evaluate(dialog => dialog.querySelector('button') === document.activeElement), true)
   } finally { await context.close() }
 })
+
+test('an initially closed panel is outside keyboard navigation until opened', async () => {
+  const { page, context } = await openComic(browser, { settings: { appLoadDefault: { isShowUI: false } } })
+  try {
+    assert.equal(await page.locator('#ten-panel').evaluate(element => element.inert), true)
+    await page.evaluate(() => window.__menus.find(menu => menu.label.includes('显示/隐藏')).action())
+    await page.locator('#ten-comic-launcher').click()
+    assert.equal(await page.locator('#ten-panel').evaluate(element => element.inert), false)
+  } finally { await context.close() }
+})
+
+test('resizing from a narrow drawer to desktop restores the options and releases modal focus', async () => {
+  const { page, context } = await openComic(browser, { viewport: { width: 390, height: 844 } })
+  try {
+    await page.locator('#ten-toggle-options').click()
+    await page.locator('.ten-mobile-drawer-sheet').waitFor({ state: 'visible' })
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.waitForFunction(() => document.getElementById('ten-mobile-drawer').getAttribute('aria-hidden') === 'true', null, { timeout: 1500 })
+    assert.equal(await page.locator('#ten-options').evaluate(element => !!element.closest('#ten-mobile-drawer')), false)
+    await page.locator('#ten-toggle-options').click()
+    assert.equal(await page.locator('#ten-options').evaluate(element => element.classList.contains('is-open')), true)
+    await page.locator('#ten-options input').first().focus()
+    assert.equal(await page.locator('#ten-options').evaluate(element => element.contains(document.activeElement)), true)
+  } finally { await context.close() }
+})
+
+test('scoping styles preserves the original readable card palettes in every theme', async () => {
+  const original = [], optimized = []
+  for (const theme of ['glass', 'mist', 'porcelain', 'expressive', 'carbon', 'ink']) {
+    for (const baseline of [true, false]) {
+      const { page, context } = await openComic(browser, { baseline, count: 1, settings: { themePreset: theme } })
+      try {
+        await page.locator('[data-tab="settings"]').click()
+        const palette = await page.evaluate(() => ['.ten-settings-card', '.ten-settings-card .ten-card-title', '.ten-setting > label'].map(selector => {
+          const style = getComputedStyle(document.querySelector(selector))
+          return { selector, color: style.color, backgroundColor: style.backgroundColor, backgroundImage: style.backgroundImage }
+        }))
+        ;(baseline ? original : optimized).push({ theme, palette })
+      } finally { await context.close() }
+    }
+  }
+  assert.deepEqual(optimized, original, 'adding a root scope must not make component rules override theme palettes')
+})

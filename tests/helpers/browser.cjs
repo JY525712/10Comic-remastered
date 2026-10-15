@@ -71,7 +71,7 @@ async function openComic(browser, options = {}) {
   await page.goto('https://comic.test/title')
   const sourcePath = options.baseline ? path.join(root, 'baseline/original-2.0.11.user.js') : (process.env.USERSCRIPT_PATH || path.join(root, '10漫画—重制版.user.js'))
   await page.addScriptTag({ content: fs.readFileSync(sourcePath, 'utf8') })
-  if (options.supported !== false) await page.locator('#ten-panel.is-open').waitFor()
+  if (options.supported !== false && options.settings?.appLoadDefault?.isShowUI !== false) await page.locator('#ten-panel.is-open').waitFor()
   return { page, context, errors }
 }
 

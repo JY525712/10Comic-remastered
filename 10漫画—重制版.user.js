@@ -2763,7 +2763,7 @@ r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 1', '9v3M2 12h3M19 12h
 aria-label="打开下载任务"><span class="ten-mini-icon">${icon("download")}</span><span class="ten-mini-copy"><strong id="ten-mini-title">正在下载</strong><small id="ten-mini-meta">准备任务</small><span class="ten-mini-progress"><i \
 id="ten-mini-progress"></i></span></span></button><button id="ten-mini-toggle" class="ten-mini-toggle" type="button" aria-label="全部暂停" title="全部暂停">${icon("pause")}</button></div>`, `<div id="ten-rule-pick-layer" class="ten-rule-pick-layer is-hidden" aria-hidden="true"><div id="ten-rule-pick-box" class="ten-rule-pick-box"></div><div \
 class="ten-rule-pick-hud"><span class="ten-rule-pick-symbol">${icon("target")}</span><span><strong id="ten-rule-pick-title">选择网页元素</strong><small id="ten-rule-pick-selector">移动鼠标并点击，Esc 取消</small></span><button id="ten-rule-pick-cancel" \
-type="button">取消</button></div></div>`, '<div id="ten-icon-tooltip" class="ten-icon-tooltip" role="tooltip" aria-hidden="true"></div>', `<aside id="${PANEL_ID}" aria-hidden="true"><div id="ten-particle-field" aria-hidden="true"></div>`, `<header class="ten-header"><span class="ten-brand-mark">10</span><div class="ten-heading"><div id="ten-title" class="ten-title">章节选择</div><div id="ten-subtitle" \
+type="button">取消</button></div></div>`, '<div id="ten-icon-tooltip" class="ten-icon-tooltip" role="tooltip" aria-hidden="true"></div>', `<aside id="${PANEL_ID}" inert aria-hidden="true"><div id="ten-particle-field" aria-hidden="true"></div>`, `<header class="ten-header"><span class="ten-brand-mark">10</span><div class="ten-heading"><div id="ten-title" class="ten-title">章节选择</div><div id="ten-subtitle" \
 class="ten-subtitle">章节管理</div></div><a id="ten-github-link" class="ten-icon-btn" href="https://github.com/JY525712/10Comic-remastered" target="_blank" \
 rel="noopener noreferrer" aria-label="打开 GitHub 仓库" title="GitHub 仓库">${icon("github")}</a><button id="ten-close" class="ten-icon-btn" type="button" aria-label="收起面板">${icon("close")}</button></header>`, '<main class="ten-content">', `<section class="ten-view" data-view="sites">\n    <div class="ten-toolbar">\n      <div class="ten-source"><button type="button" \
 data-source="0">内置站点</button><button type="button" data-source="1">导入规则</button></div>\n    </div>\n    <div id="ten-rule-manage" class="ten-rule-manage" \
@@ -3835,477 +3835,504 @@ catch (error) { return url } })\n    if (frame) frame.remove()\n    return [...n
             e && e.remove(), function() {
                 if (document.getElementById("ten-comic-style")) return;
                 const e = document.createElement("style");
-                e.id = "ten-comic-style", e.textContent = '#ten-comic-root {\n--ten-bg: rgba(5, 12, 25, .78);\n  --ten-surface: rgba(23, 38, 62, .55);\n  --ten-surface-strong: rgba(31, 50, 78, .76);\n  --ten-line: \
-rgba(137, 225, 255, .2);\n  --ten-text: #eefaff;\n  --ten-muted: #89a2b7;\n  --ten-cyan: #5ff6ff;\n  --ten-blue: #5b8cff;\n  --ten-violet: #9c6cff;\n  \
---ten-pink: #ff5fac;\n  --ten-danger: #ff6174;\n  --ten-success: #55efb6;\n  --ten-panel-bg: linear-gradient(150deg, rgba(20,42,67,.68), rgba(9,18,36,.78));\n  \
---ten-panel-border: rgba(133,233,255,.28);\n  --ten-panel-shadow: 0 30px 90px rgba(0,5,15,.5), 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 42px \
-rgba(91,140,255,.12);\n  --ten-header-bg: rgba(4,12,25,.48);\n  --ten-card-bg: rgba(23,38,62,.55);\n  --ten-card-border: rgba(137,225,255,.2);\n  \
---ten-card-shadow: inset 0 1px rgba(255,255,255,.06);\n  --ten-task-bg: rgba(10,25,46,.52);\n  --ten-list-bg: rgba(23,38,62,.46);\n  --ten-list-hover-bg: \
-rgba(36,61,91,.6);\n  --ten-control-bg: linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72));\n  --ten-control-hover-bg: \
-rgba(95,246,255,.09);\n  --ten-control-border: rgba(111,220,255,.2);\n  --ten-primary-bg: linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff);\n  \
---ten-primary-text: #04131c;\n  --ten-primary-border: rgba(160,255,255,.72);\n  --ten-danger-bg: rgba(255,97,116,.12);\n  --ten-danger-text: #ffdfe5;\n  \
---ten-danger-border: rgba(255,97,116,.3);\n  --ten-input-bg: rgba(2,10,22,.42);\n  --ten-popover-bg: \
-linear-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98));\n  --ten-empty-bg: rgba(11,27,49,.38);\n  --ten-info-bg: rgba(2,10,22,.25);\n  --ten-mini-bg: \
-linear-gradient(145deg,rgba(28,51,75,.94),rgba(20,28,52,.95));\n  --ten-overlay-bg: rgba(2,8,19,.62);\n  --ten-tooltip-bg: rgba(5,15,29,.97);\n  \
---ten-tooltip-text: #eefaff;\n  --ten-tooltip-border: rgba(95,246,255,.28);\n  --ten-tooltip-shadow: 0 10px 28px rgba(0,5,15,.38), inset 0 1px \
-rgba(255,255,255,.08);\n  --ten-toast-bg: rgba(5,15,29,.94);\n  --ten-toast-text: #eefaff;\n  --ten-toast-border: rgba(95,246,255,.3);\n  --ten-launcher-bg: \
+                e.id = "ten-comic-style", e.textContent = '/* Component isolation uses :where() to preserve the original cascade specificity. */\n#ten-comic-root {\n  --ten-bg: rgba(5, 12, 25, .78);\n  --ten-surface: \
+rgba(23, 38, 62, .55);\n  --ten-surface-strong: rgba(31, 50, 78, .76);\n  --ten-line: rgba(137, 225, 255, .2);\n  --ten-text: #eefaff;\n  --ten-muted: \
+#89a2b7;\n  --ten-cyan: #5ff6ff;\n  --ten-blue: #5b8cff;\n  --ten-violet: #9c6cff;\n  --ten-pink: #ff5fac;\n  --ten-danger: #ff6174;\n  --ten-success: \
+#55efb6;\n  --ten-panel-bg: linear-gradient(150deg, rgba(20,42,67,.68), rgba(9,18,36,.78));\n  --ten-panel-border: rgba(133,233,255,.28);\n  --ten-panel-shadow: \
+0 30px 90px rgba(0,5,15,.5), 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 42px rgba(91,140,255,.12);\n  --ten-header-bg: rgba(4,12,25,.48);\n  --ten-card-bg: \
+rgba(23,38,62,.55);\n  --ten-card-border: rgba(137,225,255,.2);\n  --ten-card-shadow: inset 0 1px rgba(255,255,255,.06);\n  --ten-task-bg: rgba(10,25,46,.52);\n \
+ --ten-list-bg: rgba(23,38,62,.46);\n  --ten-list-hover-bg: rgba(36,61,91,.6);\n  --ten-control-bg: \
+linear-gradient(110deg,rgba(39,68,101,.72),rgba(80,47,123,.65),rgba(31,92,112,.72));\n  --ten-control-hover-bg: rgba(95,246,255,.09);\n  --ten-control-border: \
+rgba(111,220,255,.2);\n  --ten-primary-bg: linear-gradient(110deg,#5ff6ff,#7fb1ff,#c078ff,#5ff6ff);\n  --ten-primary-text: #04131c;\n  --ten-primary-border: \
+rgba(160,255,255,.72);\n  --ten-danger-bg: rgba(255,97,116,.12);\n  --ten-danger-text: #ffdfe5;\n  --ten-danger-border: rgba(255,97,116,.3);\n  --ten-input-bg: \
+rgba(2,10,22,.42);\n  --ten-popover-bg: linear-gradient(150deg,rgba(28,51,75,.98),rgba(10,22,40,.98));\n  --ten-empty-bg: rgba(11,27,49,.38);\n  --ten-info-bg: \
+rgba(2,10,22,.25);\n  --ten-mini-bg: linear-gradient(145deg,rgba(28,51,75,.94),rgba(20,28,52,.95));\n  --ten-overlay-bg: rgba(2,8,19,.62);\n  --ten-tooltip-bg: \
+rgba(5,15,29,.97);\n  --ten-tooltip-text: #eefaff;\n  --ten-tooltip-border: rgba(95,246,255,.28);\n  --ten-tooltip-shadow: 0 10px 28px rgba(0,5,15,.38), inset 0 \
+1px rgba(255,255,255,.08);\n  --ten-toast-bg: rgba(5,15,29,.94);\n  --ten-toast-text: #eefaff;\n  --ten-toast-border: rgba(95,246,255,.3);\n  --ten-launcher-bg: \
 linear-gradient(145deg,rgba(28,72,108,.88),rgba(91,54,148,.86));\n  --ten-launcher-border: rgba(111,236,255,.48);\n  --ten-launcher-shadow: 0 12px 34px \
 rgba(4,14,30,.3),0 0 25px rgba(95,246,255,.2),inset 0 1px rgba(255,255,255,.18);\n  --ten-radius-launcher: 18px;\n  --ten-focus-ring: 0 0 0 3px \
 rgba(95,246,255,.1);\n  --ten-scroll-thumb: rgba(95,246,255,.3);\n  --ten-radius-panel: 24px;\n  --ten-radius-card: 15px;\n  --ten-radius-control: 11px;\n  \
 --ten-scale: 1;\n  position: fixed;\n  z-index: 2147483645;\n  inset: 0;\n  pointer-events: none;\n  color: var(--ten-text);\n  font: 13px/1.5 Inter, "PingFang \
-SC", "Microsoft YaHei", sans-serif; }\n#ten-comic-root *,\n#ten-comic-root *::before,\n#ten-comic-root *::after { box-sizing: border-box; }\n#ten-comic-root \
-#ten-comic-launcher {\nall: initial;\n  position: fixed;\n  z-index: 2147483646;\n  top: 50%;\n  right: 12px;\n  width: 52px;\n  height: 52px;\n  display: \
-grid;\n  place-items: center;\n  transform: translateY(-50%);\n  overflow: hidden;\n  color: #efffff;\n  font: 800 12px/1 Inter, "Segoe UI", sans-serif;\n  \
-letter-spacing: .06em;\n  cursor: pointer;\n  pointer-events: auto;\n  border: 1px solid var(--ten-launcher-border);\n  border-radius: \
-var(--ten-radius-launcher);\n  background: var(--ten-launcher-bg);\n  box-shadow: var(--ten-launcher-shadow);\n  backdrop-filter: blur(22px) saturate(1.4);\n  \
--webkit-backdrop-filter: blur(22px) saturate(1.4);\n  transition: opacity .12s ease, transform .18s cubic-bezier(.22,1,.36,1), box-shadow .2s; \
-}\n#ten-comic-root #ten-comic-launcher::before { content: ""; position: absolute; inset: -65%; background: conic-gradient(from 90deg, transparent, \
-rgba(95,246,255,.52), transparent 30%); animation: ten-launcher-orbit 5s linear infinite; }\n#ten-comic-root #ten-comic-launcher span { position: relative; \
-z-index: 1; }\n#ten-comic-root #ten-comic-launcher:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 15px 40px rgba(4,14,30,.38), 0 0 34px \
-rgba(95,246,255,.28); }\n#ten-comic-root #ten-comic-launcher:active { transform: translateY(-50%) scale(.95); }\n#ten-comic-root #ten-comic-launcher.is-hidden { \
-opacity: 0; visibility: hidden; pointer-events: none; transform: translate(20px,-50%) scale(.72); }\n#ten-comic-root .ten-mini-task { position: fixed; z-index: \
-2147483646; top: 50%; right: 12px; width: min(292px,calc(100vw - 24px)); min-height: 58px; display: grid; grid-template-columns: minmax(0,1fr) 42px; \
-align-items: stretch; overflow: hidden; pointer-events: auto; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
-var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.3); transform: translateY(-50%); transition: opacity .2s \
-ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .2s; }\n#ten-comic-root .ten-mini-task.is-hidden { opacity: 0; visibility: hidden; pointer-events: \
-none; transform: translate(22px,-50%) scale(.9); }\n#ten-comic-root .ten-mini-open,\n#ten-comic-root .ten-mini-toggle { min-width: 0; padding: 0; color: \
-var(--ten-text); font: inherit; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root .ten-mini-open { display: grid; grid-template-columns: \
-32px minmax(0,1fr); align-items: center; gap: 8px; padding: 8px 5px 8px 10px; text-align: left; }\n#ten-comic-root .ten-mini-icon { width: 31px; height: 31px; \
-display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.22); border-radius: 10px; background: rgba(95,246,255,.08); \
-}\n#ten-comic-root .ten-mini-icon .ten-icon { width: 17px; height: 17px; }\n#ten-comic-root .ten-mini-copy { min-width: 0; display: grid; gap: 1px; \
-}\n#ten-comic-root .ten-mini-copy strong,\n#ten-comic-root .ten-mini-copy small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
-}\n#ten-comic-root .ten-mini-copy strong { font-size: 10px; }\n#ten-comic-root .ten-mini-copy small { color: var(--ten-muted); font-size: 9px; \
-}\n#ten-comic-root .ten-mini-progress { height: 3px; margin-top: 3px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.09); \
-}\n#ten-comic-root .ten-mini-progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: \
-linear-gradient(90deg,var(--ten-cyan),var(--ten-violet)); box-shadow: 0 0 8px rgba(95,246,255,.36); transition: width .35s ease; }\n#ten-comic-root \
-.ten-mini-toggle { display: grid; place-items: center; border-left: 1px solid var(--ten-line); transition: color .18s,background .18s; }\n#ten-comic-root \
-.ten-mini-toggle:hover { color: var(--ten-cyan); background: rgba(95,246,255,.08); }\n#ten-comic-root .ten-mini-toggle[hidden] { display: none; \
-}\n#ten-comic-root .ten-icon-tooltip { position: fixed; z-index: 2147483647; left: 0; top: 0; max-width: min(240px,calc(100vw - 16px)); padding: 5px 8px; \
-overflow: hidden; color: var(--ten-tooltip-text); font: 10px/1.4 Inter,"PingFang SC","Microsoft YaHei",sans-serif; white-space: nowrap; text-overflow: ellipsis; \
-pointer-events: none; opacity: 0; visibility: hidden; border: 1px solid var(--ten-tooltip-border); border-radius: 8px; background: var(--ten-tooltip-bg); \
-box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(14px) saturate(1.2); transform: translateY(3px) scale(.96); transition: opacity .14s ease,transform \
-.18s cubic-bezier(.22,1,.36,1),visibility .14s; }\n#ten-comic-root .ten-icon-tooltip.is-show { opacity: 1; visibility: visible; transform: translateY(0) \
-scale(1); }\n#ten-comic-root .ten-rule-pick-layer { position: fixed; z-index: 2147483647; inset: 0; pointer-events: none; }\n#ten-comic-root \
-.ten-rule-pick-layer.is-hidden { display: none; }\n#ten-comic-root .ten-rule-pick-box { position: fixed; border: 2px solid var(--ten-cyan); border-radius: 7px; \
-background: rgba(95,246,255,.1); box-shadow: 0 0 0 9999px rgba(2,8,18,.12),0 0 22px rgba(95,246,255,.42); transition: left .08s,top .08s,width .08s,height .08s; \
-}\n#ten-comic-root .ten-rule-pick-hud { position: fixed; top: 16px; left: 50%; width: min(420px,calc(100vw - 24px)); min-height: 56px; display: grid; \
+SC", "Microsoft YaHei", sans-serif;\n}\n#ten-comic-root *,\n#ten-comic-root *::before,\n#ten-comic-root *::after { box-sizing: border-box; \
+}\n:where(#ten-comic-root) #ten-comic-launcher {\n  all: initial;\n  position: fixed;\n  z-index: 2147483646;\n  top: 50%;\n  right: 12px;\n  width: 52px;\n  \
+height: 52px;\n  display: grid;\n  place-items: center;\n  transform: translateY(-50%);\n  overflow: hidden;\n  color: #efffff;\n  font: 800 12px/1 Inter, \
+"Segoe UI", sans-serif;\n  letter-spacing: .06em;\n  cursor: pointer;\n  pointer-events: auto;\n  border: 1px solid var(--ten-launcher-border);\n  \
+border-radius: var(--ten-radius-launcher);\n  background: var(--ten-launcher-bg);\n  box-shadow: var(--ten-launcher-shadow);\n  backdrop-filter: blur(22px) \
+saturate(1.4);\n  -webkit-backdrop-filter: blur(22px) saturate(1.4);\n  transition: opacity .12s ease, transform .18s cubic-bezier(.22,1,.36,1), box-shadow \
+.2s;\n}\n:where(#ten-comic-root) #ten-comic-launcher::before { content: ""; position: absolute; inset: -65%; background: conic-gradient(from 90deg, transparent, \
+rgba(95,246,255,.52), transparent 30%); animation: ten-launcher-orbit 5s linear infinite; }\n:where(#ten-comic-root) #ten-comic-launcher span { position: \
+relative; z-index: 1; }\n:where(#ten-comic-root) #ten-comic-launcher:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 15px 40px rgba(4,14,30,.38), \
+0 0 34px rgba(95,246,255,.28); }\n:where(#ten-comic-root) #ten-comic-launcher:active { transform: translateY(-50%) scale(.95); }\n:where(#ten-comic-root) \
+#ten-comic-launcher.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(20px,-50%) scale(.72); }\n:where(#ten-comic-root) \
+.ten-mini-task { position: fixed; z-index: 2147483646; top: 50%; right: 12px; width: min(292px,calc(100vw - 24px)); min-height: 58px; display: grid; \
+grid-template-columns: minmax(0,1fr) 42px; align-items: stretch; overflow: hidden; pointer-events: auto; border: 1px solid var(--ten-panel-border); \
+border-radius: var(--ten-radius-card); background: var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.3); \
+transform: translateY(-50%); transition: opacity .2s ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .2s; }\n:where(#ten-comic-root) \
+.ten-mini-task.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(22px,-50%) scale(.9); }\n:where(#ten-comic-root) \
+.ten-mini-open,\n:where(#ten-comic-root) .ten-mini-toggle { min-width: 0; padding: 0; color: var(--ten-text); font: inherit; cursor: pointer; border: 0; \
+background: transparent; }\n:where(#ten-comic-root) .ten-mini-open { display: grid; grid-template-columns: 32px minmax(0,1fr); align-items: center; gap: 8px; \
+padding: 8px 5px 8px 10px; text-align: left; }\n:where(#ten-comic-root) .ten-mini-icon { width: 31px; height: 31px; display: grid; place-items: center; color: \
+var(--ten-cyan); border: 1px solid rgba(95,246,255,.22); border-radius: 10px; background: rgba(95,246,255,.08); }\n:where(#ten-comic-root) .ten-mini-icon \
+.ten-icon { width: 17px; height: 17px; }\n:where(#ten-comic-root) .ten-mini-copy { min-width: 0; display: grid; gap: 1px; }\n:where(#ten-comic-root) \
+.ten-mini-copy strong,\n:where(#ten-comic-root) .ten-mini-copy small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n:where(#ten-comic-root) .ten-mini-copy strong { font-size: 10px; }\n:where(#ten-comic-root) .ten-mini-copy small { color: var(--ten-muted); font-size: 9px; \
+}\n:where(#ten-comic-root) .ten-mini-progress { height: 3px; margin-top: 3px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.09); \
+}\n:where(#ten-comic-root) .ten-mini-progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: \
+linear-gradient(90deg,var(--ten-cyan),var(--ten-violet)); box-shadow: 0 0 8px rgba(95,246,255,.36); transition: width .35s ease; }\n:where(#ten-comic-root) \
+.ten-mini-toggle { display: grid; place-items: center; border-left: 1px solid var(--ten-line); transition: color .18s,background .18s; \
+}\n:where(#ten-comic-root) .ten-mini-toggle:hover { color: var(--ten-cyan); background: rgba(95,246,255,.08); }\n:where(#ten-comic-root) \
+.ten-mini-toggle[hidden] { display: none; }\n:where(#ten-comic-root) .ten-icon-tooltip { position: fixed; z-index: 2147483647; left: 0; top: 0; max-width: \
+min(240px,calc(100vw - 16px)); padding: 5px 8px; overflow: hidden; color: var(--ten-tooltip-text); font: 10px/1.4 Inter,"PingFang SC","Microsoft \
+YaHei",sans-serif; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; opacity: 0; visibility: hidden; border: 1px solid \
+var(--ten-tooltip-border); border-radius: 8px; background: var(--ten-tooltip-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(14px) \
+saturate(1.2); transform: translateY(3px) scale(.96); transition: opacity .14s ease,transform .18s cubic-bezier(.22,1,.36,1),visibility .14s; \
+}\n:where(#ten-comic-root) .ten-icon-tooltip.is-show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }\n:where(#ten-comic-root) \
+.ten-rule-pick-layer { position: fixed; z-index: 2147483647; inset: 0; pointer-events: none; }\n:where(#ten-comic-root) .ten-rule-pick-layer.is-hidden { \
+display: none; }\n:where(#ten-comic-root) .ten-rule-pick-box { position: fixed; border: 2px solid var(--ten-cyan); border-radius: 7px; background: \
+rgba(95,246,255,.1); box-shadow: 0 0 0 9999px rgba(2,8,18,.12),0 0 22px rgba(95,246,255,.42); transition: left .08s,top .08s,width .08s,height .08s; \
+}\n:where(#ten-comic-root) .ten-rule-pick-hud { position: fixed; top: 16px; left: 50%; width: min(420px,calc(100vw - 24px)); min-height: 56px; display: grid; \
 grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 9px; padding: 8px 9px; color: var(--ten-text); border: 1px solid \
 var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-mini-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: \
-blur(22px); transform: translateX(-50%); }\n#ten-comic-root .ten-rule-pick-symbol { width: 32px; height: 32px; display: grid; place-items: center; color: \
-var(--ten-cyan); border: 1px solid rgba(95,246,255,.25); border-radius: 10px; background: rgba(95,246,255,.08); }\n#ten-comic-root .ten-rule-pick-hud > \
-span:nth-child(2) { min-width: 0; display: grid; }\n#ten-comic-root .ten-rule-pick-hud strong,\n#ten-comic-root .ten-rule-pick-hud small { overflow: hidden; \
-white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-pick-hud strong { font-size: 11px; }\n#ten-comic-root .ten-rule-pick-hud small { \
-color: var(--ten-muted); font: 9px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }\n#ten-comic-root .ten-rule-pick-hud button { min-height: 30px; padding: \
-4px 10px; color: var(--ten-text); font: inherit; font-size: 10px; cursor: pointer; pointer-events: auto; border: 1px solid rgba(255,97,116,.28); border-radius: \
-9px; background: rgba(255,97,116,.11); }\n#ten-comic-root.is-rule-picking #ten-panel { opacity: 0; pointer-events: none; transform: translate(34px,-50%) \
-scale(.94); }\n#ten-comic-root.is-rule-picking #ten-comic-launcher,\n#ten-comic-root.is-rule-picking .ten-mini-task { opacity: 0; visibility: hidden; \
-pointer-events: none; }\nhtml.ten-rule-picking-page,\nhtml.ten-rule-picking-page * { cursor: crosshair !important; user-select: none !important; \
-}\nhtml.ten-rule-picking-page #ten-rule-pick-cancel { cursor: pointer !important; }\n#ten-comic-root #ten-panel {\nposition: fixed;\n  top: 50%;\n  right: \
-14px;\n  width: min(430px, calc(100vw - 44px));\n  height: min(780px, calc(100vh - 28px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr) 66px;\n  \
-transform: translate(28px,-50%) scale(var(--ten-scale));\n  transform-origin: right center;\n  opacity: 0;\n  pointer-events: none;\n  overflow: hidden;\n  \
-isolation: isolate;\n  border: 1px solid var(--ten-panel-border);\n  border-radius: var(--ten-radius-panel);\n  background: var(--ten-panel-bg);\n  box-shadow: \
+blur(22px); transform: translateX(-50%); }\n:where(#ten-comic-root) .ten-rule-pick-symbol { width: 32px; height: 32px; display: grid; place-items: center; \
+color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.25); border-radius: 10px; background: rgba(95,246,255,.08); }\n:where(#ten-comic-root) \
+.ten-rule-pick-hud > span:nth-child(2) { min-width: 0; display: grid; }\n:where(#ten-comic-root) .ten-rule-pick-hud strong,\n:where(#ten-comic-root) \
+.ten-rule-pick-hud small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-rule-pick-hud strong { font-size: \
+11px; }\n:where(#ten-comic-root) .ten-rule-pick-hud small { color: var(--ten-muted); font: 9px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; \
+}\n:where(#ten-comic-root) .ten-rule-pick-hud button { min-height: 30px; padding: 4px 10px; color: var(--ten-text); font: inherit; font-size: 10px; cursor: \
+pointer; pointer-events: auto; border: 1px solid rgba(255,97,116,.28); border-radius: 9px; background: rgba(255,97,116,.11); }\n#ten-comic-root.is-rule-picking \
+#ten-panel { opacity: 0; pointer-events: none; transform: translate(34px,-50%) scale(.94); }\n#ten-comic-root.is-rule-picking \
+#ten-comic-launcher,\n#ten-comic-root.is-rule-picking .ten-mini-task { opacity: 0; visibility: hidden; pointer-events: none; \
+}\nhtml.ten-rule-picking-page,\nhtml.ten-rule-picking-page * { cursor: crosshair !important; user-select: none !important; }\nhtml.ten-rule-picking-page \
+#ten-rule-pick-cancel { cursor: pointer !important; }\n:where(#ten-comic-root) #ten-panel {\n  position: fixed;\n  top: 50%;\n  right: 14px;\n  width: \
+min(430px, calc(100vw - 44px));\n  height: min(780px, calc(100vh - 28px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr) 66px;\n  transform: \
+translate(28px,-50%) scale(var(--ten-scale));\n  transform-origin: right center;\n  opacity: 0;\n  pointer-events: none;\n  overflow: hidden;\n  isolation: \
+isolate;\n  border: 1px solid var(--ten-panel-border);\n  border-radius: var(--ten-radius-panel);\n  background: var(--ten-panel-bg);\n  box-shadow: \
 var(--ten-panel-shadow);\n  backdrop-filter: blur(32px) saturate(1.45);\n  -webkit-backdrop-filter: blur(32px) saturate(1.45);\n  transition: transform .42s \
-cubic-bezier(.22,1,.36,1), opacity .22s ease; }\n#ten-comic-root #ten-panel.is-open { transform: translate(0,-50%) scale(var(--ten-scale)); opacity: 1; \
-pointer-events: auto; }\n#ten-comic-root #ten-panel::before {\ncontent: "";\n  position: absolute;\n  z-index: 1;\n  inset: 0;\n  pointer-events: none;\n  \
-background: radial-gradient(circle at 85% 0, rgba(95,246,255,.17), transparent 30%), radial-gradient(circle at 0 90%, rgba(156,108,255,.17), transparent 34%); \
-}\n#ten-comic-root #ten-particle-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }\n#ten-comic-root \
-#ten-particle-field i {\nposition: absolute;\n  left: var(--x);\n  top: var(--y);\n  width: var(--s);\n  height: var(--s);\n  border-radius: 50%;\n  opacity: \
-.45;\n  background: var(--c);\n  box-shadow: 0 0 10px var(--c);\n  animation: ten-particle var(--d) ease-in-out var(--delay) infinite alternate; \
-}\n#ten-comic-root[data-effects="0"] #ten-particle-field { display: none; }\n#ten-comic-root[data-effects="0"] #ten-comic-launcher::before { animation: none; \
-opacity: 0; }\n#ten-comic-root[data-effects="1"] #ten-particle-field i { opacity: .28; }\n#ten-comic-root[data-effects="1"] #ten-particle-field \
-i:nth-child(n+12) { display: none; }\n#ten-comic-root[data-effects="1"] #ten-comic-launcher::before { animation-duration: 8s; opacity: .6; }\n#ten-comic-root \
-#ten-search-panel {\nposition: fixed;\n  z-index: 2147483644;\n  top: 50%;\n  right: 456px;\n  width: min(680px, calc(100vw - 486px));\n  height: min(720px, \
-calc(100vh - 44px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr);\n  transform: translate(22px,-50%) scale(.98);\n  transform-origin: right \
-center;\n  overflow: hidden;\n  opacity: 0;\n  visibility: hidden;\n  pointer-events: none;\n  color: var(--ten-text);\n  border: 1px solid \
-rgba(133,233,255,.25);\n  border-radius: 22px;\n  background: radial-gradient(circle at 100% 0, rgba(95,246,255,.14), transparent 34%), linear-gradient(150deg, \
-rgba(20,42,67,.74), rgba(7,17,34,.84));\n  box-shadow: 0 26px 80px rgba(0,5,15,.44), inset 0 1px rgba(255,255,255,.07);\n  backdrop-filter: blur(30px) \
-saturate(1.4);\n  -webkit-backdrop-filter: blur(30px) saturate(1.4);\n  transition: transform .38s cubic-bezier(.22,1,.36,1), opacity .24s ease, visibility \
-.24s; }\n#ten-comic-root #ten-search-panel.is-open { transform: translate(0,-50%) scale(1); opacity: 1; visibility: visible; pointer-events: auto; \
-}\n#ten-comic-root .ten-search-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 0 13px 0 17px; border-bottom: 1px \
-solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root .ten-search-panel-content { min-height: 0; padding: 13px; overflow-y: auto; \
-scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n#ten-comic-root .ten-search-panel-content::-webkit-scrollbar { width: 6px; \
-}\n#ten-comic-root .ten-search-panel-content::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n#ten-comic-root \
-.ten-header,\n#ten-comic-root .ten-content,\n#ten-comic-root .ten-nav { position: relative; z-index: 2; }\n#ten-comic-root .ten-header { display: flex; \
-align-items: center; gap: 11px; padding: 0 14px 0 16px; border-bottom: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root \
-.ten-brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid rgba(95,246,255,.48); border-radius: 11px; color: \
-var(--ten-cyan); font-weight: 900; background: rgba(95,246,255,.08); box-shadow: 0 0 20px rgba(95,246,255,.14); }\n#ten-comic-root .ten-heading { min-width: 0; \
-flex: 1; }\n#ten-comic-root .ten-title { font-size: 14px; font-weight: 750; letter-spacing: .04em; }\n#ten-comic-root .ten-subtitle { color: var(--ten-muted); \
-font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }\n#ten-comic-root .ten-icon-btn { width: 34px; height: 34px; display: grid; place-items: \
-center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 11px; background: transparent; transition: .2s ease; \
-}\n#ten-comic-root .ten-icon-btn:hover { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-control-hover-bg); transform: \
-translateY(-1px); }\n#ten-comic-root .ten-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; \
-stroke-linejoin: round; }\n#ten-comic-root .ten-content { min-height: 0; overflow: hidden; font-size: inherit !important; }\n#ten-comic-root .ten-view { \
-display: none; height: 100%; padding: 13px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n#ten-comic-root \
-.ten-view.is-active { display: block; animation: ten-view-in .28s ease; }\n#ten-comic-root .ten-view::-webkit-scrollbar { width: 6px; }\n#ten-comic-root \
-.ten-view::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n#ten-comic-root .ten-nav { --tab: 1; display: grid; \
-grid-template-columns: repeat(4,1fr); padding: 7px; border-top: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n#ten-comic-root .ten-nav::before \
-{ content: ""; position: absolute; z-index: 0; top: 7px; bottom: 7px; left: 7px; width: calc((100% - 14px)/4); border: 1px solid rgba(95,246,255,.28); \
-border-radius: 14px; background: linear-gradient(145deg, rgba(95,246,255,.13), rgba(156,108,255,.12)); box-shadow: 0 7px 20px rgba(0,0,0,.18), inset 0 1px \
-rgba(255,255,255,.12); transform: translateX(calc(var(--tab)*100%)); transition: transform .38s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-tab { \
-position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--ten-muted); font: \
-inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; transition: color .2s, transform .2s; }\n#ten-comic-root .ten-tab:hover { color: \
-var(--ten-text); }\n#ten-comic-root .ten-tab.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-tab.is-active .ten-icon { transform: translateY(-1px) \
-scale(1.08); }\n#ten-comic-root .ten-toolbar,\n#ten-comic-root .ten-row { display: flex; align-items: center; gap: 8px; }\n#ten-comic-root .ten-toolbar { \
-margin-bottom: 11px; }\n#ten-comic-root .ten-spacer { flex: 1; }\n#ten-comic-root .ten-card { margin-bottom: 9px; padding: 11px; border: 1px solid \
+cubic-bezier(.22,1,.36,1), opacity .22s ease;\n}\n:where(#ten-comic-root) #ten-panel.is-open { transform: translate(0,-50%) scale(var(--ten-scale)); opacity: 1; \
+pointer-events: auto; }\n:where(#ten-comic-root) #ten-panel::before {\n  content: "";\n  position: absolute;\n  z-index: 1;\n  inset: 0;\n  pointer-events: \
+none;\n  background: radial-gradient(circle at 85% 0, rgba(95,246,255,.17), transparent 30%), radial-gradient(circle at 0 90%, rgba(156,108,255,.17), \
+transparent 34%);\n}\n:where(#ten-comic-root) #ten-particle-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; \
+}\n:where(#ten-comic-root) #ten-particle-field i {\n  position: absolute;\n  left: var(--x);\n  top: var(--y);\n  width: var(--s);\n  height: var(--s);\n  \
+border-radius: 50%;\n  opacity: .45;\n  background: var(--c);\n  box-shadow: 0 0 10px var(--c);\n  animation: ten-particle var(--d) ease-in-out var(--delay) \
+infinite alternate;\n}\n#ten-comic-root[data-effects="0"] #ten-particle-field { display: none; }\n#ten-comic-root[data-effects="0"] #ten-comic-launcher::before \
+{ animation: none; opacity: 0; }\n#ten-comic-root[data-effects="1"] #ten-particle-field i { opacity: .28; }\n#ten-comic-root[data-effects="1"] \
+#ten-particle-field i:nth-child(n+12) { display: none; }\n#ten-comic-root[data-effects="1"] #ten-comic-launcher::before { animation-duration: 8s; opacity: .6; \
+}\n:where(#ten-comic-root) #ten-search-panel {\n  position: fixed;\n  z-index: 2147483644;\n  top: 50%;\n  right: 456px;\n  width: min(680px, calc(100vw - \
+486px));\n  height: min(720px, calc(100vh - 44px));\n  display: grid;\n  grid-template-rows: 58px minmax(0,1fr);\n  transform: translate(22px,-50%) \
+scale(.98);\n  transform-origin: right center;\n  overflow: hidden;\n  opacity: 0;\n  visibility: hidden;\n  pointer-events: none;\n  color: var(--ten-text);\n  \
+border: 1px solid rgba(133,233,255,.25);\n  border-radius: 22px;\n  background: radial-gradient(circle at 100% 0, rgba(95,246,255,.14), transparent 34%), \
+linear-gradient(150deg, rgba(20,42,67,.74), rgba(7,17,34,.84));\n  box-shadow: 0 26px 80px rgba(0,5,15,.44), inset 0 1px rgba(255,255,255,.07);\n  \
+backdrop-filter: blur(30px) saturate(1.4);\n  -webkit-backdrop-filter: blur(30px) saturate(1.4);\n  transition: transform .38s cubic-bezier(.22,1,.36,1), \
+opacity .24s ease, visibility .24s;\n}\n:where(#ten-comic-root) #ten-search-panel.is-open { transform: translate(0,-50%) scale(1); opacity: 1; visibility: \
+visible; pointer-events: auto; }\n:where(#ten-comic-root) .ten-search-panel-header { display: flex; align-items: center; justify-content: space-between; \
+padding: 0 13px 0 17px; border-bottom: 1px solid var(--ten-line); background: var(--ten-header-bg); }\n:where(#ten-comic-root) .ten-search-panel-content { \
+min-height: 0; padding: 13px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n:where(#ten-comic-root) \
+.ten-search-panel-content::-webkit-scrollbar { width: 6px; }\n:where(#ten-comic-root) .ten-search-panel-content::-webkit-scrollbar-thumb { border-radius: 9px; \
+background: var(--ten-scroll-thumb); }\n:where(#ten-comic-root) .ten-header,\n:where(#ten-comic-root) .ten-content,\n:where(#ten-comic-root) .ten-nav { \
+position: relative; z-index: 2; }\n:where(#ten-comic-root) .ten-header { display: flex; align-items: center; gap: 11px; padding: 0 14px 0 16px; border-bottom: \
+1px solid var(--ten-line); background: var(--ten-header-bg); }\n:where(#ten-comic-root) .ten-brand-mark { width: 31px; height: 31px; display: grid; place-items: \
+center; border: 1px solid rgba(95,246,255,.48); border-radius: 11px; color: var(--ten-cyan); font-weight: 900; background: rgba(95,246,255,.08); box-shadow: 0 0 \
+20px rgba(95,246,255,.14); }\n:where(#ten-comic-root) .ten-heading { min-width: 0; flex: 1; }\n:where(#ten-comic-root) .ten-title { font-size: 14px; \
+font-weight: 750; letter-spacing: .04em; }\n:where(#ten-comic-root) .ten-subtitle { color: var(--ten-muted); font-size: 10px; letter-spacing: .12em; \
+text-transform: uppercase; }\n:where(#ten-comic-root) .ten-icon-btn { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; color: \
+var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 11px; background: transparent; transition: .2s ease; }\n:where(#ten-comic-root) \
+.ten-icon-btn:hover { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-control-hover-bg); transform: translateY(-1px); \
+}\n:where(#ten-comic-root) .ten-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: \
+round; }\n:where(#ten-comic-root) .ten-content { min-height: 0; overflow: hidden; font-size: inherit !important; }\n:where(#ten-comic-root) .ten-view { display: \
+none; height: 100%; padding: 13px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.35) transparent; }\n:where(#ten-comic-root) \
+.ten-view.is-active { display: block; animation: ten-view-in .28s ease; }\n:where(#ten-comic-root) .ten-view::-webkit-scrollbar { width: 6px; \
+}\n:where(#ten-comic-root) .ten-view::-webkit-scrollbar-thumb { border-radius: 9px; background: var(--ten-scroll-thumb); }\n:where(#ten-comic-root) .ten-nav { \
+--tab: 1; display: grid; grid-template-columns: repeat(4,1fr); padding: 7px; border-top: 1px solid var(--ten-line); background: var(--ten-header-bg); \
+}\n:where(#ten-comic-root) .ten-nav::before { content: ""; position: absolute; z-index: 0; top: 7px; bottom: 7px; left: 7px; width: calc((100% - 14px)/4); \
+border: 1px solid rgba(95,246,255,.28); border-radius: 14px; background: linear-gradient(145deg, rgba(95,246,255,.13), rgba(156,108,255,.12)); box-shadow: 0 7px \
+20px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.12); transform: translateX(calc(var(--tab)*100%)); transition: transform .38s cubic-bezier(.22,1,.36,1); \
+}\n:where(#ten-comic-root) .ten-tab { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: \
+2px; color: var(--ten-muted); font: inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; transition: color .2s, transform .2s; \
+}\n:where(#ten-comic-root) .ten-tab:hover { color: var(--ten-text); }\n:where(#ten-comic-root) .ten-tab.is-active { color: var(--ten-cyan); \
+}\n:where(#ten-comic-root) .ten-tab.is-active .ten-icon { transform: translateY(-1px) scale(1.08); }\n:where(#ten-comic-root) \
+.ten-toolbar,\n:where(#ten-comic-root) .ten-row { display: flex; align-items: center; gap: 8px; }\n:where(#ten-comic-root) .ten-toolbar { margin-bottom: 11px; \
+}\n:where(#ten-comic-root) .ten-spacer { flex: 1; }\n:where(#ten-comic-root) .ten-card { margin-bottom: 9px; padding: 11px; border: 1px solid \
 var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-card-bg); box-shadow: var(--ten-card-shadow); backdrop-filter: blur(18px); \
-}\n#ten-comic-root .ten-card-title { margin-bottom: 7px; color: var(--ten-cyan); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: \
-uppercase; }\n#ten-comic-root .ten-card-head { min-height: 30px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: \
-7px; }\n#ten-comic-root .ten-card-head .ten-card-title { margin-bottom: 0; }\n#ten-comic-root .ten-btn { position: relative; min-height: 35px; padding: 7px \
-12px; overflow: hidden; color: var(--ten-text); font: inherit; font-weight: 650; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: \
-var(--ten-radius-control); background: var(--ten-control-bg); background-size: 220% 100%; transition: transform .18s, border-color .18s, box-shadow .18s, \
-background-position .35s; }\n#ten-comic-root .ten-btn::before { content: ""; position: absolute; top: -70%; left: -35%; width: 26%; height: 240%; opacity: 0; \
-pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); transform: rotate(18deg); transition: left .45s \
-cubic-bezier(.22,1,.36,1), opacity .2s; }\n#ten-comic-root .ten-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: rgba(95,246,255,.5); \
-background-position: 100% 50%; box-shadow: 0 9px 24px rgba(29,117,165,.18); }\n#ten-comic-root .ten-btn:hover::before { left: 112%; opacity: .75; \
-}\n#ten-comic-root .ten-btn:active:not(:disabled) { transform: scale(.97); }\n#ten-comic-root .ten-btn:disabled { opacity: .38; cursor: not-allowed; \
-}\n#ten-comic-root .ten-btn.is-primary { color: var(--ten-primary-text); border-color: var(--ten-primary-border); background: var(--ten-primary-bg); \
-background-size: 260% 100%; }\n#ten-comic-root .ten-btn.is-danger { color: var(--ten-danger-text); border-color: var(--ten-danger-border); background: \
-var(--ten-danger-bg); }\n#ten-comic-root .ten-btn.is-small { min-height: 30px; padding: 5px 9px; font-size: 11px; }\n#ten-comic-root .ten-icon-label { display: \
-inline-flex; align-items: center; justify-content: center; gap: 6px; }\n#ten-comic-root .ten-icon-label span { white-space: nowrap; }\n#ten-comic-root \
-.ten-ripple { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,.36); transform: scale(0); animation: ten-ripple .62s \
-ease-out; }\n#ten-comic-root .ten-input,\n#ten-comic-root .ten-select,\n#ten-comic-root .ten-textarea { width: 100%; color: var(--ten-text); font: inherit; \
-border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); outline: 0; background: var(--ten-input-bg); transition: border-color .2s, \
-box-shadow .2s; }\n#ten-comic-root .ten-input,\n#ten-comic-root .ten-select { height: 36px; padding: 0 10px; }\n#ten-comic-root .ten-textarea { min-height: \
-110px; padding: 10px; resize: vertical; }\n#ten-comic-root input.ten-input[type="number"] { padding-right: 30px; appearance: textfield; -moz-appearance: \
-textfield; }\n#ten-comic-root input.ten-input[type="number"]::-webkit-inner-spin-button,\n#ten-comic-root \
-input.ten-input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }\n#ten-comic-root .ten-number-control { \
-position: relative; min-width: 0; width: 100%; }\n#ten-comic-root .ten-number-steps { position: absolute; top: 4px; right: 4px; bottom: 4px; width: 23px; \
-display: grid; grid-template-rows: 1fr 1fr; overflow: hidden; border: 1px solid rgba(95,246,255,.12); border-radius: 7px; opacity: .42; transition: opacity .2s, \
-border-color .2s, box-shadow .2s; }\n#ten-comic-root .ten-number-control:hover .ten-number-steps,\n#ten-comic-root .ten-number-control:focus-within \
-.ten-number-steps { opacity: 1; border-color: rgba(95,246,255,.38); box-shadow: 0 0 10px rgba(95,246,255,.08); }\n#ten-comic-root .ten-number-steps button { \
-position: relative; display: grid; place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 0; background: rgba(95,246,255,.035); \
-transition: color .16s, background .16s; }\n#ten-comic-root .ten-number-steps button + button { border-top: 1px solid rgba(95,246,255,.12); }\n#ten-comic-root \
-.ten-number-steps button:hover { color: var(--ten-cyan); background: rgba(95,246,255,.12); }\n#ten-comic-root .ten-number-steps i { width: 5px; height: 5px; \
-border-top: 1.5px solid currentColor; border-left: 1.5px solid currentColor; transform: translateY(1px) rotate(45deg); }\n#ten-comic-root .ten-number-steps \
-button:last-child i { transform: translateY(-1px) rotate(225deg); }\n#ten-comic-root .ten-view[data-view="settings"] .ten-settings-card { border-color: \
-rgba(137,225,255,.2); background: linear-gradient(145deg, rgba(61,77,98,.9), rgba(47,60,80,.9)); box-shadow: inset 0 1px rgba(255,255,255,.075), 0 8px 22px \
-rgba(1,9,20,.08); backdrop-filter: blur(18px) saturate(1.15); }\n#ten-comic-root .ten-view[data-view="settings"] .ten-input,\n#ten-comic-root \
-.ten-view[data-view="settings"] .ten-select,\n#ten-comic-root .ten-view[data-view="settings"] .ten-textarea { border-color: rgba(137,225,255,.18); background: \
-rgba(6,18,34,.42); }\n#ten-comic-root .ten-input:focus,\n#ten-comic-root .ten-select:focus,\n#ten-comic-root .ten-textarea:focus { border-color: \
-var(--ten-cyan); box-shadow: var(--ten-focus-ring); }\n#ten-comic-root .ten-select option { color: #eafaff; background: #0c1829; }\n#ten-comic-root .ten-source \
-{ --source: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); flex: 1; padding: 3px; border-radius: 12px; background: \
-rgba(2,10,22,.34); }\n#ten-comic-root .ten-source::before { content: ""; position: absolute; inset: 3px auto 3px 3px; width: calc(50% - 3px); border: 1px solid \
-rgba(95,246,255,.25); border-radius: 9px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.13)); transform: \
-translateX(calc(var(--source)*100%)); transition: transform .35s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-source button { position: relative; z-index: \
-1; min-height: 33px; color: var(--ten-muted); font: inherit; font-size: 11px; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root \
-.ten-source button.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-search-toolbar .ten-input { width: auto; min-width: 0; flex: 1 1 auto; \
-}\n#ten-comic-root .ten-search-site-picker { position: relative; z-index: 30; flex: 0 0 126px; width: 126px; min-width: 0; }\n#ten-comic-root \
-#ten-search-site-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 7px; padding: 0 10px 0 11px; overflow: hidden; color: \
-var(--ten-text); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid rgba(95,246,255,.24); border-radius: 11px; background: \
-linear-gradient(145deg, rgba(18,47,70,.76), rgba(36,38,76,.72)); box-shadow: inset 0 1px rgba(255,255,255,.08); transition: border-color .2s, box-shadow .2s; \
-}\n#ten-comic-root #ten-search-site-trigger:hover,\n#ten-comic-root .ten-search-site-picker.is-open #ten-search-site-trigger { border-color: \
-rgba(95,246,255,.58); box-shadow: 0 0 0 3px rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.1); }\n#ten-comic-root #ten-search-site-label { min-width: 0; \
-flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; }\n#ten-comic-root .ten-picker-arrow { width: 7px; height: 7px; flex: \
-0 0 7px; border-right: 1.5px solid var(--ten-cyan); border-bottom: 1.5px solid var(--ten-cyan); transform: rotate(45deg) translateY(-2px); transition: transform \
-.28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-search-site-picker.is-open .ten-picker-arrow { transform: rotate(225deg) translate(-1px,-1px); \
-}\n#ten-comic-root .ten-search-site-menu { position: absolute; z-index: 40; top: 43px; left: 0; width: 252px; max-height: 300px; padding: 6px; overflow-y: auto; \
-border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); \
-backdrop-filter: blur(26px) saturate(1.35); -webkit-backdrop-filter: blur(26px) saturate(1.35); animation: ten-picker-in .22s cubic-bezier(.22,1,.36,1); \
-scrollbar-width: thin; scrollbar-color: var(--ten-scroll-thumb) transparent; }\n#ten-comic-root .ten-search-site-menu[hidden] { display: none !important; \
-}\n#ten-comic-root .ten-search-site-menu::-webkit-scrollbar { width: 5px; }\n#ten-comic-root .ten-search-site-menu::-webkit-scrollbar-thumb { border-radius: \
-8px; background: rgba(95,246,255,.32); }\n#ten-comic-root .ten-search-site-option { width: 100%; min-height: 38px; display: grid; grid-template-columns: \
+}\n:where(#ten-comic-root) .ten-card-title { margin-bottom: 7px; color: var(--ten-cyan); font-size: 11px; font-weight: 750; letter-spacing: .08em; \
+text-transform: uppercase; }\n:where(#ten-comic-root) .ten-card-head { min-height: 30px; display: flex; align-items: center; justify-content: space-between; \
+gap: 8px; margin-bottom: 7px; }\n:where(#ten-comic-root) .ten-card-head .ten-card-title { margin-bottom: 0; }\n:where(#ten-comic-root) .ten-btn { position: \
+relative; min-height: 35px; padding: 7px 12px; overflow: hidden; color: var(--ten-text); font: inherit; font-weight: 650; cursor: pointer; border: 1px solid \
+var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-control-bg); background-size: 220% 100%; transition: transform .18s, \
+border-color .18s, box-shadow .18s, background-position .35s; }\n:where(#ten-comic-root) .ten-btn::before { content: ""; position: absolute; top: -70%; left: \
+-35%; width: 26%; height: 240%; opacity: 0; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); transform: \
+rotate(18deg); transition: left .45s cubic-bezier(.22,1,.36,1), opacity .2s; }\n:where(#ten-comic-root) .ten-btn:hover:not(:disabled) { transform: \
+translateY(-2px); border-color: rgba(95,246,255,.5); background-position: 100% 50%; box-shadow: 0 9px 24px rgba(29,117,165,.18); }\n:where(#ten-comic-root) \
+.ten-btn:hover::before { left: 112%; opacity: .75; }\n:where(#ten-comic-root) .ten-btn:active:not(:disabled) { transform: scale(.97); }\n:where(#ten-comic-root) \
+.ten-btn:disabled { opacity: .38; cursor: not-allowed; }\n:where(#ten-comic-root) .ten-btn.is-primary { color: var(--ten-primary-text); border-color: \
+var(--ten-primary-border); background: var(--ten-primary-bg); background-size: 260% 100%; }\n:where(#ten-comic-root) .ten-btn.is-danger { color: \
+var(--ten-danger-text); border-color: var(--ten-danger-border); background: var(--ten-danger-bg); }\n:where(#ten-comic-root) .ten-btn.is-small { min-height: \
+30px; padding: 5px 9px; font-size: 11px; }\n:where(#ten-comic-root) .ten-icon-label { display: inline-flex; align-items: center; justify-content: center; gap: \
+6px; }\n:where(#ten-comic-root) .ten-icon-label span { white-space: nowrap; }\n:where(#ten-comic-root) .ten-ripple { position: absolute; border-radius: 50%; \
+pointer-events: none; background: rgba(255,255,255,.36); transform: scale(0); animation: ten-ripple .62s ease-out; }\n:where(#ten-comic-root) \
+.ten-input,\n:where(#ten-comic-root) .ten-select,\n:where(#ten-comic-root) .ten-textarea { width: 100%; color: var(--ten-text); font: inherit; border: 1px solid \
+var(--ten-line); border-radius: var(--ten-radius-control); outline: 0; background: var(--ten-input-bg); transition: border-color .2s, box-shadow .2s; \
+}\n:where(#ten-comic-root) .ten-input,\n:where(#ten-comic-root) .ten-select { height: 36px; padding: 0 10px; }\n:where(#ten-comic-root) .ten-textarea { \
+min-height: 110px; padding: 10px; resize: vertical; }\n:where(#ten-comic-root) input.ten-input[type="number"] { padding-right: 30px; appearance: textfield; \
+-moz-appearance: textfield; }\n:where(#ten-comic-root) input.ten-input[type="number"]::-webkit-inner-spin-button,\n:where(#ten-comic-root) \
+input.ten-input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }\n:where(#ten-comic-root) \
+.ten-number-control { position: relative; min-width: 0; width: 100%; }\n:where(#ten-comic-root) .ten-number-steps { position: absolute; top: 4px; right: 4px; \
+bottom: 4px; width: 23px; display: grid; grid-template-rows: 1fr 1fr; overflow: hidden; border: 1px solid rgba(95,246,255,.12); border-radius: 7px; opacity: \
+.42; transition: opacity .2s, border-color .2s, box-shadow .2s; }\n:where(#ten-comic-root) .ten-number-control:hover .ten-number-steps,\n:where(#ten-comic-root) \
+.ten-number-control:focus-within .ten-number-steps { opacity: 1; border-color: rgba(95,246,255,.38); box-shadow: 0 0 10px rgba(95,246,255,.08); \
+}\n:where(#ten-comic-root) .ten-number-steps button { position: relative; display: grid; place-items: center; padding: 0; color: var(--ten-muted); cursor: \
+pointer; border: 0; background: rgba(95,246,255,.035); transition: color .16s, background .16s; }\n:where(#ten-comic-root) .ten-number-steps button + button { \
+border-top: 1px solid rgba(95,246,255,.12); }\n:where(#ten-comic-root) .ten-number-steps button:hover { color: var(--ten-cyan); background: \
+rgba(95,246,255,.12); }\n:where(#ten-comic-root) .ten-number-steps i { width: 5px; height: 5px; border-top: 1.5px solid currentColor; border-left: 1.5px solid \
+currentColor; transform: translateY(1px) rotate(45deg); }\n:where(#ten-comic-root) .ten-number-steps button:last-child i { transform: translateY(-1px) \
+rotate(225deg); }\n:where(#ten-comic-root) .ten-view[data-view="settings"] .ten-settings-card { border-color: rgba(137,225,255,.2); background: \
+linear-gradient(145deg, rgba(61,77,98,.9), rgba(47,60,80,.9)); box-shadow: inset 0 1px rgba(255,255,255,.075), 0 8px 22px rgba(1,9,20,.08); backdrop-filter: \
+blur(18px) saturate(1.15); }\n:where(#ten-comic-root) .ten-view[data-view="settings"] .ten-input,\n:where(#ten-comic-root) .ten-view[data-view="settings"] \
+.ten-select,\n:where(#ten-comic-root) .ten-view[data-view="settings"] .ten-textarea { border-color: rgba(137,225,255,.18); background: rgba(6,18,34,.42); \
+}\n:where(#ten-comic-root) .ten-input:focus,\n:where(#ten-comic-root) .ten-select:focus,\n:where(#ten-comic-root) .ten-textarea:focus { border-color: \
+var(--ten-cyan); box-shadow: var(--ten-focus-ring); }\n:where(#ten-comic-root) .ten-select option { color: #eafaff; background: #0c1829; \
+}\n:where(#ten-comic-root) .ten-source { --source: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); flex: 1; padding: 3px; \
+border-radius: 12px; background: rgba(2,10,22,.34); }\n:where(#ten-comic-root) .ten-source::before { content: ""; position: absolute; inset: 3px auto 3px 3px; \
+width: calc(50% - 3px); border: 1px solid rgba(95,246,255,.25); border-radius: 9px; background: linear-gradient(145deg, rgba(95,246,255,.14), \
+rgba(156,108,255,.13)); transform: translateX(calc(var(--source)*100%)); transition: transform .35s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) \
+.ten-source button { position: relative; z-index: 1; min-height: 33px; color: var(--ten-muted); font: inherit; font-size: 11px; cursor: pointer; border: 0; \
+background: transparent; }\n:where(#ten-comic-root) .ten-source button.is-active { color: var(--ten-cyan); }\n:where(#ten-comic-root) .ten-search-toolbar \
+.ten-input { width: auto; min-width: 0; flex: 1 1 auto; }\n:where(#ten-comic-root) .ten-search-site-picker { position: relative; z-index: 30; flex: 0 0 126px; \
+width: 126px; min-width: 0; }\n:where(#ten-comic-root) #ten-search-site-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 7px; \
+padding: 0 10px 0 11px; overflow: hidden; color: var(--ten-text); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid rgba(95,246,255,.24); \
+border-radius: 11px; background: linear-gradient(145deg, rgba(18,47,70,.76), rgba(36,38,76,.72)); box-shadow: inset 0 1px rgba(255,255,255,.08); transition: \
+border-color .2s, box-shadow .2s; }\n:where(#ten-comic-root) #ten-search-site-trigger:hover,\n:where(#ten-comic-root) .ten-search-site-picker.is-open \
+#ten-search-site-trigger { border-color: rgba(95,246,255,.58); box-shadow: 0 0 0 3px rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.1); \
+}\n:where(#ten-comic-root) #ten-search-site-label { min-width: 0; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; \
+}\n:where(#ten-comic-root) .ten-picker-arrow { width: 7px; height: 7px; flex: 0 0 7px; border-right: 1.5px solid var(--ten-cyan); border-bottom: 1.5px solid \
+var(--ten-cyan); transform: rotate(45deg) translateY(-2px); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) \
+.ten-search-site-picker.is-open .ten-picker-arrow { transform: rotate(225deg) translate(-1px,-1px); }\n:where(#ten-comic-root) .ten-search-site-menu { position: \
+absolute; z-index: 40; top: 43px; left: 0; width: 252px; max-height: 300px; padding: 6px; overflow-y: auto; border: 1px solid var(--ten-panel-border); \
+border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(26px) saturate(1.35); \
+-webkit-backdrop-filter: blur(26px) saturate(1.35); animation: ten-picker-in .22s cubic-bezier(.22,1,.36,1); scrollbar-width: thin; scrollbar-color: \
+var(--ten-scroll-thumb) transparent; }\n:where(#ten-comic-root) .ten-search-site-menu[hidden] { display: none !important; }\n:where(#ten-comic-root) \
+.ten-search-site-menu::-webkit-scrollbar { width: 5px; }\n:where(#ten-comic-root) .ten-search-site-menu::-webkit-scrollbar-thumb { border-radius: 8px; \
+background: rgba(95,246,255,.32); }\n:where(#ten-comic-root) .ten-search-site-option { width: 100%; min-height: 38px; display: grid; grid-template-columns: \
 minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px 9px; color: var(--ten-text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; \
 border: 1px solid transparent; border-radius: 9px; background: transparent; transition: color .18s, border-color .18s, background .18s, transform .18s; \
-}\n#ten-comic-root .ten-search-site-option + .ten-search-site-option { margin-top: 3px; }\n#ten-comic-root .ten-search-site-option span { min-width: 0; \
-overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-search-site-option small { color: var(--ten-muted); font-size: 9px; \
-}\n#ten-comic-root .ten-search-site-option:hover:not(:disabled) { color: var(--ten-cyan); border-color: rgba(95,246,255,.18); background: rgba(95,246,255,.07); \
-transform: translateX(2px); }\n#ten-comic-root .ten-search-site-option.is-selected { color: var(--ten-cyan); border-color: rgba(95,246,255,.28); background: \
-linear-gradient(100deg, rgba(95,246,255,.11), rgba(156,108,255,.08)); }\n#ten-comic-root .ten-search-site-option:disabled { opacity: .43; cursor: not-allowed; \
-}\n#ten-comic-root .ten-search-toolbar #ten-search-btn { flex: 0 0 76px; width: 76px; padding: 7px 10px; white-space: nowrap; }\n#ten-comic-root \
-.ten-search-toolbar #ten-search-btn .ten-icon { flex: 0 0 17px; width: 17px; height: 17px; }\n#ten-comic-root .ten-rule-manage { display: flex; align-items: \
-center; justify-content: space-between; gap: 8px; margin: -2px 0 10px; padding: 7px 8px 7px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid \
-var(--ten-line); border-radius: 12px; background: rgba(5,16,31,.3); }\n#ten-comic-root .ten-rule-manage[hidden] { display: none !important; }\n#ten-comic-root \
-.ten-rule-item { display: grid; grid-template-columns: minmax(0,1fr) 34px 34px; align-items: center; gap: 5px; }\n#ten-comic-root .ten-rule-item .ten-list-item \
-{ min-width: 0; }\n#ten-comic-root .ten-rule-edit { color: var(--ten-cyan); border-color: rgba(95,246,255,.16); background: rgba(95,246,255,.06); \
-}\n#ten-comic-root .ten-rule-delete { color: var(--ten-danger); border-color: rgba(255,97,116,.18); background: rgba(255,97,116,.07); }\n#ten-comic-root \
-.ten-list { display: grid; gap: 7px; }\n#ten-comic-root .ten-list-item { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 43px; padding: \
-9px 11px; color: var(--ten-text); text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: \
-var(--ten-list-bg); transition: .2s ease; }\n#ten-comic-root .ten-list-item:hover { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); \
-transform: translateX(2px); }\n#ten-comic-root .ten-list-item.is-disabled { opacity: .4; cursor: not-allowed; }\n#ten-comic-root .ten-list-item \
-input[type="checkbox"] { accent-color: var(--ten-cyan); }\n#ten-comic-root .ten-site-kind { flex: 0 0 auto; padding: 1px 6px; color: var(--ten-cyan); font-size: \
-9px; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; background: rgba(95,246,255,.06); }\n#ten-comic-root .ten-name { min-width: 0; flex: 1; \
-overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-meta { color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
-.ten-empty { display: grid; place-items: center; min-height: 250px; color: var(--ten-muted); text-align: center; }\n#ten-comic-root .ten-status { margin-bottom: \
-10px; padding: 9px 11px; color: var(--ten-muted); border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); \
-}\n#ten-comic-root .ten-status.is-ready { color: var(--ten-success); }\n#ten-comic-root .ten-options { max-height: 0; margin-bottom: 0; padding: 0 11px; \
-overflow: hidden; opacity: 0; border-width: 0; transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .2s, margin .2s, padding .2s, border-width .2s; \
-}\n#ten-comic-root .ten-options.is-open { max-height: 390px; margin-bottom: 10px; padding: 11px; opacity: 1; border-width: 1px; }\n#ten-comic-root \
-.ten-mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }\n#ten-comic-root .ten-mode { min-height: 36px; color: var(--ten-muted); font: \
-inherit; font-size: 11px; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 10px; background: rgba(4,13,27,.3); transition: .2s; \
-}\n#ten-comic-root .ten-mode.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.48); background: rgba(95,246,255,.1); box-shadow: 0 0 18px \
-rgba(95,246,255,.08); }\n#ten-comic-root .ten-chapter-tools { position: sticky; z-index: 8; top: -13px; display: grid; grid-template-columns: 1fr auto 1fr; gap: \
-8px; margin: 0 -5px 9px; padding: 7px 5px; border: 1px solid rgba(137,225,255,.16); border-radius: 13px; background: \
-linear-gradient(145deg,rgba(61,77,98,.94),rgba(47,60,80,.94)); box-shadow: 0 8px 20px rgba(1,9,20,.15), inset 0 1px rgba(255,255,255,.07); backdrop-filter: \
-blur(18px) saturate(1.15); }\n#ten-comic-root .ten-chapter-tools > :last-child { justify-self: end; }\n#ten-comic-root .ten-chapter-reload { position: relative; \
-display: grid; place-items: center; min-height: 34px; margin: 3px 0 9px; }\n#ten-comic-root .ten-chapter-reload::before { content: ""; position: absolute; left: \
-0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(95,246,255,.28), transparent); }\n#ten-comic-root .ten-chapter-reload button { \
-position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; color: var(--ten-cyan); font: inherit; font-size: 10px; cursor: \
-pointer; border: 1px solid rgba(95,246,255,.17); border-radius: 999px; background: rgba(9,24,44,.82); transition: .22s ease; }\n#ten-comic-root \
-.ten-chapter-reload button:hover { border-color: rgba(95,246,255,.42); box-shadow: 0 0 17px rgba(95,246,255,.1); }\n#ten-comic-root .ten-chapter-empty { \
-display: grid; justify-items: center; gap: 8px; padding: 26px 16px 17px; text-align: center; border: 1px solid var(--ten-line); border-radius: \
-var(--ten-radius-card); background: var(--ten-empty-bg); }\n#ten-comic-root .ten-chapter-empty[hidden],\n#ten-comic-root #ten-chapter-loaded[hidden] { display: \
-none !important; }\n#ten-comic-root .ten-empty-orbit { width: 52px; height: 52px; display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid \
-rgba(95,246,255,.28); border-radius: 17px; background: linear-gradient(145deg, rgba(95,246,255,.1), rgba(156,108,255,.1)); box-shadow: 0 0 24px \
-rgba(95,246,255,.1); }\n#ten-comic-root .ten-empty-orbit .ten-icon { width: 24px; height: 24px; }\n#ten-comic-root .ten-empty-title { font-weight: 700; \
-}\n#ten-comic-root .ten-chapter-empty .ten-btn { margin-top: 4px; }\n#ten-comic-root .ten-comic-info { width: min(290px,100%); display: grid; \
-grid-template-columns: 52px minmax(0,1fr); gap: 1px; margin-top: 6px; overflow: hidden; text-align: left; border: 1px solid var(--ten-line); border-radius: \
-var(--ten-radius-control); background: var(--ten-info-bg); }\n#ten-comic-root .ten-comic-info span,\n#ten-comic-root .ten-comic-info strong { padding: 7px 9px; \
-border-bottom: 1px solid rgba(95,246,255,.08); }\n#ten-comic-root .ten-comic-info span { color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
+}\n:where(#ten-comic-root) .ten-search-site-option + .ten-search-site-option { margin-top: 3px; }\n:where(#ten-comic-root) .ten-search-site-option span { \
+min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-search-site-option small { color: \
+var(--ten-muted); font-size: 9px; }\n:where(#ten-comic-root) .ten-search-site-option:hover:not(:disabled) { color: var(--ten-cyan); border-color: \
+rgba(95,246,255,.18); background: rgba(95,246,255,.07); transform: translateX(2px); }\n:where(#ten-comic-root) .ten-search-site-option.is-selected { color: \
+var(--ten-cyan); border-color: rgba(95,246,255,.28); background: linear-gradient(100deg, rgba(95,246,255,.11), rgba(156,108,255,.08)); \
+}\n:where(#ten-comic-root) .ten-search-site-option:disabled { opacity: .43; cursor: not-allowed; }\n:where(#ten-comic-root) .ten-search-toolbar #ten-search-btn \
+{ flex: 0 0 76px; width: 76px; padding: 7px 10px; white-space: nowrap; }\n:where(#ten-comic-root) .ten-search-toolbar #ten-search-btn .ten-icon { flex: 0 0 \
+17px; width: 17px; height: 17px; }\n:where(#ten-comic-root) .ten-rule-manage { display: flex; align-items: center; justify-content: space-between; gap: 8px; \
+margin: -2px 0 10px; padding: 7px 8px 7px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: \
+rgba(5,16,31,.3); }\n:where(#ten-comic-root) .ten-rule-manage[hidden] { display: none !important; }\n:where(#ten-comic-root) .ten-rule-item { display: grid; \
+grid-template-columns: minmax(0,1fr) 34px 34px; align-items: center; gap: 5px; }\n:where(#ten-comic-root) .ten-rule-item .ten-list-item { min-width: 0; \
+}\n:where(#ten-comic-root) .ten-rule-edit { color: var(--ten-cyan); border-color: rgba(95,246,255,.16); background: rgba(95,246,255,.06); \
+}\n:where(#ten-comic-root) .ten-rule-delete { color: var(--ten-danger); border-color: rgba(255,97,116,.18); background: rgba(255,97,116,.07); \
+}\n:where(#ten-comic-root) .ten-list { display: grid; gap: 7px; }\n:where(#ten-comic-root) .ten-list-item { display: flex; align-items: center; gap: 9px; width: \
+100%; min-height: 43px; padding: 9px 11px; color: var(--ten-text); text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: \
+var(--ten-radius-control); background: var(--ten-list-bg); transition: .2s ease; }\n:where(#ten-comic-root) .ten-list-item:hover { border-color: \
+var(--ten-cyan); background: var(--ten-list-hover-bg); transform: translateX(2px); }\n:where(#ten-comic-root) .ten-list-item.is-disabled { opacity: .4; cursor: \
+not-allowed; }\n:where(#ten-comic-root) .ten-list-item input[type="checkbox"] { accent-color: var(--ten-cyan); }\n:where(#ten-comic-root) .ten-site-kind { flex: \
+0 0 auto; padding: 1px 6px; color: var(--ten-cyan); font-size: 9px; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; background: \
+rgba(95,246,255,.06); }\n:where(#ten-comic-root) .ten-name { min-width: 0; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n:where(#ten-comic-root) .ten-meta { color: var(--ten-muted); font-size: 10px; }\n:where(#ten-comic-root) .ten-empty { display: grid; place-items: center; \
+min-height: 250px; color: var(--ten-muted); text-align: center; }\n:where(#ten-comic-root) .ten-status { margin-bottom: 10px; padding: 9px 11px; color: \
+var(--ten-muted); border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); }\n:where(#ten-comic-root) \
+.ten-status.is-ready { color: var(--ten-success); }\n:where(#ten-comic-root) .ten-options { max-height: 0; margin-bottom: 0; padding: 0 11px; overflow: hidden; \
+opacity: 0; border-width: 0; transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .2s, margin .2s, padding .2s, border-width .2s; \
+}\n:where(#ten-comic-root) .ten-options.is-open { max-height: 390px; margin-bottom: 10px; padding: 11px; opacity: 1; border-width: 1px; \
+}\n:where(#ten-comic-root) .ten-mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }\n:where(#ten-comic-root) .ten-mode { min-height: \
+36px; color: var(--ten-muted); font: inherit; font-size: 11px; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 10px; background: \
+rgba(4,13,27,.3); transition: .2s; }\n:where(#ten-comic-root) .ten-mode.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.48); background: \
+rgba(95,246,255,.1); box-shadow: 0 0 18px rgba(95,246,255,.08); }\n:where(#ten-comic-root) .ten-chapter-tools { position: sticky; z-index: 8; top: -13px; \
+display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin: 0 -5px 9px; padding: 7px 5px; border: 1px solid rgba(137,225,255,.16); border-radius: \
+13px; background: linear-gradient(145deg,rgba(61,77,98,.94),rgba(47,60,80,.94)); box-shadow: 0 8px 20px rgba(1,9,20,.15), inset 0 1px rgba(255,255,255,.07); \
+backdrop-filter: blur(18px) saturate(1.15); }\n:where(#ten-comic-root) .ten-chapter-tools > :last-child { justify-self: end; }\n:where(#ten-comic-root) \
+.ten-chapter-reload { position: relative; display: grid; place-items: center; min-height: 34px; margin: 3px 0 9px; }\n:where(#ten-comic-root) \
+.ten-chapter-reload::before { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, \
+rgba(95,246,255,.28), transparent); }\n:where(#ten-comic-root) .ten-chapter-reload button { position: relative; display: inline-flex; align-items: center; gap: \
+6px; padding: 4px 10px; color: var(--ten-cyan); font: inherit; font-size: 10px; cursor: pointer; border: 1px solid rgba(95,246,255,.17); border-radius: 999px; \
+background: rgba(9,24,44,.82); transition: .22s ease; }\n:where(#ten-comic-root) .ten-chapter-reload button:hover { border-color: rgba(95,246,255,.42); \
+box-shadow: 0 0 17px rgba(95,246,255,.1); }\n:where(#ten-comic-root) .ten-chapter-empty { display: grid; justify-items: center; gap: 8px; padding: 26px 16px \
+17px; text-align: center; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-card); background: var(--ten-empty-bg); }\n:where(#ten-comic-root) \
+.ten-chapter-empty[hidden],\n:where(#ten-comic-root) #ten-chapter-loaded[hidden] { display: none !important; }\n:where(#ten-comic-root) .ten-empty-orbit { \
+width: 52px; height: 52px; display: grid; place-items: center; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.28); border-radius: 17px; background: \
+linear-gradient(145deg, rgba(95,246,255,.1), rgba(156,108,255,.1)); box-shadow: 0 0 24px rgba(95,246,255,.1); }\n:where(#ten-comic-root) .ten-empty-orbit \
+.ten-icon { width: 24px; height: 24px; }\n:where(#ten-comic-root) .ten-empty-title { font-weight: 700; }\n:where(#ten-comic-root) .ten-chapter-empty .ten-btn { \
+margin-top: 4px; }\n:where(#ten-comic-root) .ten-comic-info { width: min(290px,100%); display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 1px; \
+margin-top: 6px; overflow: hidden; text-align: left; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: \
+var(--ten-info-bg); }\n:where(#ten-comic-root) .ten-comic-info span,\n:where(#ten-comic-root) .ten-comic-info strong { padding: 7px 9px; border-bottom: 1px \
+solid rgba(95,246,255,.08); }\n:where(#ten-comic-root) .ten-comic-info span { color: var(--ten-muted); font-size: 10px; }\n:where(#ten-comic-root) \
 .ten-comic-info strong { min-width: 0; overflow: hidden; color: var(--ten-text); font-size: 11px; font-weight: 600; white-space: nowrap; text-overflow: \
-ellipsis; }\n#ten-comic-root .ten-chapter-list-head { display: flex; align-items: center; justify-content: space-between; min-height: 39px; margin-bottom: 6px; \
-padding: 3px 5px 3px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: rgba(9,24,44,.38); \
-}\n#ten-comic-root .ten-chapter-list-head .ten-icon-btn.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.35); background: rgba(95,246,255,.1); \
-}\n#ten-comic-root .ten-chapter-list { display: grid; gap: 5px; max-height: none; overflow: visible; }\n#ten-comic-root .ten-progress { height: 5px; margin-top: \
-7px; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.08); }\n#ten-comic-root .ten-progress > i { position: relative; display: block; height: \
-100%; overflow: hidden; border-radius: inherit; background: linear-gradient(90deg, var(--ten-cyan), var(--ten-violet)); box-shadow: 0 0 12px \
-rgba(95,246,255,.4); transition: width .35s; }\n#ten-comic-root .ten-progress > i::after { content: ""; position: absolute; inset: 0; width: 42%; \
-pointer-events: none; opacity: 0; background: linear-gradient(90deg,transparent,rgba(255,255,255,.9),rgba(95,246,255,.45),transparent); transform: \
-translateX(-140%); }\n#ten-comic-root[data-effects="1"] .ten-progress > i::after { opacity: .34; animation: ten-energy-flow var(--ten-energy-duration,7s) linear \
-infinite; }\n#ten-comic-root[data-effects="2"] .ten-progress > i::after { opacity: .62; animation: ten-energy-flow var(--ten-energy-duration,5.8s) linear \
-infinite; }\n#ten-comic-root .ten-progress > i.is-paused::after { opacity: 0 !important; animation-play-state: paused !important; }\n#ten-comic-root \
-.ten-task-title { min-width: 0; overflow: hidden; font-weight: 650; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-task-group { \
-margin-bottom: 9px; overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-task-bg); \
-box-shadow: var(--ten-card-shadow); }\n#ten-comic-root .ten-task-header { min-height: 48px; display: flex; align-items: center; padding: 5px 8px 5px 13px; \
-}\n#ten-comic-root .ten-task-title-button { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 0; color: var(--ten-text); font: \
-inherit; font-weight: 700; text-align: left; cursor: pointer; border: 0; background: transparent; }\n#ten-comic-root .ten-task-bulk { flex: 0 0 auto; \
-min-height: 29px; margin-left: 4px; padding: 4px 9px; font-size: 9px; white-space: nowrap; }\n#ten-comic-root .ten-task-bulk[hidden] { display: none; \
-}\n#ten-comic-root .ten-task-control-group { flex: 0 0 auto; display: flex; align-items: center; gap: 5px; margin-left: 4px; }\n#ten-comic-root \
-.ten-task-control-group .ten-task-bulk { margin-left: 0; }\n#ten-comic-root .ten-task-arrow-button { width: 31px; height: 31px; flex: 0 0 31px; display: grid; \
-place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; \
-transition: color .2s, border-color .2s, background .2s; }\n#ten-comic-root .ten-task-arrow-button:hover { color: var(--ten-cyan); border-color: \
-rgba(95,246,255,.2); background: rgba(95,246,255,.07); }\n#ten-comic-root .ten-task-arrow-button .ten-task-arrow { margin: 0; }\n#ten-comic-root .ten-task-count \
-{ min-width: 22px; padding: 1px 7px; color: var(--ten-cyan); font-size: 10px; text-align: center; border: 1px solid rgba(95,246,255,.2); border-radius: 999px; \
-background: rgba(95,246,255,.07); }\n#ten-comic-root .ten-task-arrow { width: 8px; height: 8px; margin-left: auto; margin-right: 5px; border-right: 1.5px solid \
-var(--ten-muted); border-bottom: 1.5px solid var(--ten-muted); transform: rotate(45deg) translateY(-2px); transition: transform .5s cubic-bezier(.22,1,.36,1); \
-}\n#ten-comic-root .ten-task-group.is-open .ten-task-arrow { transform: rotate(225deg) translate(-2px,-2px); }\n#ten-comic-root .ten-task-body { min-width: 0; \
-display: grid; grid-template-rows: 0fr; padding: 0 10px; overflow: hidden; opacity: 0; border-top: 0 solid var(--ten-line); transition: grid-template-rows .5s \
-cubic-bezier(.22,1,.36,1), opacity .5s ease, padding .5s ease, border-width .5s ease; }\n#ten-comic-root .ten-task-body > .ten-list { min-width: 0; width: 100%; \
-min-height: 0; overflow: hidden; }\n#ten-comic-root .ten-task-group.is-open .ten-task-body { grid-template-rows: 1fr; padding: 9px 10px 10px; opacity: 1; \
-border-top-width: 1px; }\n#ten-comic-root .ten-task-group.is-open .ten-task-body > .ten-list { max-height: none; overflow: visible; }\n#ten-comic-root \
-.ten-task-group.is-open.has-scroll .ten-task-body > .ten-list { max-height: 400px; overflow-y: auto; }\n#ten-comic-root .ten-task-body .ten-empty { min-height: \
-72px; }\n#ten-comic-root .ten-task-meta { min-width: 0; display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: var(--ten-muted); \
-font-size: 10px; }\n#ten-comic-root .ten-task-meta > span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
-}\n#ten-comic-root .ten-task-meta > span:last-child { flex: 0 0 auto; white-space: nowrap; }\n#ten-comic-root .ten-task-performance { min-width: 0; display: \
-flex; justify-content: space-between; gap: 8px; margin-top: 3px; color: rgba(190,216,231,.72); font-size: 9px; font-variant-numeric: tabular-nums; \
-}\n#ten-comic-root .ten-task-performance > span:first-child { color: rgba(95,246,255,.86); }\n#ten-comic-root .ten-task-performance > span:last-child { \
-overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right; }\n#ten-comic-root .ten-effect-level { position: relative; display: grid; \
-gap: 3px; padding: 3px; border-radius: 11px; background: rgba(3,14,28,.38); }\n#ten-comic-root .ten-effect-level { grid-template-columns: \
-repeat(3,minmax(0,1fr)); }\n#ten-comic-root .ten-effect-level button { min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; \
-font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, \
-background .18s, box-shadow .18s; }\n#ten-comic-root .ten-effect-level button.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.28); \
-background: linear-gradient(145deg,rgba(95,246,255,.12),rgba(156,108,255,.11)); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n#ten-comic-root \
-.ten-state-animate { --ten-state-rgb: 95,246,255; position: relative; }\n#ten-comic-root .ten-state-animate.is-state-pause { --ten-state-rgb: 156,108,255; \
-}\n#ten-comic-root .ten-state-animate.is-state-resume { --ten-state-rgb: 95,246,255; }\n#ten-comic-root .ten-state-animate.is-state-success { --ten-state-rgb: \
-85,239,182; }\n#ten-comic-root .ten-state-animate.is-state-danger { --ten-state-rgb: 255,97,116; }\n#ten-comic-root .ten-state-animate::after { content: ""; \
-position: absolute; z-index: 4; top: 0; bottom: 0; left: -42%; width: 38%; pointer-events: none; opacity: 0; border-radius: inherit; background: \
-linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.38),transparent); }\n#ten-comic-root[data-effects="1"] .ten-state-animate { animation: \
-ten-state-border .9s ease-out 1; }\n#ten-comic-root[data-effects="1"] .ten-state-animate::after { animation: ten-state-scan .86s cubic-bezier(.22,1,.36,1) 1; \
-}\n#ten-comic-root[data-effects="2"] .ten-state-animate { animation: ten-state-border .68s ease-out 1; }\n#ten-comic-root[data-effects="2"] \
-.ten-state-animate::after { background: linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.62),transparent); animation: ten-state-scan .62s \
-cubic-bezier(.22,1,.36,1) 1; }\n#ten-comic-root .ten-setting { display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,1fr); align-items: center; gap: \
-10px; margin-bottom: 9px; }\n#ten-comic-root .ten-setting label { color: #c9dce8; }\n#ten-comic-root .ten-setting label,\n#ten-comic-root .ten-rule-fields label \
-{ position: static !important; inset: auto !important; transform: none !important; }\n#ten-comic-root .ten-appearance-card { padding-bottom: 7px; \
-}\n#ten-comic-root .ten-appearance-setting { margin-bottom: 7px; }\n#ten-comic-root .ten-appearance-axis { display: grid; grid-template-columns: \
+ellipsis; }\n:where(#ten-comic-root) .ten-chapter-list-head { display: flex; align-items: center; justify-content: space-between; min-height: 39px; \
+margin-bottom: 6px; padding: 3px 5px 3px 11px; color: var(--ten-muted); font-size: 10px; border: 1px solid var(--ten-line); border-radius: 12px; background: \
+rgba(9,24,44,.38); }\n:where(#ten-comic-root) .ten-chapter-list-head .ten-icon-btn.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.35); \
+background: rgba(95,246,255,.1); }\n:where(#ten-comic-root) .ten-chapter-list { display: grid; gap: 5px; max-height: none; overflow: visible; \
+}\n:where(#ten-comic-root) .ten-progress { height: 5px; margin-top: 7px; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.08); \
+}\n:where(#ten-comic-root) .ten-progress > i { position: relative; display: block; height: 100%; overflow: hidden; border-radius: inherit; background: \
+linear-gradient(90deg, var(--ten-cyan), var(--ten-violet)); box-shadow: 0 0 12px rgba(95,246,255,.4); transition: width .35s; }\n:where(#ten-comic-root) \
+.ten-progress > i::after { content: ""; position: absolute; inset: 0; width: 42%; pointer-events: none; opacity: 0; background: \
+linear-gradient(90deg,transparent,rgba(255,255,255,.9),rgba(95,246,255,.45),transparent); transform: translateX(-140%); }\n#ten-comic-root[data-effects="1"] \
+.ten-progress > i::after { opacity: .34; animation: ten-energy-flow var(--ten-energy-duration,7s) linear infinite; }\n#ten-comic-root[data-effects="2"] \
+.ten-progress > i::after { opacity: .62; animation: ten-energy-flow var(--ten-energy-duration,5.8s) linear infinite; }\n:where(#ten-comic-root) .ten-progress > \
+i.is-paused::after { opacity: 0 !important; animation-play-state: paused !important; }\n:where(#ten-comic-root) .ten-task-title { min-width: 0; overflow: \
+hidden; font-weight: 650; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-task-group { margin-bottom: 9px; overflow: hidden; \
+border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-task-bg); box-shadow: var(--ten-card-shadow); \
+}\n:where(#ten-comic-root) .ten-task-header { min-height: 48px; display: flex; align-items: center; padding: 5px 8px 5px 13px; }\n:where(#ten-comic-root) \
+.ten-task-title-button { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 0; color: var(--ten-text); font: inherit; \
+font-weight: 700; text-align: left; cursor: pointer; border: 0; background: transparent; }\n:where(#ten-comic-root) .ten-task-bulk { flex: 0 0 auto; min-height: \
+29px; margin-left: 4px; padding: 4px 9px; font-size: 9px; white-space: nowrap; }\n:where(#ten-comic-root) .ten-task-bulk[hidden] { display: none; \
+}\n:where(#ten-comic-root) .ten-task-control-group { flex: 0 0 auto; display: flex; align-items: center; gap: 5px; margin-left: 4px; }\n:where(#ten-comic-root) \
+.ten-task-control-group .ten-task-bulk { margin-left: 0; }\n:where(#ten-comic-root) .ten-task-arrow-button { width: 31px; height: 31px; flex: 0 0 31px; display: \
+grid; place-items: center; padding: 0; color: var(--ten-muted); cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; \
+transition: color .2s, border-color .2s, background .2s; }\n:where(#ten-comic-root) .ten-task-arrow-button:hover { color: var(--ten-cyan); border-color: \
+rgba(95,246,255,.2); background: rgba(95,246,255,.07); }\n:where(#ten-comic-root) .ten-task-arrow-button .ten-task-arrow { margin: 0; }\n:where(#ten-comic-root) \
+.ten-task-count { min-width: 22px; padding: 1px 7px; color: var(--ten-cyan); font-size: 10px; text-align: center; border: 1px solid rgba(95,246,255,.2); \
+border-radius: 999px; background: rgba(95,246,255,.07); }\n:where(#ten-comic-root) .ten-task-arrow { width: 8px; height: 8px; margin-left: auto; margin-right: \
+5px; border-right: 1.5px solid var(--ten-muted); border-bottom: 1.5px solid var(--ten-muted); transform: rotate(45deg) translateY(-2px); transition: transform \
+.5s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) .ten-task-group.is-open .ten-task-arrow { transform: rotate(225deg) translate(-2px,-2px); \
+}\n:where(#ten-comic-root) .ten-task-body { min-width: 0; display: grid; grid-template-rows: 0fr; padding: 0 10px; overflow: hidden; opacity: 0; border-top: 0 \
+solid var(--ten-line); transition: grid-template-rows .5s cubic-bezier(.22,1,.36,1), opacity .5s ease, padding .5s ease, border-width .5s ease; \
+}\n:where(#ten-comic-root) .ten-task-body > .ten-list { min-width: 0; width: 100%; min-height: 0; overflow: hidden; }\n:where(#ten-comic-root) \
+.ten-task-group.is-open .ten-task-body { grid-template-rows: 1fr; padding: 9px 10px 10px; opacity: 1; border-top-width: 1px; }\n:where(#ten-comic-root) \
+.ten-task-group.is-open .ten-task-body > .ten-list { max-height: none; overflow: visible; }\n:where(#ten-comic-root) .ten-task-group.is-open.has-scroll \
+.ten-task-body > .ten-list { max-height: 400px; overflow-y: auto; }\n:where(#ten-comic-root) .ten-task-body .ten-empty { min-height: 72px; \
+}\n:where(#ten-comic-root) .ten-task-meta { min-width: 0; display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: var(--ten-muted); \
+font-size: 10px; }\n:where(#ten-comic-root) .ten-task-meta > span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
+}\n:where(#ten-comic-root) .ten-task-meta > span:last-child { flex: 0 0 auto; white-space: nowrap; }\n:where(#ten-comic-root) .ten-task-performance { min-width: \
+0; display: flex; justify-content: space-between; gap: 8px; margin-top: 3px; color: rgba(190,216,231,.72); font-size: 9px; font-variant-numeric: tabular-nums; \
+}\n:where(#ten-comic-root) .ten-task-performance > span:first-child { color: rgba(95,246,255,.86); }\n:where(#ten-comic-root) .ten-task-performance > \
+span:last-child { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right; }\n:where(#ten-comic-root) .ten-effect-level { position: \
+relative; display: grid; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(3,14,28,.38); }\n:where(#ten-comic-root) .ten-effect-level { \
+grid-template-columns: repeat(3,minmax(0,1fr)); }\n:where(#ten-comic-root) .ten-effect-level button { min-width: 0; min-height: 29px; padding: 3px 5px; color: \
+var(--ten-muted); font: inherit; font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color \
+.18s, border-color .18s, background .18s, box-shadow .18s; }\n:where(#ten-comic-root) .ten-effect-level button.is-active { color: var(--ten-cyan); border-color: \
+rgba(95,246,255,.28); background: linear-gradient(145deg,rgba(95,246,255,.12),rgba(156,108,255,.11)); box-shadow: inset 0 1px rgba(255,255,255,.06); \
+}\n:where(#ten-comic-root) .ten-state-animate { --ten-state-rgb: 95,246,255; position: relative; }\n:where(#ten-comic-root) .ten-state-animate.is-state-pause { \
+--ten-state-rgb: 156,108,255; }\n:where(#ten-comic-root) .ten-state-animate.is-state-resume { --ten-state-rgb: 95,246,255; }\n:where(#ten-comic-root) \
+.ten-state-animate.is-state-success { --ten-state-rgb: 85,239,182; }\n:where(#ten-comic-root) .ten-state-animate.is-state-danger { --ten-state-rgb: 255,97,116; \
+}\n:where(#ten-comic-root) .ten-state-animate::after { content: ""; position: absolute; z-index: 4; top: 0; bottom: 0; left: -42%; width: 38%; pointer-events: \
+none; opacity: 0; border-radius: inherit; background: linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.38),transparent); \
+}\n#ten-comic-root[data-effects="1"] .ten-state-animate { animation: ten-state-border .9s ease-out 1; }\n#ten-comic-root[data-effects="1"] \
+.ten-state-animate::after { animation: ten-state-scan .86s cubic-bezier(.22,1,.36,1) 1; }\n#ten-comic-root[data-effects="2"] .ten-state-animate { animation: \
+ten-state-border .68s ease-out 1; }\n#ten-comic-root[data-effects="2"] .ten-state-animate::after { background: \
+linear-gradient(90deg,transparent,rgba(var(--ten-state-rgb),.62),transparent); animation: ten-state-scan .62s cubic-bezier(.22,1,.36,1) 1; \
+}\n:where(#ten-comic-root) .ten-setting { display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,1fr); align-items: center; gap: 10px; margin-bottom: \
+9px; }\n:where(#ten-comic-root) .ten-setting label { color: #c9dce8; }\n#ten-comic-root .ten-setting label,\n#ten-comic-root .ten-rule-fields label { position: \
+static !important; inset: auto !important; transform: none !important; }\n:where(#ten-comic-root) .ten-appearance-card { padding-bottom: 7px; \
+}\n:where(#ten-comic-root) .ten-appearance-setting { margin-bottom: 7px; }\n:where(#ten-comic-root) .ten-appearance-axis { display: grid; grid-template-columns: \
 repeat(3,minmax(0,1fr)); gap: 3px; padding: 3px; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: \
-var(--ten-input-bg); }\n#ten-comic-root .ten-appearance-axis button { min-width: 0; min-height: 29px; padding: 3px 4px; color: var(--ten-muted); font: inherit; \
-font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, \
-background .18s, transform .18s; }\n#ten-comic-root .ten-appearance-axis button:hover { color: var(--ten-text); background: var(--ten-control-hover-bg); \
-}\n#ten-comic-root .ten-appearance-axis button.is-active { color: var(--ten-cyan); border-color: var(--ten-control-border); background: \
-var(--ten-control-hover-bg); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n#ten-comic-root .ten-settings-download .ten-setting { min-height: 36px; \
-margin-bottom: 10px; }\n#ten-comic-root .ten-settings-download .ten-setting > label { font-size: 11px; line-height: 1.5; }\n#ten-comic-root \
-.ten-settings-download .ten-setting-check { min-height: 30px; margin-top: 2px; margin-bottom: 11px; }\n#ten-comic-root .ten-direct-flow-setting { display: block \
-!important; min-height: 0 !important; }\n#ten-comic-root .ten-direct-flow-setting > label { display: block; margin-bottom: 6px; }\n#ten-comic-root \
-.ten-direct-flow-options { display: grid; gap: 6px; }\n#ten-comic-root .ten-direct-flow-options button { width: 100%; padding: 8px 10px; color: var(--ten-text); \
-font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: 10px; background: var(--ten-input-bg); transition: \
-border-color .18s, background .18s, transform .18s; }\n#ten-comic-root .ten-direct-flow-options button:hover { transform: translateY(-1px); background: \
-var(--ten-control-hover-bg); }\n#ten-comic-root .ten-direct-flow-options button.is-active { border-color: var(--ten-cyan); box-shadow: 0 0 0 3px \
-rgba(95,246,255,.08); }\n#ten-comic-root .ten-direct-flow-options strong,\n#ten-comic-root .ten-direct-flow-options small { display: block; }\n#ten-comic-root \
-.ten-direct-flow-options small { margin-top: 3px; color: var(--ten-muted); font-size: 10px; line-height: 1.45; }\n#ten-comic-root .ten-path-sanitize-setting { \
-align-items: center; }\n#ten-comic-root .ten-path-sanitize-setting > div { min-width: 0; }\n#ten-comic-root .ten-path-sanitize-setting label,\n#ten-comic-root \
-.ten-path-sanitize-setting small { display: block; }\n#ten-comic-root .ten-path-sanitize-setting small { margin-top: 3px; color: var(--ten-muted); font-size: \
-9px; line-height: 1.4; }\n#ten-comic-root .ten-setting .ten-input { text-align: center; font-variant-numeric: tabular-nums; }\n#ten-comic-root .ten-setting \
-.ten-select { text-align: center; text-align-last: center; }\n#ten-comic-root .ten-setting-select { position: relative; z-index: 12; min-width: 0; width: 100%; \
-}\n#ten-comic-root #ten-default-mode-trigger { width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 11px; color: var(--ten-text); \
-font: inherit; cursor: pointer; border: 1px solid rgba(137,225,255,.2); border-radius: 11px; background: rgba(6,18,34,.42); box-shadow: inset 0 1px \
-rgba(255,255,255,.045); transition: border-color .2s, box-shadow .2s, background .2s; }\n#ten-comic-root #ten-default-mode-trigger:hover,\n#ten-comic-root \
-.ten-setting-select.is-open #ten-default-mode-trigger { border-color: rgba(95,246,255,.55); background: rgba(9,27,46,.58); box-shadow: 0 0 0 3px \
-rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.07); }\n#ten-comic-root #ten-default-mode-label { min-width: 0; flex: 1; text-align: center; \
-}\n#ten-comic-root .ten-setting-select.is-open .ten-picker-arrow { transform: rotate(225deg) translate(-1px,-1px); }\n#ten-comic-root .ten-setting-select-menu { \
-position: absolute; z-index: 45; top: 42px; right: 0; left: 0; padding: 6px; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); \
-background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.35); animation: ten-picker-in .22s \
-cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-setting-select-menu[hidden] { display: none !important; }\n#ten-comic-root .ten-setting-select-menu button { \
-width: 100%; min-height: 43px; display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: center; gap: 8px; padding: 6px 8px; color: \
-var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; transition: \
-border-color .18s, background .18s, transform .18s; }\n#ten-comic-root .ten-setting-select-menu button + button { margin-top: 3px; }\n#ten-comic-root \
-.ten-setting-select-menu button:hover { border-color: rgba(95,246,255,.2); background: rgba(95,246,255,.08); transform: translateX(2px); }\n#ten-comic-root \
-.ten-setting-select-menu button.is-selected { border-color: rgba(95,246,255,.28); background: linear-gradient(100deg, rgba(95,246,255,.13), \
-rgba(156,108,255,.09)); }\n#ten-comic-root .ten-setting-select-menu button > span:last-child { min-width: 0; display: grid; gap: 1px; }\n#ten-comic-root \
-.ten-setting-select-menu strong { font-size: 11px; font-weight: 700; }\n#ten-comic-root .ten-setting-select-menu small { color: var(--ten-muted); font-size: \
-9px; }\n#ten-comic-root .ten-mode-option-mark { width: 10px; height: 10px; border: 1px solid rgba(137,225,255,.35); border-radius: 50%; box-shadow: inset 0 0 0 \
-2px rgba(7,18,34,.9); transition: background .18s, box-shadow .18s; }\n#ten-comic-root .ten-setting-select-menu button.is-selected .ten-mode-option-mark { \
-background: var(--ten-cyan); box-shadow: 0 0 10px rgba(95,246,255,.48), inset 0 0 0 2px rgba(7,18,34,.82); }\n#ten-comic-root .ten-setting \
-input[type="checkbox"] { justify-self: end; accent-color: var(--ten-cyan); width: 18px; height: 18px; }\n#ten-comic-root .ten-setting input[type="range"] { \
-width: 100%; accent-color: var(--ten-cyan); }\n#ten-comic-root .ten-setting-value { color: var(--ten-cyan); font-variant-numeric: tabular-nums; text-align: \
-right; }\n#ten-comic-root .ten-grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }\n#ten-comic-root .ten-toast { position: \
-absolute; z-index: 20; left: 50%; bottom: 78px; max-width: 86%; display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 13px; color: \
-var(--ten-toast-text); border: 1px solid var(--ten-toast-border); border-radius: var(--ten-radius-control); background: var(--ten-toast-bg); box-shadow: \
-var(--ten-tooltip-shadow); transform: translate(-50%,12px); opacity: 0; pointer-events: none; transition: .22s; }\n#ten-comic-root .ten-toast.is-show { \
-transform: translate(-50%,0); opacity: 1; }\n#ten-comic-root #ten-toast-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; \
-}\n#ten-comic-root .ten-toast button { flex: 0 0 auto; min-height: 27px; padding: 4px 9px; color: var(--ten-cyan); font: inherit; font-size: 10px; font-weight: \
-700; cursor: pointer; pointer-events: auto; border: 1px solid var(--ten-control-border); border-radius: 8px; background: var(--ten-control-hover-bg); \
-}\n#ten-comic-root .ten-toast button[hidden] { display: none; }\n#ten-comic-root .ten-confirm { position: absolute; z-index: 50; inset: 0; display: grid; \
-place-items: center; padding: 22px; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity .24s ease, visibility .24s; }\n#ten-comic-root \
-.ten-confirm.is-open { visibility: visible; opacity: 1; pointer-events: auto; }\n#ten-comic-root .ten-confirm-backdrop { position: absolute; inset: 0; padding: \
-0; cursor: default; border: 0; background: var(--ten-overlay-bg); backdrop-filter: blur(7px); }\n#ten-comic-root .ten-confirm-dialog { position: relative; \
-width: min(310px,100%); padding: 18px; text-align: center; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: \
-var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.96); transition: transform .28s cubic-bezier(.22,1,.36,1); \
-}\n#ten-comic-root .ten-confirm.is-open .ten-confirm-dialog { transform: translateY(0) scale(1); }\n#ten-comic-root .ten-confirm-icon { width: 42px; height: \
-42px; display: grid; place-items: center; margin: 0 auto 10px; color: #ff9aac; border: 1px solid rgba(255,97,116,.3); border-radius: 14px; background: \
-rgba(255,97,116,.11); box-shadow: 0 0 22px rgba(255,97,116,.1); }\n#ten-comic-root .ten-confirm-title { margin-bottom: 6px; font-size: 14px; font-weight: 750; \
-}\n#ten-comic-root .ten-confirm-message { min-height: 34px; color: #c5d8e5; font-size: 11px; line-height: 1.55; word-break: break-word; }\n#ten-comic-root \
-.ten-confirm-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; }\n#ten-comic-root .ten-diagnostic { position: \
-absolute; z-index: 51; inset: 0; display: grid; place-items: center; padding: 18px; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity \
-.24s ease, visibility .24s; }\n#ten-comic-root .ten-diagnostic.is-open { visibility: visible; opacity: 1; pointer-events: auto; }\n#ten-comic-root \
-.ten-diagnostic-dialog { position: relative; width: 100%; max-height: 78%; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 11px; padding: 15px; \
-border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); \
-transform: translateY(10px) scale(.97); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-diagnostic.is-open .ten-diagnostic-dialog \
-{ transform: translateY(0) scale(1); }\n#ten-comic-root .ten-diagnostic-head { display: grid; grid-template-columns: 42px minmax(0,1fr) 34px; align-items: \
-center; gap: 10px; text-align: left; }\n#ten-comic-root .ten-diagnostic-head .ten-confirm-icon { margin: 0; }\n#ten-comic-root .ten-confirm-icon.is-info { \
-color: var(--ten-cyan); border-color: rgba(95,246,255,.3); background: rgba(95,246,255,.1); box-shadow: 0 0 22px rgba(95,246,255,.1); }\n#ten-comic-root \
+var(--ten-input-bg); }\n:where(#ten-comic-root) .ten-appearance-axis button { min-width: 0; min-height: 29px; padding: 3px 4px; color: var(--ten-muted); font: \
+inherit; font-size: 9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, \
+background .18s, transform .18s; }\n:where(#ten-comic-root) .ten-appearance-axis button:hover { color: var(--ten-text); background: var(--ten-control-hover-bg); \
+}\n:where(#ten-comic-root) .ten-appearance-axis button.is-active { color: var(--ten-cyan); border-color: var(--ten-control-border); background: \
+var(--ten-control-hover-bg); box-shadow: inset 0 1px rgba(255,255,255,.06); }\n:where(#ten-comic-root) .ten-settings-download .ten-setting { min-height: 36px; \
+margin-bottom: 10px; }\n:where(#ten-comic-root) .ten-settings-download .ten-setting > label { font-size: 11px; line-height: 1.5; }\n:where(#ten-comic-root) \
+.ten-settings-download .ten-setting-check { min-height: 30px; margin-top: 2px; margin-bottom: 11px; }\n:where(#ten-comic-root) .ten-direct-flow-setting { \
+display: block !important; min-height: 0 !important; }\n:where(#ten-comic-root) .ten-direct-flow-setting > label { display: block; margin-bottom: 6px; \
+}\n:where(#ten-comic-root) .ten-direct-flow-options { display: grid; gap: 6px; }\n:where(#ten-comic-root) .ten-direct-flow-options button { width: 100%; \
+padding: 8px 10px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: 10px; \
+background: var(--ten-input-bg); transition: border-color .18s, background .18s, transform .18s; }\n:where(#ten-comic-root) .ten-direct-flow-options \
+button:hover { transform: translateY(-1px); background: var(--ten-control-hover-bg); }\n:where(#ten-comic-root) .ten-direct-flow-options button.is-active { \
+border-color: var(--ten-cyan); box-shadow: 0 0 0 3px rgba(95,246,255,.08); }\n:where(#ten-comic-root) .ten-direct-flow-options strong,\n:where(#ten-comic-root) \
+.ten-direct-flow-options small { display: block; }\n:where(#ten-comic-root) .ten-direct-flow-options small { margin-top: 3px; color: var(--ten-muted); \
+font-size: 10px; line-height: 1.45; }\n:where(#ten-comic-root) .ten-path-sanitize-setting { align-items: center; }\n:where(#ten-comic-root) \
+.ten-path-sanitize-setting > div { min-width: 0; }\n:where(#ten-comic-root) .ten-path-sanitize-setting label,\n:where(#ten-comic-root) \
+.ten-path-sanitize-setting small { display: block; }\n:where(#ten-comic-root) .ten-path-sanitize-setting small { margin-top: 3px; color: var(--ten-muted); \
+font-size: 9px; line-height: 1.4; }\n:where(#ten-comic-root) .ten-setting .ten-input { text-align: center; font-variant-numeric: tabular-nums; \
+}\n:where(#ten-comic-root) .ten-setting .ten-select { text-align: center; text-align-last: center; }\n:where(#ten-comic-root) .ten-setting-select { position: \
+relative; z-index: 12; min-width: 0; width: 100%; }\n:where(#ten-comic-root) #ten-default-mode-trigger { width: 100%; height: 36px; display: flex; align-items: \
+center; gap: 8px; padding: 0 11px; color: var(--ten-text); font: inherit; cursor: pointer; border: 1px solid rgba(137,225,255,.2); border-radius: 11px; \
+background: rgba(6,18,34,.42); box-shadow: inset 0 1px rgba(255,255,255,.045); transition: border-color .2s, box-shadow .2s, background .2s; \
+}\n:where(#ten-comic-root) #ten-default-mode-trigger:hover,\n:where(#ten-comic-root) .ten-setting-select.is-open #ten-default-mode-trigger { border-color: \
+rgba(95,246,255,.55); background: rgba(9,27,46,.58); box-shadow: 0 0 0 3px rgba(95,246,255,.08), inset 0 1px rgba(255,255,255,.07); }\n:where(#ten-comic-root) \
+#ten-default-mode-label { min-width: 0; flex: 1; text-align: center; }\n:where(#ten-comic-root) .ten-setting-select.is-open .ten-picker-arrow { transform: \
+rotate(225deg) translate(-1px,-1px); }\n:where(#ten-comic-root) .ten-setting-select-menu { position: absolute; z-index: 45; top: 42px; right: 0; left: 0; \
+padding: 6px; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); box-shadow: \
+var(--ten-tooltip-shadow); backdrop-filter: blur(24px) saturate(1.35); animation: ten-picker-in .22s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) \
+.ten-setting-select-menu[hidden] { display: none !important; }\n:where(#ten-comic-root) .ten-setting-select-menu button { width: 100%; min-height: 43px; \
+display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: center; gap: 8px; padding: 6px 8px; color: var(--ten-text); font: inherit; text-align: \
+left; cursor: pointer; border: 1px solid transparent; border-radius: 9px; background: transparent; transition: border-color .18s, background .18s, transform \
+.18s; }\n:where(#ten-comic-root) .ten-setting-select-menu button + button { margin-top: 3px; }\n:where(#ten-comic-root) .ten-setting-select-menu button:hover { \
+border-color: rgba(95,246,255,.2); background: rgba(95,246,255,.08); transform: translateX(2px); }\n:where(#ten-comic-root) .ten-setting-select-menu \
+button.is-selected { border-color: rgba(95,246,255,.28); background: linear-gradient(100deg, rgba(95,246,255,.13), rgba(156,108,255,.09)); \
+}\n:where(#ten-comic-root) .ten-setting-select-menu button > span:last-child { min-width: 0; display: grid; gap: 1px; }\n:where(#ten-comic-root) \
+.ten-setting-select-menu strong { font-size: 11px; font-weight: 700; }\n:where(#ten-comic-root) .ten-setting-select-menu small { color: var(--ten-muted); \
+font-size: 9px; }\n:where(#ten-comic-root) .ten-mode-option-mark { width: 10px; height: 10px; border: 1px solid rgba(137,225,255,.35); border-radius: 50%; \
+box-shadow: inset 0 0 0 2px rgba(7,18,34,.9); transition: background .18s, box-shadow .18s; }\n:where(#ten-comic-root) .ten-setting-select-menu \
+button.is-selected .ten-mode-option-mark { background: var(--ten-cyan); box-shadow: 0 0 10px rgba(95,246,255,.48), inset 0 0 0 2px rgba(7,18,34,.82); \
+}\n:where(#ten-comic-root) .ten-setting input[type="checkbox"] { justify-self: end; accent-color: var(--ten-cyan); width: 18px; height: 18px; \
+}\n:where(#ten-comic-root) .ten-setting input[type="range"] { width: 100%; accent-color: var(--ten-cyan); }\n:where(#ten-comic-root) .ten-setting-value { color: \
+var(--ten-cyan); font-variant-numeric: tabular-nums; text-align: right; }\n:where(#ten-comic-root) .ten-grid-2 { display: grid; grid-template-columns: \
+repeat(2,minmax(0,1fr)); gap: 7px; }\n:where(#ten-comic-root) .ten-toast { position: absolute; z-index: 20; left: 50%; bottom: 78px; max-width: 86%; display: \
+flex; align-items: center; gap: 8px; padding: 9px 10px 9px 13px; color: var(--ten-toast-text); border: 1px solid var(--ten-toast-border); border-radius: \
+var(--ten-radius-control); background: var(--ten-toast-bg); box-shadow: var(--ten-tooltip-shadow); transform: translate(-50%,12px); opacity: 0; pointer-events: \
+none; transition: .22s; }\n:where(#ten-comic-root) .ten-toast.is-show { transform: translate(-50%,0); opacity: 1; }\n:where(#ten-comic-root) #ten-toast-text { \
+min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-toast button { flex: 0 0 auto; min-height: 27px; \
+padding: 4px 9px; color: var(--ten-cyan); font: inherit; font-size: 10px; font-weight: 700; cursor: pointer; pointer-events: auto; border: 1px solid \
+var(--ten-control-border); border-radius: 8px; background: var(--ten-control-hover-bg); }\n:where(#ten-comic-root) .ten-toast button[hidden] { display: none; \
+}\n:where(#ten-comic-root) .ten-confirm { position: absolute; z-index: 50; inset: 0; display: grid; place-items: center; padding: 22px; visibility: hidden; \
+opacity: 0; pointer-events: none; transition: opacity .24s ease, visibility .24s; }\n:where(#ten-comic-root) .ten-confirm.is-open { visibility: visible; \
+opacity: 1; pointer-events: auto; }\n:where(#ten-comic-root) .ten-confirm-backdrop { position: absolute; inset: 0; padding: 0; cursor: default; border: 0; \
+background: var(--ten-overlay-bg); backdrop-filter: blur(7px); }\n:where(#ten-comic-root) .ten-confirm-dialog { position: relative; width: min(310px,100%); \
+padding: 18px; text-align: center; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); background: var(--ten-popover-bg); \
+box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.96); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) \
+.ten-confirm.is-open .ten-confirm-dialog { transform: translateY(0) scale(1); }\n:where(#ten-comic-root) .ten-confirm-icon { width: 42px; height: 42px; display: \
+grid; place-items: center; margin: 0 auto 10px; color: #ff9aac; border: 1px solid rgba(255,97,116,.3); border-radius: 14px; background: rgba(255,97,116,.11); \
+box-shadow: 0 0 22px rgba(255,97,116,.1); }\n:where(#ten-comic-root) .ten-confirm-title { margin-bottom: 6px; font-size: 14px; font-weight: 750; \
+}\n:where(#ten-comic-root) .ten-confirm-message { min-height: 34px; color: #c5d8e5; font-size: 11px; line-height: 1.55; word-break: break-word; \
+}\n:where(#ten-comic-root) .ten-confirm-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; \
+}\n:where(#ten-comic-root) .ten-diagnostic { position: absolute; z-index: 51; inset: 0; display: grid; place-items: center; padding: 18px; visibility: hidden; \
+opacity: 0; pointer-events: none; transition: opacity .24s ease, visibility .24s; }\n:where(#ten-comic-root) .ten-diagnostic.is-open { visibility: visible; \
+opacity: 1; pointer-events: auto; }\n:where(#ten-comic-root) .ten-diagnostic-dialog { position: relative; width: 100%; max-height: 78%; display: grid; \
+grid-template-rows: auto minmax(0,1fr) auto; gap: 11px; padding: 15px; border: 1px solid var(--ten-panel-border); border-radius: var(--ten-radius-card); \
+background: var(--ten-popover-bg); box-shadow: var(--ten-tooltip-shadow); transform: translateY(10px) scale(.97); transition: transform .28s \
+cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) .ten-diagnostic.is-open .ten-diagnostic-dialog { transform: translateY(0) scale(1); \
+}\n:where(#ten-comic-root) .ten-diagnostic-head { display: grid; grid-template-columns: 42px minmax(0,1fr) 34px; align-items: center; gap: 10px; text-align: \
+left; }\n:where(#ten-comic-root) .ten-diagnostic-head .ten-confirm-icon { margin: 0; }\n:where(#ten-comic-root) .ten-confirm-icon.is-info { color: \
+var(--ten-cyan); border-color: rgba(95,246,255,.3); background: rgba(95,246,255,.1); box-shadow: 0 0 22px rgba(95,246,255,.1); }\n:where(#ten-comic-root) \
 #ten-diagnostic-content { min-height: 140px; margin: 0; padding: 11px; overflow: auto; color: #c9dce8; font: 10px/1.65 ui-monospace, SFMono-Regular, Consolas, \
 monospace; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(137,225,255,.16); border-radius: 12px; background: rgba(3,13,27,.52); \
-scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n#ten-comic-root .ten-diagnostic-actions { display: grid; grid-template-columns: \
-repeat(auto-fit,minmax(88px,1fr)); gap: 8px; }\n#ten-comic-root .ten-rule-guide-dialog { position: absolute; inset: 18px; width: auto; max-height: none; \
-overflow: hidden; }\n#ten-comic-root .ten-rule-guide-content { min-height: 0; padding-right: 4px; overflow-y: auto; color: #c9dce8; font-size: 10px; \
-line-height: 1.65; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n#ten-comic-root .ten-rule-guide-content section { padding: 9px \
-10px; border: 1px solid rgba(137,225,255,.13); border-radius: 11px; background: rgba(3,13,27,.34); }\n#ten-comic-root .ten-rule-guide-content section + section \
-{ margin-top: 7px; }\n#ten-comic-root .ten-rule-guide-content h3 { margin: 0 0 5px; color: var(--ten-cyan); font-size: 10px; letter-spacing: .04em; \
-}\n#ten-comic-root .ten-rule-guide-content ol,\n#ten-comic-root .ten-rule-guide-content ul { margin: 0; padding-left: 18px; }\n#ten-comic-root \
-.ten-rule-guide-content li + li { margin-top: 3px; }\n#ten-comic-root .ten-rule-guide-content dl { display: grid; grid-template-columns: 78px minmax(0,1fr); \
-gap: 4px 7px; margin: 0; }\n#ten-comic-root .ten-rule-guide-content dt { color: var(--ten-text); font-weight: 700; }\n#ten-comic-root .ten-rule-guide-content dd \
-{ margin: 0; }\n#ten-comic-root .ten-rule-guide-content code { padding: 1px 4px; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.13); border-radius: \
-5px; background: rgba(95,246,255,.06); font: 9px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }\n#ten-comic-root .ten-rule-guide-example > code { \
-display: block; padding: 7px 8px; color: #bffbff; border-radius: 8px; background: rgba(2,10,22,.46); }\n#ten-comic-root .ten-rule-guide-warning { margin-top: \
-8px; padding: 7px 9px; color: #ffd0d9; border: 1px solid rgba(255,97,116,.24); border-radius: 9px; background: rgba(255,97,116,.08); }\n#ten-comic-root \
-.ten-task-card,\n#ten-comic-root .ten-history-card { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; contain: paint; cursor: \
-default; transform: none !important; transition: border-color .24s ease, background-color .24s ease, box-shadow .24s ease; }\n#ten-comic-root \
-.ten-task-card:hover,\n#ten-comic-root .ten-history-card:hover { border-color: rgba(95,246,255,.3); background: rgba(27,46,70,.52); box-shadow: inset 0 1px \
-rgba(255,255,255,.04); transform: none; }\n#ten-comic-root .ten-task-card .ten-name,\n#ten-comic-root .ten-history-card .ten-name { min-width: 0; width: 100%; \
-}\n#ten-comic-root .ten-task-actions { min-width: max-content; flex: 0 0 auto; display: flex; align-items: center; gap: 1px; }\n#ten-comic-root \
-.ten-task-actions .ten-icon-btn { width: 29px; height: 29px; border-radius: 9px; }\n#ten-comic-root .ten-task-actions .ten-icon-btn.is-danger { color: #ff9aac; \
-}\n#ten-comic-root .ten-task-actions .ten-icon-btn:focus-visible { outline: 2px solid var(--ten-cyan); outline-offset: 1px; }\n#ten-comic-root .ten-task-actions \
-.ten-icon-btn:disabled { opacity: .24; cursor: default; }\n#ten-comic-root .ten-history-card .ten-task-actions .ten-icon-btn { width: 27px; height: 27px; \
-}\n#ten-comic-root .ten-history-wrap { gap: 7px; }\n#ten-comic-root .ten-history-filter { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: \
-4px; padding: 3px; border: 1px solid rgba(137,225,255,.12); border-radius: 11px; background: rgba(3,14,28,.3); }\n#ten-comic-root .ten-history-filter button { \
-min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; font-size: 9px; cursor: pointer; border: 1px solid transparent; \
-border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, background .18s; }\n#ten-comic-root .ten-history-filter button:hover { \
-color: var(--ten-text); background: rgba(95,246,255,.05); }\n#ten-comic-root .ten-history-filter button.is-active { color: var(--ten-cyan); border-color: \
-rgba(95,246,255,.24); background: linear-gradient(145deg,rgba(95,246,255,.11),rgba(156,108,255,.09)); }\n#ten-comic-root .ten-recovery { margin-bottom: 9px; \
-padding: 10px 11px; display: flex; align-items: center; justify-content: space-between; gap: 9px; border: 1px solid rgba(95,246,255,.28); border-radius: 14px; \
-background: linear-gradient(145deg,rgba(35,73,91,.72),rgba(59,48,91,.68)); box-shadow: inset 0 1px rgba(255,255,255,.08); }\n#ten-comic-root \
-.ten-recovery[hidden] { display: none; }\n#ten-comic-root .ten-recovery > div:first-child { min-width: 0; display: grid; gap: 2px; }\n#ten-comic-root \
-.ten-recovery strong { color: var(--ten-text); font-size: 11px; }\n#ten-comic-root .ten-recovery span { color: var(--ten-muted); font-size: 9px; \
-}\n#ten-comic-root .ten-recovery .ten-btn { min-height: 30px; padding: 5px 9px; }\n#ten-comic-root .ten-task-state { padding: 1px 6px; border: 1px solid \
-rgba(137,225,255,.18); border-radius: 999px; font-size: 9px; }\n#ten-comic-root .ten-task-state.is-failed,\n#ten-comic-root .ten-task-state.is-partial { color: \
-#ff9aac; border-color: rgba(255,97,116,.25); background: rgba(255,97,116,.08); }\n#ten-comic-root .ten-task-state.is-cancelled { color: #b4c2ce; \
-}\n#ten-comic-root .ten-task-state.is-completed { color: var(--ten-cyan); }\n#ten-comic-root .ten-search-results { margin-top: 10px; }\n#ten-comic-root \
-.ten-result-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(100px,1fr)); gap: 8px; }\n#ten-comic-root .ten-result { padding: 6px; overflow: \
-hidden; color: var(--ten-text); cursor: pointer; border: 1px solid var(--ten-line); border-radius: 12px; background: var(--ten-surface); }\n#ten-comic-root \
-.ten-result img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; background: rgba(255,255,255,.05); }\n#ten-comic-root .ten-result span \
-{ display: block; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }\n#ten-comic-root .ten-section-title { \
-margin: 13px 2px 7px; color: var(--ten-muted); font-size: 10px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }\n#ten-comic-root \
-.ten-file-name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ten-muted); font-size: 10px; }\n#ten-comic-root \
-.ten-dir-control { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }\n#ten-comic-root .ten-dir-control .ten-btn { flex: 0 \
-0 auto; margin: 0; }\n#ten-comic-root .ten-dir-control .ten-file-name { flex: 1 1 auto; max-width: 92px; text-align: left; }\n#ten-comic-root .ten-settings-hint \
-{ color: var(--ten-muted); font-size: 9px; line-height: 1.5; text-align: right; }\n#ten-comic-root .ten-rule-fields { display: grid; gap: 8px; \
-}\n#ten-comic-root .ten-rule-fields label { min-width: 0; display: grid; gap: 4px; color: #c9dce8; font-size: 10px; }\n#ten-comic-root .ten-rule-fields \
-.ten-input { height: 34px; text-align: left; }\n#ten-comic-root .ten-rule-intro { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; \
-margin-bottom: 9px; padding: 8px 10px; color: var(--ten-muted); font-size: 9px; line-height: 1.45; border: 1px solid var(--ten-card-border); border-radius: \
-var(--ten-radius-control); background: var(--ten-list-bg); }\n#ten-comic-root .ten-rule-intro strong { color: var(--ten-cyan); font-size: 10px; white-space: \
-nowrap; }\n#ten-comic-root .ten-rule-pick-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin: 0 0 8px; }\n#ten-comic-root \
-.ten-rule-templates { margin: 0 0 8px; overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: \
-var(--ten-list-bg); }\n#ten-comic-root .ten-rule-templates summary { display: flex; align-items: center; gap: 8px; padding: 9px 10px; color: var(--ten-text); \
-font-size: 10px; cursor: pointer; list-style: none; }\n#ten-comic-root .ten-rule-templates summary::-webkit-details-marker { display: none; }\n#ten-comic-root \
-.ten-rule-templates summary::after { content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid \
-currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .2s; }\n#ten-comic-root .ten-rule-templates summary span { margin-left: auto; \
-overflow: hidden; color: var(--ten-muted); font-size: 9px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-templates[open] summary { \
-color: var(--ten-cyan); border-bottom: 1px solid var(--ten-card-border); }\n#ten-comic-root .ten-rule-templates[open] summary::after { transform: rotate(225deg) \
-translate(-1px,-1px); }\n#ten-comic-root .ten-rule-template-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; padding: 8px; \
-animation: ten-picker-in .22s ease both; }\n#ten-comic-root .ten-rule-template-grid button { min-width: 0; min-height: 48px; display: grid; align-content: \
-center; gap: 2px; padding: 7px 8px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-control-border); \
-border-radius: var(--ten-radius-control); background: var(--ten-input-bg); transition: border-color .18s, background .18s, transform .18s; }\n#ten-comic-root \
-.ten-rule-template-grid button:hover,\n#ten-comic-root .ten-rule-template-grid button.is-active { color: var(--ten-cyan); border-color: var(--ten-cyan); \
-background: var(--ten-control-hover-bg); transform: translateY(-1px); }\n#ten-comic-root .ten-rule-template-grid strong { overflow: hidden; font-size: 10px; \
-white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-rule-template-grid small { overflow: hidden; color: var(--ten-muted); font-size: 8px; \
-white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-mobile-drawer { display: none; }\n#ten-comic-root .ten-rule-pick-actions button { \
-min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 7px; color: var(--ten-text); font: inherit; \
-font-size: 9px; cursor: pointer; border: 1px solid var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); \
-}\n#ten-comic-root .ten-rule-pick-actions button .ten-icon { width: 14px; height: 14px; color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-pick-actions \
-button:hover { color: var(--ten-cyan); border-color: rgba(95,246,255,.42); background: rgba(95,246,255,.09); box-shadow: inset 0 1px rgba(255,255,255,.06); \
-}\n#ten-comic-root .ten-rule-guide-open { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; color: var(--ten-cyan); font: \
-inherit; font-size: 9px; cursor: pointer; border: 1px solid rgba(95,246,255,.2); border-radius: 9px; background: rgba(95,246,255,.07); transition: transform \
-.18s, border-color .18s, background .18s, box-shadow .18s; }\n#ten-comic-root .ten-rule-guide-open .ten-icon { width: 15px; height: 15px; }\n#ten-comic-root \
-.ten-rule-guide-open:hover { transform: translateY(-1px); border-color: rgba(95,246,255,.5); background: rgba(95,246,255,.12); box-shadow: 0 6px 16px \
-rgba(5,25,43,.14); }\n#ten-comic-root .ten-rule-simple-hint { margin-top: -3px; color: var(--ten-muted); font-size: 9px; line-height: 1.45; }\n#ten-comic-root \
-.ten-rule-advanced { overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); \
-}\n#ten-comic-root .ten-rule-advanced summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; color: #c9dce8; \
-font-size: 10px; cursor: pointer; list-style: none; }\n#ten-comic-root .ten-rule-advanced summary::-webkit-details-marker { display: none; }\n#ten-comic-root \
-.ten-rule-advanced summary::after { content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid \
-currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .25s ease; }\n#ten-comic-root .ten-rule-advanced[open] summary { color: \
-var(--ten-cyan); border-bottom: 1px solid rgba(137,225,255,.12); }\n#ten-comic-root .ten-rule-advanced[open] summary::after { transform: rotate(225deg) \
-translate(-1px,-1px); }\n#ten-comic-root .ten-rule-advanced summary span,\n#ten-comic-root .ten-rule-json summary span { margin-left: auto; color: \
-var(--ten-muted); font-size: 9px; font-weight: 400; }\n#ten-comic-root .ten-rule-advanced-body { display: grid; gap: 8px; padding: 9px; animation: ten-picker-in \
-.24s ease both; }\n#ten-comic-root .ten-rule-frame { min-height: 34px; padding: 0 2px; }\n#ten-comic-root .ten-rule-function { min-height: 96px; font: 9px/1.55 \
-ui-monospace, SFMono-Regular, Consolas, monospace; }\n#ten-comic-root .ten-rule-label { display: block; margin-bottom: 4px; color: #c9dce8; font-size: 10px; \
-}\n#ten-comic-root .ten-rule-readtype { --rule-type: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); padding: 3px; border-radius: \
-11px; background: rgba(3,14,28,.38); }\n#ten-comic-root .ten-rule-readtype::before { content: ""; position: absolute; inset: 3px 50% 3px 3px; border: 1px solid \
-rgba(95,246,255,.25); border-radius: 8px; background: linear-gradient(145deg, rgba(95,246,255,.14), rgba(156,108,255,.12)); transform: \
-translateX(calc(var(--rule-type)*100%)); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n#ten-comic-root .ten-rule-readtype button { position: \
-relative; z-index: 1; min-height: 30px; color: var(--ten-muted); font: inherit; font-size: 10px; cursor: pointer; border: 0; background: transparent; \
-}\n#ten-comic-root .ten-rule-readtype button.is-active { color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-test-result { margin-top: 9px; padding: 9px; \
-color: #c9dce8; font: 9px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; border: 1px solid rgba(137,225,255,.18); border-radius: \
-10px; background: rgba(3,14,28,.4); }\n#ten-comic-root .ten-rule-test-result.is-success { color: #a9fff0; border-color: rgba(95,246,255,.3); }\n#ten-comic-root \
-.ten-rule-test-result.is-error { color: #ffc0cb; border-color: rgba(255,97,116,.3); }\n#ten-comic-root .ten-rule-actions { display: grid; grid-template-columns: \
-repeat(auto-fit,minmax(88px,1fr)); gap: 7px; margin-top: 9px; }\n#ten-comic-root .ten-backup-actions { display: grid; grid-template-columns: \
-repeat(2,minmax(0,1fr)); gap: 7px; margin-bottom: 7px; }\n#ten-comic-root .ten-rule-json { margin-top: 10px; border-top: 1px solid rgba(137,225,255,.13); \
-}\n#ten-comic-root .ten-rule-json summary { padding: 9px 2px 7px; color: var(--ten-muted); font-size: 10px; cursor: pointer; }\n#ten-comic-root \
-.ten-rule-json[open] summary { color: var(--ten-cyan); }\n#ten-comic-root .ten-rule-json .ten-textarea { min-height: 96px; }\n#ten-comic-root .ten-rule-json \
-.ten-btn { width: 100%; margin-top: 7px; }\n@keyframes ten-particle { from { transform: translate3d(0,0,0) scale(.7); opacity: .15; } to { transform: \
-translate3d(var(--tx),var(--ty),0) scale(1.2); opacity: .7; } }\n@keyframes ten-launcher-orbit { to { transform: rotate(360deg); } }\n@keyframes ten-view-in { \
-from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }\n@keyframes ten-ripple { to { transform: scale(4); opacity: 0; } \
-}\n@keyframes ten-picker-in { from { opacity: 0; transform: translateY(-7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }\n@keyframes \
-ten-energy-flow { to { transform: translateX(340%); } }\n@keyframes ten-state-scan { from { left: -42%; opacity: 0; } 24% { opacity: 1; } to { left: 108%; \
-opacity: 0; } }\n@keyframes ten-state-border { 0% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } 35% { box-shadow: 0 0 18px rgba(var(--ten-state-rgb),.18), \
-inset 0 0 12px rgba(var(--ten-state-rgb),.06); } 100% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } }\n@media (max-width: 560px), (max-height: 720px) \
-{\n\n  #ten-comic-root #ten-panel { right: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n  #ten-comic-root \
-#ten-comic-launcher { right: 8px; }\n  #ten-comic-root .ten-mobile-drawer { position: fixed; z-index: 2147483647; inset: 0; display: block; visibility: hidden; \
-pointer-events: none; }\n  #ten-comic-root .ten-mobile-drawer.is-open { visibility: visible; pointer-events: auto; }\n  #ten-comic-root \
+scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n:where(#ten-comic-root) .ten-diagnostic-actions { display: grid; \
+grid-template-columns: repeat(auto-fit,minmax(88px,1fr)); gap: 8px; }\n:where(#ten-comic-root) .ten-rule-guide-dialog { position: absolute; inset: 18px; width: \
+auto; max-height: none; overflow: hidden; }\n:where(#ten-comic-root) .ten-rule-guide-content { min-height: 0; padding-right: 4px; overflow-y: auto; color: \
+#c9dce8; font-size: 10px; line-height: 1.65; scrollbar-width: thin; scrollbar-color: rgba(95,246,255,.34) transparent; }\n:where(#ten-comic-root) \
+.ten-rule-guide-content section { padding: 9px 10px; border: 1px solid rgba(137,225,255,.13); border-radius: 11px; background: rgba(3,13,27,.34); \
+}\n:where(#ten-comic-root) .ten-rule-guide-content section + section { margin-top: 7px; }\n:where(#ten-comic-root) .ten-rule-guide-content h3 { margin: 0 0 5px; \
+color: var(--ten-cyan); font-size: 10px; letter-spacing: .04em; }\n:where(#ten-comic-root) .ten-rule-guide-content ol,\n:where(#ten-comic-root) \
+.ten-rule-guide-content ul { margin: 0; padding-left: 18px; }\n:where(#ten-comic-root) .ten-rule-guide-content li + li { margin-top: 3px; \
+}\n:where(#ten-comic-root) .ten-rule-guide-content dl { display: grid; grid-template-columns: 78px minmax(0,1fr); gap: 4px 7px; margin: 0; \
+}\n:where(#ten-comic-root) .ten-rule-guide-content dt { color: var(--ten-text); font-weight: 700; }\n:where(#ten-comic-root) .ten-rule-guide-content dd { \
+margin: 0; }\n:where(#ten-comic-root) .ten-rule-guide-content code { padding: 1px 4px; color: var(--ten-cyan); border: 1px solid rgba(95,246,255,.13); \
+border-radius: 5px; background: rgba(95,246,255,.06); font: 9px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }\n:where(#ten-comic-root) \
+.ten-rule-guide-example > code { display: block; padding: 7px 8px; color: #bffbff; border-radius: 8px; background: rgba(2,10,22,.46); }\n:where(#ten-comic-root) \
+.ten-rule-guide-warning { margin-top: 8px; padding: 7px 9px; color: #ffd0d9; border: 1px solid rgba(255,97,116,.24); border-radius: 9px; background: \
+rgba(255,97,116,.08); }\n:where(#ten-comic-root) .ten-task-card,\n:where(#ten-comic-root) .ten-history-card { min-width: 0; display: grid; \
+grid-template-columns: minmax(0,1fr) auto; gap: 7px; contain: paint; cursor: default; transform: none !important; transition: border-color .24s ease, \
+background-color .24s ease, box-shadow .24s ease; }\n:where(#ten-comic-root) .ten-task-card:hover,\n:where(#ten-comic-root) .ten-history-card:hover { \
+border-color: rgba(95,246,255,.3); background: rgba(27,46,70,.52); box-shadow: inset 0 1px rgba(255,255,255,.04); transform: none; }\n:where(#ten-comic-root) \
+.ten-task-card .ten-name,\n:where(#ten-comic-root) .ten-history-card .ten-name { min-width: 0; width: 100%; }\n:where(#ten-comic-root) .ten-task-actions { \
+min-width: max-content; flex: 0 0 auto; display: flex; align-items: center; gap: 1px; }\n:where(#ten-comic-root) .ten-task-actions .ten-icon-btn { width: 29px; \
+height: 29px; border-radius: 9px; }\n:where(#ten-comic-root) .ten-task-actions .ten-icon-btn.is-danger { color: #ff9aac; }\n:where(#ten-comic-root) \
+.ten-task-actions .ten-icon-btn:focus-visible { outline: 2px solid var(--ten-cyan); outline-offset: 1px; }\n:where(#ten-comic-root) .ten-task-actions \
+.ten-icon-btn:disabled { opacity: .24; cursor: default; }\n:where(#ten-comic-root) .ten-history-card .ten-task-actions .ten-icon-btn { width: 27px; height: \
+27px; }\n:where(#ten-comic-root) .ten-history-wrap { gap: 7px; }\n:where(#ten-comic-root) .ten-history-filter { display: grid; grid-template-columns: \
+repeat(4,minmax(0,1fr)); gap: 4px; padding: 3px; border: 1px solid rgba(137,225,255,.12); border-radius: 11px; background: rgba(3,14,28,.3); \
+}\n:where(#ten-comic-root) .ten-history-filter button { min-width: 0; min-height: 29px; padding: 3px 5px; color: var(--ten-muted); font: inherit; font-size: \
+9px; cursor: pointer; border: 1px solid transparent; border-radius: 8px; background: transparent; transition: color .18s, border-color .18s, background .18s; \
+}\n:where(#ten-comic-root) .ten-history-filter button:hover { color: var(--ten-text); background: rgba(95,246,255,.05); }\n:where(#ten-comic-root) \
+.ten-history-filter button.is-active { color: var(--ten-cyan); border-color: rgba(95,246,255,.24); background: \
+linear-gradient(145deg,rgba(95,246,255,.11),rgba(156,108,255,.09)); }\n:where(#ten-comic-root) .ten-recovery { margin-bottom: 9px; padding: 10px 11px; display: \
+flex; align-items: center; justify-content: space-between; gap: 9px; border: 1px solid rgba(95,246,255,.28); border-radius: 14px; background: \
+linear-gradient(145deg,rgba(35,73,91,.72),rgba(59,48,91,.68)); box-shadow: inset 0 1px rgba(255,255,255,.08); }\n:where(#ten-comic-root) .ten-recovery[hidden] { \
+display: none; }\n:where(#ten-comic-root) .ten-recovery > div:first-child { min-width: 0; display: grid; gap: 2px; }\n:where(#ten-comic-root) .ten-recovery \
+strong { color: var(--ten-text); font-size: 11px; }\n:where(#ten-comic-root) .ten-recovery span { color: var(--ten-muted); font-size: 9px; \
+}\n:where(#ten-comic-root) .ten-recovery .ten-btn { min-height: 30px; padding: 5px 9px; }\n:where(#ten-comic-root) .ten-task-state { padding: 1px 6px; border: \
+1px solid rgba(137,225,255,.18); border-radius: 999px; font-size: 9px; }\n:where(#ten-comic-root) .ten-task-state.is-failed,\n:where(#ten-comic-root) \
+.ten-task-state.is-partial { color: #ff9aac; border-color: rgba(255,97,116,.25); background: rgba(255,97,116,.08); }\n:where(#ten-comic-root) \
+.ten-task-state.is-cancelled { color: #b4c2ce; }\n:where(#ten-comic-root) .ten-task-state.is-completed { color: var(--ten-cyan); }\n:where(#ten-comic-root) \
+.ten-search-results { margin-top: 10px; }\n:where(#ten-comic-root) .ten-result-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(100px,1fr)); \
+gap: 8px; }\n:where(#ten-comic-root) .ten-result { padding: 6px; overflow: hidden; color: var(--ten-text); cursor: pointer; border: 1px solid var(--ten-line); \
+border-radius: 12px; background: var(--ten-surface); }\n:where(#ten-comic-root) .ten-result img { width: 100%; aspect-ratio: 2/3; object-fit: cover; \
+border-radius: 8px; background: rgba(255,255,255,.05); }\n:where(#ten-comic-root) .ten-result span { display: block; margin-top: 5px; overflow: hidden; \
+white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }\n:where(#ten-comic-root) .ten-section-title { margin: 13px 2px 7px; color: var(--ten-muted); \
+font-size: 10px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }\n:where(#ten-comic-root) .ten-file-name { min-width: 0; overflow: hidden; \
+white-space: nowrap; text-overflow: ellipsis; color: var(--ten-muted); font-size: 10px; }\n:where(#ten-comic-root) .ten-dir-control { min-width: 0; display: \
+flex; align-items: center; justify-content: flex-end; gap: 8px; }\n:where(#ten-comic-root) .ten-dir-control .ten-btn { flex: 0 0 auto; margin: 0; \
+}\n:where(#ten-comic-root) .ten-dir-control .ten-file-name { flex: 1 1 auto; max-width: 92px; text-align: left; }\n:where(#ten-comic-root) .ten-settings-hint { \
+color: var(--ten-muted); font-size: 9px; line-height: 1.5; text-align: right; }\n:where(#ten-comic-root) .ten-rule-fields { display: grid; gap: 8px; \
+}\n:where(#ten-comic-root) .ten-rule-fields label { min-width: 0; display: grid; gap: 4px; color: #c9dce8; font-size: 10px; }\n:where(#ten-comic-root) \
+.ten-rule-fields .ten-input { height: 34px; text-align: left; }\n:where(#ten-comic-root) .ten-rule-intro { display: grid; grid-template-columns: auto 1fr; \
+align-items: center; gap: 8px; margin-bottom: 9px; padding: 8px 10px; color: var(--ten-muted); font-size: 9px; line-height: 1.45; border: 1px solid \
+var(--ten-card-border); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); }\n:where(#ten-comic-root) .ten-rule-intro strong { color: \
+var(--ten-cyan); font-size: 10px; white-space: nowrap; }\n:where(#ten-comic-root) .ten-rule-pick-actions { display: grid; grid-template-columns: \
+repeat(3,minmax(0,1fr)); gap: 7px; margin: 0 0 8px; }\n:where(#ten-comic-root) .ten-rule-templates { margin: 0 0 8px; overflow: hidden; border: 1px solid \
+var(--ten-card-border); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); }\n:where(#ten-comic-root) .ten-rule-templates summary { \
+display: flex; align-items: center; gap: 8px; padding: 9px 10px; color: var(--ten-text); font-size: 10px; cursor: pointer; list-style: none; \
+}\n:where(#ten-comic-root) .ten-rule-templates summary::-webkit-details-marker { display: none; }\n:where(#ten-comic-root) .ten-rule-templates summary::after { \
+content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) \
+translateY(-2px); transition: transform .2s; }\n:where(#ten-comic-root) .ten-rule-templates summary span { margin-left: auto; overflow: hidden; color: \
+var(--ten-muted); font-size: 9px; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-rule-templates[open] summary { color: \
+var(--ten-cyan); border-bottom: 1px solid var(--ten-card-border); }\n:where(#ten-comic-root) .ten-rule-templates[open] summary::after { transform: \
+rotate(225deg) translate(-1px,-1px); }\n:where(#ten-comic-root) .ten-rule-template-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: \
+6px; padding: 8px; animation: ten-picker-in .22s ease both; }\n:where(#ten-comic-root) .ten-rule-template-grid button { min-width: 0; min-height: 48px; display: \
+grid; align-content: center; gap: 2px; padding: 7px 8px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid \
+var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); transition: border-color .18s, background .18s, transform \
+.18s; }\n:where(#ten-comic-root) .ten-rule-template-grid button:hover,\n:where(#ten-comic-root) .ten-rule-template-grid button.is-active { color: \
+var(--ten-cyan); border-color: var(--ten-cyan); background: var(--ten-control-hover-bg); transform: translateY(-1px); }\n:where(#ten-comic-root) \
+.ten-rule-template-grid strong { overflow: hidden; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) \
+.ten-rule-template-grid small { overflow: hidden; color: var(--ten-muted); font-size: 8px; white-space: nowrap; text-overflow: ellipsis; \
+}\n:where(#ten-comic-root) .ten-mobile-drawer { display: none; }\n:where(#ten-comic-root) .ten-rule-pick-actions button { min-height: 32px; display: \
+inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 7px; color: var(--ten-text); font: inherit; font-size: 9px; cursor: pointer; \
+border: 1px solid var(--ten-control-border); border-radius: var(--ten-radius-control); background: var(--ten-input-bg); }\n:where(#ten-comic-root) \
+.ten-rule-pick-actions button .ten-icon { width: 14px; height: 14px; color: var(--ten-cyan); }\n:where(#ten-comic-root) .ten-rule-pick-actions button:hover { \
+color: var(--ten-cyan); border-color: rgba(95,246,255,.42); background: rgba(95,246,255,.09); box-shadow: inset 0 1px rgba(255,255,255,.06); \
+}\n:where(#ten-comic-root) .ten-rule-guide-open { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; color: \
+var(--ten-cyan); font: inherit; font-size: 9px; cursor: pointer; border: 1px solid rgba(95,246,255,.2); border-radius: 9px; background: rgba(95,246,255,.07); \
+transition: transform .18s, border-color .18s, background .18s, box-shadow .18s; }\n:where(#ten-comic-root) .ten-rule-guide-open .ten-icon { width: 15px; \
+height: 15px; }\n:where(#ten-comic-root) .ten-rule-guide-open:hover { transform: translateY(-1px); border-color: rgba(95,246,255,.5); background: \
+rgba(95,246,255,.12); box-shadow: 0 6px 16px rgba(5,25,43,.14); }\n:where(#ten-comic-root) .ten-rule-simple-hint { margin-top: -3px; color: var(--ten-muted); \
+font-size: 9px; line-height: 1.45; }\n:where(#ten-comic-root) .ten-rule-advanced { overflow: hidden; border: 1px solid var(--ten-card-border); border-radius: \
+var(--ten-radius-control); background: var(--ten-input-bg); }\n:where(#ten-comic-root) .ten-rule-advanced summary { display: flex; align-items: center; \
+justify-content: space-between; gap: 8px; padding: 9px 10px; color: #c9dce8; font-size: 10px; cursor: pointer; list-style: none; }\n:where(#ten-comic-root) \
+.ten-rule-advanced summary::-webkit-details-marker { display: none; }\n:where(#ten-comic-root) .ten-rule-advanced summary::after { content: ""; width: 6px; \
+height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); \
+transition: transform .25s ease; }\n:where(#ten-comic-root) .ten-rule-advanced[open] summary { color: var(--ten-cyan); border-bottom: 1px solid \
+rgba(137,225,255,.12); }\n:where(#ten-comic-root) .ten-rule-advanced[open] summary::after { transform: rotate(225deg) translate(-1px,-1px); \
+}\n:where(#ten-comic-root) .ten-rule-advanced summary span,\n:where(#ten-comic-root) .ten-rule-json summary span { margin-left: auto; color: var(--ten-muted); \
+font-size: 9px; font-weight: 400; }\n:where(#ten-comic-root) .ten-rule-advanced-body { display: grid; gap: 8px; padding: 9px; animation: ten-picker-in .24s ease \
+both; }\n:where(#ten-comic-root) .ten-rule-frame { min-height: 34px; padding: 0 2px; }\n:where(#ten-comic-root) .ten-rule-function { min-height: 96px; font: \
+9px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }\n:where(#ten-comic-root) .ten-rule-label { display: block; margin-bottom: 4px; color: #c9dce8; \
+font-size: 10px; }\n:where(#ten-comic-root) .ten-rule-readtype { --rule-type: 0; position: relative; display: grid; grid-template-columns: repeat(2,1fr); \
+padding: 3px; border-radius: 11px; background: rgba(3,14,28,.38); }\n:where(#ten-comic-root) .ten-rule-readtype::before { content: ""; position: absolute; \
+inset: 3px 50% 3px 3px; border: 1px solid rgba(95,246,255,.25); border-radius: 8px; background: linear-gradient(145deg, rgba(95,246,255,.14), \
+rgba(156,108,255,.12)); transform: translateX(calc(var(--rule-type)*100%)); transition: transform .28s cubic-bezier(.22,1,.36,1); }\n:where(#ten-comic-root) \
+.ten-rule-readtype button { position: relative; z-index: 1; min-height: 30px; color: var(--ten-muted); font: inherit; font-size: 10px; cursor: pointer; border: \
+0; background: transparent; }\n:where(#ten-comic-root) .ten-rule-readtype button.is-active { color: var(--ten-cyan); }\n:where(#ten-comic-root) \
+.ten-rule-test-result { margin-top: 9px; padding: 9px; color: #c9dce8; font: 9px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; \
+border: 1px solid rgba(137,225,255,.18); border-radius: 10px; background: rgba(3,14,28,.4); }\n:where(#ten-comic-root) .ten-rule-test-result.is-success { color: \
+#a9fff0; border-color: rgba(95,246,255,.3); }\n:where(#ten-comic-root) .ten-rule-test-result.is-error { color: #ffc0cb; border-color: rgba(255,97,116,.3); \
+}\n:where(#ten-comic-root) .ten-rule-actions { display: grid; grid-template-columns: repeat(auto-fit,minmax(88px,1fr)); gap: 7px; margin-top: 9px; \
+}\n:where(#ten-comic-root) .ten-backup-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; margin-bottom: 7px; \
+}\n:where(#ten-comic-root) .ten-rule-json { margin-top: 10px; border-top: 1px solid rgba(137,225,255,.13); }\n:where(#ten-comic-root) .ten-rule-json summary { \
+padding: 9px 2px 7px; color: var(--ten-muted); font-size: 10px; cursor: pointer; }\n:where(#ten-comic-root) .ten-rule-json[open] summary { color: \
+var(--ten-cyan); }\n:where(#ten-comic-root) .ten-rule-json .ten-textarea { min-height: 96px; }\n:where(#ten-comic-root) .ten-rule-json .ten-btn { width: 100%; \
+margin-top: 7px; }\n@keyframes ten-particle { from { transform: translate3d(0,0,0) scale(.7); opacity: .15; } to { transform: translate3d(var(--tx),var(--ty),0) \
+scale(1.2); opacity: .7; } }\n@keyframes ten-launcher-orbit { to { transform: rotate(360deg); } }\n@keyframes ten-view-in { from { opacity: 0; transform: \
+translateY(7px); } to { opacity: 1; transform: translateY(0); } }\n@keyframes ten-ripple { to { transform: scale(4); opacity: 0; } }\n@keyframes ten-picker-in { \
+from { opacity: 0; transform: translateY(-7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }\n@keyframes ten-energy-flow { to { \
+transform: translateX(340%); } }\n@keyframes ten-state-scan { from { left: -42%; opacity: 0; } 24% { opacity: 1; } to { left: 108%; opacity: 0; } }\n@keyframes \
+ten-state-border { 0% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } 35% { box-shadow: 0 0 18px rgba(var(--ten-state-rgb),.18), inset 0 0 12px \
+rgba(var(--ten-state-rgb),.06); } 100% { box-shadow: 0 0 0 rgba(var(--ten-state-rgb),0); } }\n@media (max-width: 560px), (max-height: 720px) \
+{\n:where(#ten-comic-root) #ten-panel { right: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n:where(#ten-comic-root) \
+#ten-comic-launcher { right: 8px; }\n:where(#ten-comic-root) .ten-mobile-drawer { position: fixed; z-index: 2147483647; inset: 0; display: block; visibility: \
+hidden; pointer-events: none; }\n:where(#ten-comic-root) .ten-mobile-drawer.is-open { visibility: visible; pointer-events: auto; }\n:where(#ten-comic-root) \
 .ten-mobile-drawer-backdrop { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: var(--ten-overlay-bg); backdrop-filter: blur(5px); \
-opacity: 0; transition: opacity .22s; }\n  #ten-comic-root .ten-mobile-drawer.is-open .ten-mobile-drawer-backdrop { opacity: 1; }\n  #ten-comic-root \
+opacity: 0; transition: opacity .22s; }\n:where(#ten-comic-root) .ten-mobile-drawer.is-open .ten-mobile-drawer-backdrop { opacity: 1; }\n:where(#ten-comic-root) \
 .ten-mobile-drawer-sheet { position: absolute; right: 0; bottom: 0; left: 0; max-height: min(78vh,620px); display: grid; grid-template-rows: auto auto \
 minmax(0,1fr); padding: 7px 12px 14px; overflow: hidden; border: 1px solid var(--ten-panel-border); border-radius: 22px 22px 0 0; background: \
-var(--ten-popover-bg); box-shadow: 0 -18px 48px rgba(0,5,15,.28); transform: translateY(104%); transition: transform .3s cubic-bezier(.22,1,.36,1); }\n  \
-#ten-comic-root .ten-mobile-drawer.is-open .ten-mobile-drawer-sheet { transform: translateY(0); }\n  #ten-comic-root .ten-mobile-drawer-handle { width: 34px; \
-height: 4px; margin: 0 auto 5px; border-radius: 999px; background: var(--ten-scroll-thumb); }\n  #ten-comic-root .ten-mobile-drawer-sheet header { min-height: \
-38px; display: flex; align-items: center; justify-content: space-between; color: var(--ten-text); font-size: 12px; font-weight: 750; }\n  #ten-comic-root \
-#ten-mobile-drawer-content { min-height: 0; overflow-y: auto; padding: 2px 1px; }\n  #ten-comic-root #ten-mobile-drawer-content .ten-options { max-height: none; \
-margin: 0; padding: 10px; opacity: 1; border-width: 1px; }\n  #ten-comic-root #ten-mobile-drawer-content .ten-options.is-mobile-drawer-content { background: \
-var(--ten-card-bg); }\n  #ten-comic-root #ten-mobile-drawer-content .ten-rule-advanced-body { padding: 10px; border: 1px solid var(--ten-card-border); \
-border-radius: var(--ten-radius-card); background: var(--ten-card-bg); }\n  \n}\n@media (min-width: 561px) {\n\n  #ten-comic-root .ten-mobile-drawer { display: \
-none; }\n  \n}\n@media (max-width: 1000px) {\n\n  #ten-comic-root #ten-search-panel { z-index: 2147483647; right: 8px; width: calc(100vw - 16px); height: \
-calc(100vh - 16px); border-radius: 19px; }\n  \n}\n@media (prefers-reduced-motion: reduce) {\n\n  #ten-comic-root *,\n  #ten-comic-root *::before,\n  \
-#ten-comic-root *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }\n  #ten-comic-root #ten-particle-field { display: \
-none; }\n  \n}\n#ten-comic-root .ten-theme-presets { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }\n#ten-comic-root \
-.ten-theme-choice { min-width: 0; min-height: 58px; display: grid; align-content: center; gap: 2px; padding: 8px 10px; color: var(--ten-text); font: inherit; \
-text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 13px; background: rgba(4,14,28,.36); transition: border-color .2s, \
-box-shadow .2s, transform .18s, background .2s; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="glass"] { box-shadow: inset 3px 0 #5ff6ff; \
-}\n#ten-comic-root .ten-theme-choice[data-theme-choice="mist"] { box-shadow: inset 3px 0 #78bfe8; }\n#ten-comic-root \
-.ten-theme-choice[data-theme-choice="porcelain"] { box-shadow: inset 3px 0 #b9835e; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="expressive"] { \
-box-shadow: inset 3px 0 #aa71ff; }\n#ten-comic-root .ten-theme-choice[data-theme-choice="carbon"] { box-shadow: inset 3px 0 #ff4f96; }\n#ten-comic-root \
-.ten-theme-choice[data-theme-choice="ink"] { box-shadow: inset 3px 0 #a18558; }\n#ten-comic-root .ten-theme-choice:hover { border-color: rgba(95,246,255,.46); \
-transform: translateY(-1px); }\n#ten-comic-root .ten-theme-choice[aria-pressed="true"] { color: var(--ten-cyan); border-color: var(--ten-cyan); background: \
-rgba(95,246,255,.09); box-shadow: 0 0 0 3px rgba(95,246,255,.07), inset 0 1px rgba(255,255,255,.08); }\n#ten-comic-root .ten-theme-choice strong { overflow: \
-hidden; font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root .ten-theme-choice small { overflow: hidden; color: var(--ten-muted); \
+var(--ten-popover-bg); box-shadow: 0 -18px 48px rgba(0,5,15,.28); transform: translateY(104%); transition: transform .3s cubic-bezier(.22,1,.36,1); \
+}\n:where(#ten-comic-root) .ten-mobile-drawer.is-open .ten-mobile-drawer-sheet { transform: translateY(0); }\n:where(#ten-comic-root) .ten-mobile-drawer-handle \
+{ width: 34px; height: 4px; margin: 0 auto 5px; border-radius: 999px; background: var(--ten-scroll-thumb); }\n:where(#ten-comic-root) .ten-mobile-drawer-sheet \
+header { min-height: 38px; display: flex; align-items: center; justify-content: space-between; color: var(--ten-text); font-size: 12px; font-weight: 750; \
+}\n:where(#ten-comic-root) #ten-mobile-drawer-content { min-height: 0; overflow-y: auto; padding: 2px 1px; }\n:where(#ten-comic-root) #ten-mobile-drawer-content \
+.ten-options { max-height: none; margin: 0; padding: 10px; opacity: 1; border-width: 1px; }\n:where(#ten-comic-root) #ten-mobile-drawer-content \
+.ten-options.is-mobile-drawer-content { background: var(--ten-card-bg); }\n:where(#ten-comic-root) #ten-mobile-drawer-content .ten-rule-advanced-body { padding: \
+10px; border: 1px solid var(--ten-card-border); border-radius: var(--ten-radius-card); background: var(--ten-card-bg); }\n}\n@media (min-width: 561px) \
+{\n:where(#ten-comic-root) .ten-mobile-drawer { display: none; }\n}\n@media (max-width: 1000px) {\n:where(#ten-comic-root) #ten-search-panel { z-index: \
+2147483647; right: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 19px; }\n}\n@media (prefers-reduced-motion: reduce) \
+{\n#ten-comic-root *,\n#ten-comic-root *::before,\n#ten-comic-root *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; \
+}\n:where(#ten-comic-root) #ten-particle-field { display: none; }\n}\n:where(#ten-comic-root) .ten-theme-presets { display: grid; grid-template-columns: \
+repeat(2,minmax(0,1fr)); gap: 7px; }\n:where(#ten-comic-root) .ten-theme-choice { min-width: 0; min-height: 58px; display: grid; align-content: center; gap: \
+2px; padding: 8px 10px; color: var(--ten-text); font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--ten-line); border-radius: 13px; \
+background: rgba(4,14,28,.36); transition: border-color .2s, box-shadow .2s, transform .18s, background .2s; }\n:where(#ten-comic-root) \
+.ten-theme-choice[data-theme-choice="glass"] { box-shadow: inset 3px 0 #5ff6ff; }\n:where(#ten-comic-root) .ten-theme-choice[data-theme-choice="mist"] { \
+box-shadow: inset 3px 0 #78bfe8; }\n:where(#ten-comic-root) .ten-theme-choice[data-theme-choice="porcelain"] { box-shadow: inset 3px 0 #b9835e; \
+}\n:where(#ten-comic-root) .ten-theme-choice[data-theme-choice="expressive"] { box-shadow: inset 3px 0 #aa71ff; }\n:where(#ten-comic-root) \
+.ten-theme-choice[data-theme-choice="carbon"] { box-shadow: inset 3px 0 #ff4f96; }\n:where(#ten-comic-root) .ten-theme-choice[data-theme-choice="ink"] { \
+box-shadow: inset 3px 0 #a18558; }\n:where(#ten-comic-root) .ten-theme-choice:hover { border-color: rgba(95,246,255,.46); transform: translateY(-1px); \
+}\n:where(#ten-comic-root) .ten-theme-choice[aria-pressed="true"] { color: var(--ten-cyan); border-color: var(--ten-cyan); background: rgba(95,246,255,.09); \
+box-shadow: 0 0 0 3px rgba(95,246,255,.07), inset 0 1px rgba(255,255,255,.08); }\n:where(#ten-comic-root) .ten-theme-choice strong { overflow: hidden; \
+font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }\n:where(#ten-comic-root) .ten-theme-choice small { overflow: hidden; color: var(--ten-muted); \
 font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }\n#ten-comic-root[data-theme="mist"] { --ten-bg: rgba(241,248,253,.76); --ten-surface: \
 rgba(255,255,255,.5); --ten-surface-strong: rgba(255,255,255,.74); --ten-line: rgba(67,112,148,.18); --ten-text: #183247; --ten-muted: #667d90; --ten-cyan: \
 #168eaf; --ten-blue: #4d7edc; --ten-violet: #7c69ca; --ten-pink: #c45e91; --ten-danger: #ce4f6d; --ten-success: #278768; }\n#ten-comic-root[data-theme="mist"] \
@@ -4620,8 +4647,8 @@ gap: 5px; }\n#ten-comic-root[data-density="compact"] .ten-list-item { min-height
 }\n#ten-comic-root[data-density="comfortable"] .ten-list { gap: 9px; }\n#ten-comic-root[data-density="comfortable"] .ten-list-item { min-height: 47px; padding: \
 11px 13px; }\n#ten-comic-root[data-motion="calm"] #ten-panel { transition-duration: .25s; }\n#ten-comic-root[data-motion="calm"] .ten-task-body { \
 transition-duration: .32s; }\n#ten-comic-root[data-motion="spring"] #ten-panel { transition-timing-function: cubic-bezier(.16,1.35,.3,1); \
-}\n#ten-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: cubic-bezier(.16,1.25,.3,1); }\n@media (max-width: 380px) {\n\n  \
-#ten-comic-root .ten-theme-presets { grid-template-columns: 1fr; }\n  \n}\n\n#ten-comic-root #ten-panel { width: min(430px, calc((100vw - 28px) / \
+}\n#ten-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: cubic-bezier(.16,1.25,.3,1); }\n\n@media (max-width: 380px) \
+{\n:where(#ten-comic-root) .ten-theme-presets { grid-template-columns: 1fr; }\n}\n\n#ten-comic-root #ten-panel { width: min(430px, calc((100vw - 28px) / \
 var(--ten-scale))); height: min(780px, calc((100vh - 28px) / var(--ten-scale))); }\n/* Shared interaction and layout refinements. Theme values remain \
 authoritative. */\n#ten-comic-root {\n  --ten-space-1: 4px;\n  --ten-space-2: 8px;\n  --ten-space-3: 12px;\n  --ten-space-4: 16px;\n  \
 --ten-readable-line-height: 1.6;\n  -webkit-tap-highlight-color: transparent;\n}\n#ten-comic-root .ten-confirm,\n#ten-comic-root .ten-diagnostic { transition: \
@@ -4693,7 +4720,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             }(e.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
             byId(ROOT_ID).addEventListener("pointerout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("focusin", showIconTooltip), 
             byId(ROOT_ID).addEventListener("focusout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("click", hideIconTooltip), 
-            window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", hideIconTooltip), 
+            window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", handleLayoutResize), 
             byId("ten-close").addEventListener("click", hideUI), byId("ten-toast-action").addEventListener("click", runToastUndo), 
             all("[data-drawer-close]").forEach(e => e.addEventListener("click", closeMobileDrawer)), 
             one("summary", byId("ten-rule-advanced")).addEventListener("click", openRuleAdvancedDrawer), 
@@ -4889,6 +4916,10 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         function toggleOptions() {
             isNarrowLayout() ? byId("ten-mobile-drawer").classList.contains("is-open") ? closeMobileDrawer() : openMobileDrawer("下载选项", byId("ten-options")) : (state.optionsOpen = !state.optionsOpen, 
             byId("ten-options").classList.toggle("is-open", state.optionsOpen));
+        }
+        function handleLayoutResize() {
+            hideIconTooltip();
+            if (state.drawerContent && !isNarrowLayout()) closeMobileDrawer();
         }
         function isNarrowLayout() {
             return window.matchMedia("(max-width: 560px)").matches;

@@ -176,7 +176,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         }(e.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
         byId(ROOT_ID).addEventListener("pointerout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("focusin", showIconTooltip), 
         byId(ROOT_ID).addEventListener("focusout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("click", hideIconTooltip), 
-        window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", hideIconTooltip), 
+        window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", handleLayoutResize), 
         byId("ten-close").addEventListener("click", hideUI), byId("ten-toast-action").addEventListener("click", runToastUndo), 
         all("[data-drawer-close]").forEach(e => e.addEventListener("click", closeMobileDrawer)), 
         one("summary", byId("ten-rule-advanced")).addEventListener("click", openRuleAdvancedDrawer), 
@@ -374,6 +374,10 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
     function toggleOptions() {
         isNarrowLayout() ? byId("ten-mobile-drawer").classList.contains("is-open") ? closeMobileDrawer() : openMobileDrawer("下载选项", byId("ten-options")) : (state.optionsOpen = !state.optionsOpen, 
         byId("ten-options").classList.toggle("is-open", state.optionsOpen));
+    }
+    function handleLayoutResize() {
+        hideIconTooltip();
+        if (state.drawerContent && !isNarrowLayout()) closeMobileDrawer();
     }
     function isNarrowLayout() {
         return window.matchMedia("(max-width: 560px)").matches;

@@ -108,9 +108,13 @@ module.exports = () => {
             return t;
         }
     }
+    function expandRuleEditor() {
+        const editor = byId("ten-rule-editor-card");
+        if (editor) editor.open = true;
+    }
     function openUnsupportedRuleEditor() {
         initializeAppStorage();
-        state.settings || (state.settings = readSettings()), injectStyle(), showUI(), activateTab("settings");
+        state.settings || (state.settings = readSettings()), injectStyle(), showUI(), activateTab("settings"), expandRuleEditor();
         const e = window.location.hostname.toLowerCase();
         byId("ten-rule-domain").value || (byId("ten-rule-domain").value = e), byId("ten-rule-homepage").value || (byId("ten-rule-homepage").value = `${window.location.protocol}//${window.location.host}/`), 
         setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
@@ -283,9 +287,9 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
     function navButton(e, t, n) {
         return `<button class="ten-tab" type="button" data-tab="${e}">${icon(t)}<span>${n}</span></button>`;
     }
-    function appearanceAxesCard() {
+    function appearanceAxesSection() {
         const e = (e, t, n) => `<div class="ten-setting ten-appearance-setting"><label>${t}</label><div class="ten-appearance-axis" role="group" aria-label="${t}">${n.map(([t, n]) => `<button type="button" data-appearance-axis="${e}" data-appearance-value="${t}">${n}</button>`).join("")}</div></div>`;
-        return `<div class="ten-card ten-settings-card ten-appearance-card"><div class="ten-card-title">主题外观</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</div>`;
+        return `<section class="ten-settings-section ten-appearance-card"><div class="ten-card-title">外观调整</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</section>`;
     }
     function settingCheck(e, t) {
         return `<div class="ten-setting ten-setting-check"><label for="${e}">${t}</label><input id="${e}" type="checkbox"></div>`;

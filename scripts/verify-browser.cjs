@@ -30,6 +30,15 @@ async function main() {
           assert.ok(geometry.viewHeight >= 80, `unusable content height ${JSON.stringify(geometry)}`)
           assert.ok(geometry.viewScrollWidth <= geometry.viewWidth + 2, `horizontal overflow ${viewport.width}/${tab}: ${JSON.stringify(geometry)}`)
           await page.screenshot({ animations: 'disabled', path: path.join(directory, `${viewport.width}x${viewport.height}-${tab}.png`) })
+          if (tab === 'settings') {
+            for (const id of ['ten-theme-settings', 'ten-rule-editor-card']) {
+              await page.locator(`#${id} > summary`).click()
+              const fits = await page.locator('.ten-view.is-active').evaluate(view => view.scrollWidth <= view.clientWidth + 2)
+              assert.equal(fits, true, `expanded ${id} overflows ${viewport.width}`)
+              await page.screenshot({ animations: 'disabled', path: path.join(directory, `${viewport.width}x${viewport.height}-${id}-expanded.png`) })
+              await page.locator(`#${id} > summary`).click()
+            }
+          }
           report.push({ viewport, tab, geometry })
         }
         if (viewport.width <= 560) {
@@ -47,6 +56,7 @@ async function main() {
       const { page, context } = await openComic(browser, { settings: { themePreset: theme } })
       try {
         await page.locator('[data-tab="settings"]').click()
+        await page.locator('#ten-theme-settings > summary').click()
         assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), theme)
         await page.screenshot({ animations: 'disabled', path: path.join(directory, `theme-${theme}.png`) })
         report.push({ theme })

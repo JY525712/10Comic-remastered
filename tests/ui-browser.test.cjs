@@ -5,6 +5,11 @@ let browser
 before(async () => { browser = await chromium.launch({ headless: true }) })
 after(async () => { await browser?.close() })
 
+async function openRuleSettings(page) {
+  const group = page.locator('details#ten-rule-editor-card')
+  if (await group.count() && !await group.evaluate(element => element.open)) await group.locator(':scope > summary').click()
+}
+
 test('selecting a chapter preserves its DOM node, keyboard focus and list scroll', async () => {
   const { page, context, errors } = await openComic(browser, { baseline: process.env.TEST_BASELINE === '1' })
   try {
@@ -71,6 +76,7 @@ test('guide close restores keyboard focus and hidden panels leave the tab order'
   const { page, context } = await openComic(browser, { baseline: process.env.TEST_BASELINE === '1' })
   try {
     await page.locator('[data-tab="settings"]').click()
+    await openRuleSettings(page)
     await page.locator('#ten-rule-guide-open').click()
     await page.locator('.ten-rule-guide-dialog > [data-rule-guide-close]').click()
     assert.equal(await page.evaluate(() => document.activeElement.id), 'ten-rule-guide-open')
@@ -87,6 +93,7 @@ test('unsupported pages defer storage initialization and still offer the rule ed
     await page.evaluate(() => window.__menus.find(menu => menu.label.includes('添加自定义规则')).action())
     await page.locator('#ten-panel.is-open').waitFor()
     assert.equal(await page.locator('#ten-rule-domain').inputValue(), 'comic.test')
+    assert.equal(await page.locator('#ten-rule-name').isVisible(), true)
     assert.equal(await page.locator('.ten-view.is-active').getAttribute('data-view'), 'settings')
     assert.deepEqual(errors, [])
   } finally { await context.close() }
@@ -125,6 +132,7 @@ test('rule templates, visual picking, validation and saving keep their existing 
   const { page, context, errors } = await openComic(browser)
   try {
     await page.locator('[data-tab="settings"]').click()
+    await openRuleSettings(page)
     await page.locator('[data-rule-pick="title"]').click()
     await page.locator('#fixture-title').click()
     assert.equal(await page.locator('#ten-rule-title-selector').inputValue(), '#fixture-title')
@@ -162,11 +170,13 @@ test('recreating a root removed by the host page discards obsolete modal focus t
   const { page, context } = await openComic(browser)
   try {
     await page.locator('[data-tab="settings"]').click()
+    await openRuleSettings(page)
     await page.locator('#ten-rule-guide-open').click()
     await page.evaluate(() => {
       document.getElementById('ten-comic-root').remove()
       window.__menus.find(menu => menu.label.includes('显示/隐藏')).action()
     })
+    await openRuleSettings(page)
     await page.locator('#ten-rule-guide-open').click()
     await page.locator('.ten-rule-guide-dialog button').first().waitFor({ state: 'visible' })
     await page.locator('.ten-rule-guide-dialog > [data-rule-guide-close]').focus()
@@ -207,6 +217,7 @@ test('scoping styles preserves the original readable card palettes in every them
       const { page, context } = await openComic(browser, { baseline, count: 1, settings: { themePreset: theme } })
       try {
         await page.locator('[data-tab="settings"]').click()
+        if (await page.locator('#ten-theme-settings').count()) await page.locator('#ten-theme-settings > summary').click()
         const palette = await page.evaluate(() => ['.ten-settings-card', '.ten-settings-card .ten-card-title', '.ten-setting > label'].map(selector => {
           const style = getComputedStyle(document.querySelector(selector))
           return { selector, color: style.color, backgroundColor: style.backgroundColor, backgroundImage: style.backgroundImage }

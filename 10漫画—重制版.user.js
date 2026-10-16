@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         10漫画—重制版
 // @namespace    urn:10comic:remastered
-// @version      2.0.12
+// @version      2.0.13
 // @description  漫画章节下载、搜索与自定义规则工具（液体玻璃 UI 重制版）
 // @run-at       document-start
 // @grant        GM_getValue
@@ -2719,9 +2719,14 @@
                 return t;
             }
         }
+        function expandRuleEditor() {
+            const editor = byId("ten-rule-editor-card");
+            if (editor) editor.open = true;
+        }
         function openUnsupportedRuleEditor() {
             initializeAppStorage();
-            state.settings || (state.settings = readSettings()), injectStyle(), showUI(), activateTab("settings");
+            state.settings || (state.settings = readSettings()), injectStyle(), showUI(), activateTab("settings"), 
+            expandRuleEditor();
             const e = window.location.hostname.toLowerCase();
             byId("ten-rule-domain").value || (byId("ten-rule-domain").value = e), byId("ten-rule-homepage").value || (byId("ten-rule-homepage").value = `${window.location.protocol}//${window.location.host}/`), 
             setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
@@ -2800,11 +2805,7 @@ id="ten-clear-history" class="ten-icon-btn" type="button" title="清空记录">'
 class="ten-task-arrow"></span></button></div></div><div class="ten-task-body"><div class="ten-list ten-history-wrap"><div id="ten-history-filter" \
 class="ten-history-filter" role="group" aria-label="下载记录筛选"><button type="button" data-history-filter="all">全部</button><button type="button" \
 data-history-filter="completed">完成</button><button type="button" data-history-filter="failed">失败</button><button type="button" \
-data-history-filter="cancelled">取消</button></div><div id="ten-history" class="ten-list"></div></div></div></div></section>' ].join(""), [ `<section class="ten-view" data-view="settings"><div class="ten-card ten-settings-card"><div class="ten-card-title">主题预设</div><div class="ten-theme-presets" \
-role="group" aria-label="主题预设">${Object.entries(THEMES).map(([e, t]) => `<button class="ten-theme-choice" data-theme-choice="${e}" type="button"><strong>${t[0]}</strong><small>${t[1]}</small></button>`).join("")}</div></div>`, appearanceAxesCard(), '<div class="ten-card ten-settings-card"><div class="ten-card-title">界面</div>', settingCheck("ten-auto-open", "随网页打开界面"), '<div class="ten-setting"><label for="ten-hotkey">快捷键（Alt +）</label><input id="ten-hotkey" class="ten-input" maxlength="1"></div><div class="ten-setting"><label \
-for="ten-scale">界面缩放</label><div class="ten-row"><input id="ten-scale" type="range" min="75" max="125" step="1"><span id="ten-scale-value" \
-class="ten-setting-value"></span></div></div><div class="ten-setting"><label>特效强度</label><div class="ten-effect-level" role="group" aria-label="特效强度"><button \
-type="button" data-effect-level="0">关闭</button><button type="button" data-effect-level="1">轻量</button><button type="button" data-effect-level="2">标准</button></div></div></div>', [ '<div class="ten-card ten-settings-card ten-settings-download"><div class="ten-card-title">下载</div><div class="ten-setting"><label \
+data-history-filter="cancelled">取消</button></div><div id="ten-history" class="ten-list"></div></div></div></div></section>' ].join(""), [ '<section class="ten-view" data-view="settings">', renderThemeSettings(), [ '<div class="ten-card ten-settings-card ten-settings-download"><div class="ten-card-title">下载</div><div class="ten-setting"><label \
 for="ten-max-chapters">同时下载章节</label><input id="ten-max-chapters" class="ten-input" type="number" min="1" max="3"></div><div class="ten-setting"><label \
 for="ten-concurrent-images">每章并发图片</label><input id="ten-concurrent-images" cl', 'ass="ten-input" type="number" min="1" max="5"></div><div class="ten-setting"><label for="ten-default-mode-trigger">默认方式</label><div id="ten-default-mode" \
 class="ten-setting-select"><button id="ten-default-mode-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span \
@@ -2821,8 +2822,9 @@ max="65530"></div><div class="ten-setting"><label for="ten-digits">图片序号�
 max="8"></div><div class="ten-setting"><label>图片下载范围</label><div class="ten-grid-2"><input id="ten-range-start" class="ten-input" type="number" min="1"><input \
 id="ten-range-end" class="ten-input" type="number" min="-1"></div></div>', settingCheck("ten-splice-page", "网站图片连续阅读"), settingCheck("ten-notify-complete", "下载完成通知"), '<div class="ten-setting"><label for="ten-history-limit">下载记录上限</label><input id="ten-history-limit" class="ten-input" type="number" min="10" \
 max="500"></div><div class="ten-setting"><label>本地保存目录</label><div class="ten-dir-control"><button id="ten-choose-dir" class="ten-btn is-small" \
-type="button">选择目录</button><span id="ten-dir-name" class="ten-file-name"></span></div></div></div>', '<div id="ten-rule-editor-card" class="ten-card ten-settings-card"><div class="ten-card-head"><div class="ten-card-title">自定义规则</div><button \
-id="ten-rule-guide-open" class="ten-rule-guide-open" type="button" aria-label="自定义站点设置方法">' + icon("guide") + [ '<span>方法</span></button></div><div class="ten-rule-intro"><strong>简单填写</strong><span>普通卷轴漫画站只需填写名称、域名、章节列表和图片选择器</span></div><div class="ten-rule-fields"><div \
+type="button">选择目录</button><span id="ten-dir-name" class="ten-file-name"></span></div></div></div>', '<details id="ten-rule-editor-card" class="ten-card ten-settings-card ten-settings-disclosure"><summary class="ten-settings-summary">自定义规则</summary><div \
+class="ten-settings-disclosure-body"><div class="ten-card-head"><span class="ten-meta">站点解析与规则导入</span><button id="ten-rule-guide-open" \
+class="ten-rule-guide-open" type="button" aria-label="自定义站点设置方法">' + icon("guide") + [ '<span>方法</span></button></div><div class="ten-rule-intro"><strong>简单填写</strong><span>普通卷轴漫画站只需填写名称、域名、章节列表和图片选择器</span></div><div class="ten-rule-fields"><div \
 class="ten-grid-2"><label>站点名称<input id="ten-rule-name" class="ten-input" placeholder="例如：示例漫画"></label><label>域名<input id="ten-rule-domain" class="ten-input" \
 placeholder="example.com"></label></div><d', 'iv class="ten-grid-2"><label>漫画标题选择器<input id="ten-rule-title-selector" class="ten-input" placeholder="例如：h1.title"></label><label>章节列表选择器<input \
 id="ten-rule-chapter-selector" class="ten-input" placeholder="例如：.chapter-list"></label></div><label>章节图片选择器<input id="ten-rule-image-selector" \
@@ -2835,7 +2837,7 @@ getImgs 函数" spellcheck="false"></textarea></label></div></details></div><div
 class="ten-rule-actions"><button id="ten-rule-test" ', 'class="ten-btn" type="button">测试当前页面</button><button id="ten-rule-save" class="ten-btn is-primary" type="button">保存规则</button><button id="ten-rule-cancel-edit" \
 class="ten-btn is-danger" type="button" hidden>取消编辑</button></div><details class="ten-rule-json"><summary>原版 JSON 导入 <span>兼容旧规则</span></summary><textarea \
 id="ten-rule-text" class="ten-textarea" place', 'holder="粘贴原版站点规则数组" autocomplete="off" spellcheck="false"></textarea><button id="ten-import-rules" class="ten-btn" \
-type="button">导入并保存</button></details></div><div class="ten-card ten-settings-card"><div class="ten-card-title">设置与规则备份</div><div \
+type="button">导入并保存</button></details></div></details><div class="ten-card ten-settings-card"><div class="ten-card-title">设置与规则备份</div><div \
 class="ten-backup-actions"><button id="ten-backup-export" class="ten-btn" type="button">导出备份</button><button id="te', 'n-backup-import" class="ten-btn is-primary" type="button">导入备份</button></div><input id="ten-backup-file" type="file" accept="application/json,.json" \
 hidden><div class="ten-settings-hint">包含界面、下载设置和自定义规则</div></div><button id="ten-reset" class="ten-btn is-danger" type="button" style="width:100%">重置全部设置</button></section>' ].join("") ].join(""), '</main><nav class="ten-nav" aria-label="功能导航">', navButton("sites", "globe", "站点"), navButton("chapters", "layers", "章节"), navButton("tasks", "download", "任务"), navButton("settings", "settings", "设置"), '</nav><div id="ten-toast" class="ten-toast" role="status" aria-live="polite"><span id="ten-toast-text"></span><button id="ten-toast-action" type="button" hidden>撤销</button></div>', `<div id="ten-confirm" inert class="ten-confirm" aria-hidden="true"><button class="ten-confirm-backdrop" type="button" data-confirm-cancel \
 aria-label="取消"></button><div class="ten-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ten-confirm-title" \
@@ -2861,6 +2863,15 @@ class="ten-rule-guide-warning">解析函数可以执行代码，请勿导入来�
 id="ten-search-panel-subtitle" class="ten-subtitle">全部站点</div></div><button id="ten-search-close" class="ten-icon-btn" type="button" aria-label="关闭搜索结果">${icon("close")}</button></header>\n    <div id="ten-search-results" class="ten-search-panel-content"></div>\n  </aside>`, '<div id="ten-mobile-drawer" inert class="ten-mobile-drawer" aria-hidden="true"><button class="ten-mobile-drawer-backdrop" type="button" data-drawer-close \
 aria-label="关闭抽屉"></button><section class="ten-mobile-drawer-sheet" role="dialog" aria-modal="true" aria-labelledby="ten-mobile-drawer-title"><div \
 class="ten-mobile-drawer-handle"></div><header><div id="ten-mobile-drawer-title">下载选项</div><button type="button" class="ten-icon-btn" data-drawer-close aria-label="关闭">' + icon("close") + '</button></header><div id="ten-mobile-drawer-content"></div></section></div>' ].join("");
+        }
+        function renderThemeSettings() {
+            return `<details id="ten-theme-settings" class="ten-card ten-settings-card ten-settings-disclosure">\n      <summary class="ten-settings-summary">主题</summary>\n      \
+<div class="ten-settings-disclosure-body">\n        <section class="ten-settings-section">\n          <div class="ten-card-title">预设选择</div>\n          <div \
+class="ten-theme-presets" role="group" aria-label="主题预设">\n            ${Object.entries(THEMES).map(([key, theme]) => `<button class="ten-theme-choice" data-theme-choice="${key}" type="button"><strong>${theme[0]}</strong><small>${theme[1]}</small></button>`).join("")}\n          </div>\n        </section>\n        ${appearanceAxesSection()}\n        <section class="ten-settings-section">\n          <div class="ten-card-title">界面设置</div>\n          ${settingCheck("ten-auto-open", "随网页打开界面")}\n          <div class="ten-setting"><label for="ten-hotkey">快捷键（Alt +）</label><input id="ten-hotkey" class="ten-input" maxlength="1"></div>\n          <div \
+class="ten-setting"><label for="ten-scale">界面缩放</label><div class="ten-row"><input id="ten-scale" type="range" min="75" max="125" step="1"><span \
+id="ten-scale-value" class="ten-setting-value"></span></div></div>\n          <div class="ten-setting"><label>特效强度</label><div class="ten-effect-level" \
+role="group" aria-label="特效强度"><button type="button" data-effect-level="0">关闭</button><button type="button" data-effect-level="1">轻量</button><button \
+type="button" data-effect-level="2">标准</button></div></div>\n        </section>\n      </div>\n    </details>`;
         }
         function renderSites() {
             const e = (0, siteRules.eT)(), t = Array.isArray(e.originalInfo) ? e.originalInfo.slice() : [], n = Array.isArray(e.userWebInfo) ? e.userWebInfo.slice() : [], r = 0 === state.sourceMode ? t : n;
@@ -2890,7 +2901,8 @@ class="ten-mobile-drawer-handle"></div><header><div id="ten-mobile-drawer-title"
                 byId("ten-rule-image-selector").value = n.imageCss || "", byId("ten-rule-use-frame").checked = Boolean(n.useFrame), 
                 byId("ten-rule-getimgs").value = n.simpleRule ? "" : "function" == typeof n.getImgs ? n.getImgs.toString() : n.getImgs || "", 
                 setRuleReadType(n.readtype), byId("ten-rule-advanced").open = !n.simpleRule, byId("ten-rule-save").textContent = "更新规则", 
-                byId("ten-rule-cancel-edit").hidden = !1, activateTab("settings"), setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
+                byId("ten-rule-cancel-edit").hidden = !1, activateTab("settings"), expandRuleEditor(), 
+                setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
                     behavior: "smooth",
                     block: "start"
                 }), 80));
@@ -4684,7 +4696,21 @@ gap: 8px; padding: 10px; }\n  #ten-comic-root #ten-diagnostic-content { min-heig
 minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-chapter-tools > :last-child { grid-column: 1 / -1; width: 100%; justify-self: stretch; }\n  #ten-comic-root \
 .ten-chapter-select-group { flex-wrap: nowrap; }\n}\n\n@media (max-width: 560px) {\n  #ten-comic-root .ten-search-toolbar { display: grid; \
 grid-template-columns: minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-search-site-picker { grid-column: 1 / -1; width: 100%; }\n  #ten-comic-root \
-.ten-search-toolbar .ten-input { width: 100%; }\n}\n', 
+.ten-search-toolbar .ten-input { width: 100%; }\n}\n\n/* Settings disclosures keep their controls in the original settings scope. */\n#ten-comic-root \
+.ten-settings-disclosure { padding: 0; }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary {\n  display: flex;\n  align-items: center;\n  \
+justify-content: space-between;\n  gap: 12px;\n  min-height: 46px;\n  padding: 12px 14px;\n  color: var(--ten-text);\n  font-size: 13px;\n  font-weight: 750;\n  \
+line-height: 1.5;\n  list-style: none;\n  cursor: pointer;\n  user-select: none;\n  border-radius: inherit;\n}\n#ten-comic-root \
+.ten-settings-summary::-webkit-details-marker { display: none; }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary::after {\n  content: "";\n  \
+flex: 0 0 7px;\n  width: 7px;\n  height: 7px;\n  margin: -3px 2px 0 0;\n  border-right: 1.5px solid currentColor;\n  border-bottom: 1.5px solid currentColor;\n  \
+transform: rotate(45deg);\n  transition: transform .18s ease;\n}\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:hover { background: \
+var(--ten-control-hover-bg); }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:focus-visible { outline-offset: -3px; }\n#ten-comic-root \
+.ten-settings-disclosure[open] > .ten-settings-summary {\n  border-bottom: 1px solid var(--ten-line);\n  border-bottom-left-radius: 0;\n  \
+border-bottom-right-radius: 0;\n}\n#ten-comic-root .ten-settings-disclosure[open] > .ten-settings-summary::after { transform: rotate(225deg); margin-top: 3px; \
+}\n#ten-comic-root .ten-settings-disclosure-body { min-width: 0; padding: 12px; }\n#ten-comic-root .ten-settings-section { min-width: 0; }\n#ten-comic-root \
+.ten-settings-section + .ten-settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ten-line); }\n#ten-comic-root \
+.ten-settings-section > .ten-card-title { margin-bottom: 10px; font-size: 11px; }\n#ten-comic-root .ten-settings-section .ten-setting:last-child { \
+margin-bottom: 0; }\n@media (max-width: 560px) {\n  #ten-comic-root .ten-settings-disclosure > .ten-settings-summary { min-height: 48px; padding: 12px; }\n  \
+#ten-comic-root .ten-settings-disclosure-body { padding: 10px; }\n}\n', 
                 (document.head || document.documentElement).appendChild(e);
             }(), (0, siteRules.HL)(window.location.href);
             const t = document.createElement("div");
@@ -4827,9 +4853,9 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         function navButton(e, t, n) {
             return `<button class="ten-tab" type="button" data-tab="${e}">${icon(t)}<span>${n}</span></button>`;
         }
-        function appearanceAxesCard() {
+        function appearanceAxesSection() {
             const e = (e, t, n) => `<div class="ten-setting ten-appearance-setting"><label>${t}</label><div class="ten-appearance-axis" role="group" aria-label="${t}">${n.map(([t, n]) => `<button type="button" data-appearance-axis="${e}" data-appearance-value="${t}">${n}</button>`).join("")}</div></div>`;
-            return `<div class="ten-card ten-settings-card ten-appearance-card"><div class="ten-card-title">主题外观</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</div>`;
+            return `<section class="ten-settings-section ten-appearance-card"><div class="ten-card-title">外观调整</div>${e("density", "界面密度", [ [ "compact", "紧凑" ], [ "standard", "标准" ], [ "comfortable", "舒适" ] ])}${e("shape", "圆角风格", [ [ "sharp", "利落" ], [ "standard", "标准" ], [ "round", "圆润" ] ])}${e("motion", "动效节奏", [ [ "calm", "克制" ], [ "standard", "标准" ], [ "spring", "弹性" ] ])}</section>`;
         }
         function settingCheck(e, t) {
             return `<div class="ten-setting ten-setting-check"><label for="${e}">${t}</label><input id="${e}" type="checkbox"></div>`;

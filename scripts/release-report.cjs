@@ -26,7 +26,7 @@ async function main() {
   assert.equal(benchmark.sha256, sha256, 'benchmark is for an earlier artifact')
   assert.equal(browser.checks.length, 27)
   const report = {
-    version: '2.0.12', generatedAt: new Date().toISOString(),
+    version: JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version, generatedAt: new Date().toISOString(),
     artifact: { file: '10漫画—重制版.user.js', bytes: artifact.length, sha256 },
     baseline: manifest,
     sizeReductionPercent: Number((100 * (1 - artifact.length / baseline.length)).toFixed(2)),

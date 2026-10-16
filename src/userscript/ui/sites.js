@@ -27,7 +27,8 @@ function deleteImportedRule(e) {
         byId("ten-rule-image-selector").value = n.imageCss || "", byId("ten-rule-use-frame").checked = Boolean(n.useFrame), 
         byId("ten-rule-getimgs").value = n.simpleRule ? "" : "function" == typeof n.getImgs ? n.getImgs.toString() : n.getImgs || "", 
         setRuleReadType(n.readtype), byId("ten-rule-advanced").open = !n.simpleRule, byId("ten-rule-save").textContent = "更新规则", 
-        byId("ten-rule-cancel-edit").hidden = !1, activateTab("settings"), setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
+        byId("ten-rule-cancel-edit").hidden = !1, activateTab("settings"), expandRuleEditor(), 
+        setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
             behavior: "smooth",
             block: "start"
         }), 80));

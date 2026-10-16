@@ -969,3 +969,51 @@ html.ten-rule-picking-page #ten-rule-pick-cancel { cursor: pointer !important; }
   #ten-comic-root .ten-search-site-picker { grid-column: 1 / -1; width: 100%; }
   #ten-comic-root .ten-search-toolbar .ten-input { width: 100%; }
 }
+
+/* Settings disclosures keep their controls in the original settings scope. */
+#ten-comic-root .ten-settings-disclosure { padding: 0; }
+#ten-comic-root .ten-settings-disclosure > .ten-settings-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 12px 14px;
+  color: var(--ten-text);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.5;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  border-radius: inherit;
+}
+#ten-comic-root .ten-settings-summary::-webkit-details-marker { display: none; }
+#ten-comic-root .ten-settings-disclosure > .ten-settings-summary::after {
+  content: "";
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  margin: -3px 2px 0 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform .18s ease;
+}
+#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:hover { background: var(--ten-control-hover-bg); }
+#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:focus-visible { outline-offset: -3px; }
+#ten-comic-root .ten-settings-disclosure[open] > .ten-settings-summary {
+  border-bottom: 1px solid var(--ten-line);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#ten-comic-root .ten-settings-disclosure[open] > .ten-settings-summary::after { transform: rotate(225deg); margin-top: 3px; }
+#ten-comic-root .ten-settings-disclosure-body { min-width: 0; padding: 12px; }
+#ten-comic-root .ten-settings-section { min-width: 0; }
+#ten-comic-root .ten-settings-section + .ten-settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ten-line); }
+#ten-comic-root .ten-settings-section > .ten-card-title { margin-bottom: 10px; font-size: 11px; }
+#ten-comic-root .ten-settings-section .ten-setting:last-child { margin-bottom: 0; }
+@media (max-width: 560px) {
+  #ten-comic-root .ten-settings-disclosure > .ten-settings-summary { min-height: 48px; padding: 12px; }
+  #ten-comic-root .ten-settings-disclosure-body { padding: 10px; }
+}

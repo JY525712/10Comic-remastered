@@ -11,7 +11,10 @@ function composeUI(source, sourceRoot) {
   }
   const styleSlot = source.match(/\/\*__UI_STYLE__\*\/\s*""/)
   if (!styleSlot) throw new Error('Missing UI style slot')
-  replace(styleSlot[0], JSON.stringify(fs.readFileSync(path.join(directory, 'styles.css'), 'utf8')))
+  let styles = fs.readFileSync(path.join(directory, 'styles.css'), 'utf8')
+  if (styles.split('/*__LIGHT_THEME_STYLES__*/').length !== 2) throw new Error('Expected one light theme style slot')
+  styles = styles.replace('/*__LIGHT_THEME_STYLES__*/', () => fs.readFileSync(path.join(directory, 'light-themes.css'), 'utf8'))
+  replace(styleSlot[0], JSON.stringify(styles))
   for (const name of ['shell', 'sites', 'chapters', 'tasks', 'rules', 'accessibility']) {
     replace(`/*__UI_${name.toUpperCase()}__*/`, fs.readFileSync(path.join(directory, name + '.js'), 'utf8').trim())
   }

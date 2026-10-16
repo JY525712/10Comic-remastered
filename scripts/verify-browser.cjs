@@ -57,7 +57,7 @@ async function main() {
         assert.deepEqual(errors, [])
       } finally { await context.close() }
     }
-    for (const theme of ['glass', 'mist', 'porcelain', 'expressive', 'carbon', 'ink']) {
+    for (const theme of ['glass', 'mist', 'cloud', 'expressive', 'carbon', 'paper']) {
       const { page, context } = await openComic(browser, { settings: { themePreset: theme } })
       try {
         await page.locator('[data-tab="settings"]').click()

@@ -17,10 +17,10 @@ module.exports = () => {
     const ROOT_ID = "ten-comic-root", PANEL_ID = "ten-panel", LAUNCHER_ID = "ten-comic-launcher", PENDING_TASKS_KEY = "pendingTasks", BACKUP_KEYS = [ "appLoadDefault", "maxChapterNum", "maxPictureNum", "downType", "directDownloadFlow", "sanitizePathNames", "maxSplicingHeight", "imgIndexBitNum", "imgSplicingFlag", "imgDownRange", "historyLimit", "downloadNotification", "effectLevel", "themePreset", "appearanceAxes" ], THEMES = {
         glass: [ "深海流光", "青紫通透 · 经典" ],
         mist: [ "晨雾晶璃", "白色玻璃 · 柔光折射" ],
-        porcelain: [ "白瓷简章", "暖白实体 · 清晰秩序" ],
+        cloud: [ "云白浮雕", "柔白拟态 · 轻盈触感" ],
         expressive: [ "星雾紫", "柔和圆角 · 层叠色面" ],
         carbon: [ "霓虹炭黑", "蓝粉边光 · 精密组件" ],
-        ink: [ "墨竹书斋", "墨色暖金 · 阅读质感" ]
+        paper: [ "纸白蓝图", "纯白线框 · 蓝色秩序" ]
     }, TAB_ORDER = [ "sites", "chapters", "tasks", "settings" ], TAB_TITLES = {
         sites: [ "漫画站点", "站点索引" ],
         chapters: [ "章节选择", "章节管理" ],
@@ -70,6 +70,10 @@ module.exports = () => {
         particleCount: -1,
         settings: null
     };
+    function normalizeThemePreset(value) {
+        const preset = value === "porcelain" ? "cloud" : value === "ink" ? "paper" : value;
+        return Object.prototype.hasOwnProperty.call(THEMES, preset) ? preset : "glass";
+    }
     function readSettings() {
         const e = safeGet("appLoadDefault", {}), t = e && "object" == typeof e ? e : {}, n = safeGet("imgDownRange", [ 1, -1 ]), r = Array.isArray(n) && n.length >= 2 ? n : [ 1, -1 ], a = safeGet("themePreset", "glass"), i = safeGet("appearanceAxes", {}), o = i && "object" == typeof i ? i : {};
         return {
@@ -86,7 +90,7 @@ module.exports = () => {
             historyLimit: boundedNumber(safeGet("historyLimit", 100), 100, 10, 500),
             notifyComplete: Boolean(safeGet("downloadNotification", !0)),
             effectLevel: boundedNumber(safeGet("effectLevel", 1), 1, 0, 2),
-            themePreset: Object.prototype.hasOwnProperty.call(THEMES, a) ? a : "glass",
+            themePreset: normalizeThemePreset(a),
             appearance: {
                 density: [ "compact", "standard", "comfortable" ].includes(o.density) ? o.density : "standard",
                 shape: [ "sharp", "standard", "round" ].includes(o.shape) ? o.shape : "standard",
@@ -626,7 +630,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         }), t && ((0, configModule.po)("effectLevel", n), toast([ "特效已关闭", "已切换为轻量特效", "已切换为标准特效" ][n]));
     }
     function setThemePreset(e, t) {
-        const n = Object.prototype.hasOwnProperty.call(THEMES, e) ? e : "glass";
+        const n = normalizeThemePreset(e);
         state.settings.themePreset = n, byId(ROOT_ID).dataset.theme = n, all("[data-theme-choice]").forEach(e => e.setAttribute("aria-pressed", String(e.dataset.themeChoice === n))), 
         t && ((0, configModule.po)("themePreset", n), toast(`已切换为${THEMES[n][0]}`));
     }

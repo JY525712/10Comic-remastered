@@ -1,0 +1,188 @@
+/*
+White themes adapted and recomposed from Uiverse components:
+https://uiverse.io/adamgiebl/lucky-donkey-6
+https://uiverse.io/adamgiebl/hot-cat-14
+https://uiverse.io/0xnihilism/thin-crab-36
+https://uiverse.io/0xnihilism/calm-baboon-55
+
+MIT License
+Copyright (c) 2026 adamgiebl (Adam Giebl)
+Copyright (c) 2026 0xnihilism (0xNihilist)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+#ten-comic-root[data-theme="cloud"] {
+  color-scheme: light;
+  --ten-bg: #f2f5fa; --ten-surface: #f9fbff; --ten-surface-strong: #ffffff;
+  --ten-text: #26354a; --ten-muted: #53647a; --ten-line: #d5deea;
+  --ten-cyan: #2559a7; --ten-blue: #356bc0; --ten-violet: #626ba8; --ten-pink: #ae4572;
+  --ten-danger: #b4233b; --ten-success: #15715c;
+  --ten-panel-bg: #f2f5fa; --ten-panel-border: #d3ddea;
+  --ten-panel-shadow: 12px 16px 38px rgba(47,66,94,.2),inset 1px 1px 0 #ffffff;
+  --ten-header-bg: #f8faff;
+  --ten-card-bg: #f9fbff; --ten-card-border: #dce4ee;
+  --ten-card-shadow: 5px 5px 13px rgba(70,92,122,.12),-5px -5px 13px #ffffff;
+  --ten-task-bg: #f9fbff; --ten-list-bg: #f5f8fc; --ten-list-hover-bg: #eaf1fc;
+  --ten-control-bg: #f3f6fb; --ten-control-hover-bg: #e8effa; --ten-control-border: #d3dfed;
+  --ten-primary-bg: #e6efff; --ten-primary-text: #204b92; --ten-primary-border: #b9cdee;
+  --ten-danger-bg: #fff0f3; --ten-danger-text: #ad1d39; --ten-danger-border: #efc3cc;
+  --ten-input-bg: #f7f9fd; --ten-popover-bg: #ffffff;
+  --ten-empty-bg: #f9fbff; --ten-info-bg: #f4f7fc; --ten-mini-bg: #f9fbff;
+  --ten-overlay-bg: rgba(30,45,70,.28);
+  --ten-tooltip-bg: #ffffff; --ten-tooltip-text: #26354a; --ten-tooltip-border: #cad7e8;
+  --ten-tooltip-shadow: 5px 7px 18px rgba(47,66,94,.16),inset 1px 1px 0 #ffffff;
+  --ten-toast-bg: #ffffff; --ten-toast-text: #26354a; --ten-toast-border: #cad7e8;
+  --ten-launcher-bg: #f5f8fd; --ten-launcher-border: #cfdaea;
+  --ten-launcher-shadow: 5px 5px 12px rgba(47,66,94,.18),-3px -3px 10px #ffffff;
+  --ten-radius-panel: 25px; --ten-radius-card: 18px; --ten-radius-control: 12px; --ten-radius-launcher: 18px;
+  --ten-focus-ring: 0 0 0 3px rgba(37,89,167,.17); --ten-scroll-thumb: #a4b6cd;
+  --ten-component-shadow: 4px 4px 9px rgba(70,92,122,.16),-4px -4px 9px #ffffff;
+  --ten-input-shadow: inset 2px 2px 5px rgba(70,92,122,.12),inset -2px -2px 5px #ffffff;
+}
+
+#ten-comic-root[data-theme="paper"] {
+  color-scheme: light;
+  --ten-bg: #f8fbff; --ten-surface: #ffffff; --ten-surface-strong: #ffffff;
+  --ten-text: #1c2d48; --ten-muted: #52627a; --ten-line: #bac9df;
+  --ten-cyan: #1d4ed8; --ten-blue: #2563eb; --ten-violet: #5750ae; --ten-pink: #ad346c;
+  --ten-danger: #b91c35; --ten-success: #116b55;
+  --ten-panel-bg: #f8fbff; --ten-panel-border: #203451;
+  --ten-panel-shadow: 6px 6px 0 #cbd8eb,0 18px 42px rgba(28,45,72,.16);
+  --ten-header-bg: #ffffff;
+  --ten-card-bg: #ffffff; --ten-card-border: #8fa5c3;
+  --ten-card-shadow: 3px 3px 0 #dce5f3;
+  --ten-task-bg: #ffffff; --ten-list-bg: #f7faff; --ten-list-hover-bg: #edf3ff;
+  --ten-control-bg: #ffffff; --ten-control-hover-bg: #edf3ff; --ten-control-border: #8299ba;
+  --ten-primary-bg: #2558d5; --ten-primary-text: #ffffff; --ten-primary-border: #1e40af;
+  --ten-danger-bg: #fff1f3; --ten-danger-text: #aa1530; --ten-danger-border: #d796a5;
+  --ten-input-bg: #ffffff; --ten-popover-bg: #ffffff;
+  --ten-empty-bg: #ffffff; --ten-info-bg: #f5f8ff; --ten-mini-bg: #ffffff;
+  --ten-overlay-bg: rgba(23,38,65,.3);
+  --ten-tooltip-bg: #ffffff; --ten-tooltip-text: #1c2d48; --ten-tooltip-border: #8fa5c3;
+  --ten-tooltip-shadow: 3px 3px 0 #cbd8eb,0 8px 20px rgba(28,45,72,.13);
+  --ten-toast-bg: #ffffff; --ten-toast-text: #1c2d48; --ten-toast-border: #8fa5c3;
+  --ten-launcher-bg: #ffffff; --ten-launcher-border: #203451;
+  --ten-launcher-shadow: 4px 4px 0 #cbd8eb,0 8px 18px rgba(28,45,72,.12);
+  --ten-radius-panel: 17px; --ten-radius-card: 11px; --ten-radius-control: 8px; --ten-radius-launcher: 12px;
+  --ten-focus-ring: 0 0 0 3px rgba(37,88,213,.2); --ten-scroll-thumb: #8fa5c3;
+  --ten-component-shadow: 2px 2px 0 #aabdd9; --ten-input-shadow: 2px 2px 0 #e0e8f5;
+}
+
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-panel,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-search-panel,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-card,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-group,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-mini-task { backdrop-filter: none; -webkit-backdrop-filter: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-panel::before,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-particle-field,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-comic-launcher::before { display: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-comic-launcher { color: var(--ten-cyan); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-brand-mark { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-list-bg); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-chapter-tools { border-color: var(--ten-card-border); background: var(--ten-card-bg); box-shadow: var(--ten-card-shadow); backdrop-filter: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-chapter-reload button { border-color: var(--ten-control-border); background: var(--ten-control-bg); box-shadow: var(--ten-component-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-input,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-select,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-textarea,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-setting-select > button { color: var(--ten-text); border-color: var(--ten-control-border); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) :is(input,textarea)::placeholder { color: var(--ten-muted); opacity: 1; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) :is(input,textarea,select):focus { border-color: var(--ten-cyan); box-shadow: var(--ten-input-shadow),var(--ten-focus-ring); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-select option { color: var(--ten-text); background: #ffffff; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-setting label,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-fields label,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-label,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-confirm-message { color: var(--ten-text); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-diagnostic-content { color: var(--ten-text); border-color: var(--ten-line); background: var(--ten-input-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-btn { box-shadow: var(--ten-component-shadow); background-size: 100% 100%; }
+#ten-comic-root[data-theme="cloud"] .ten-btn:hover:not(:disabled) { transform: translateY(-1px); border-color: #aebfd8; box-shadow: 5px 5px 12px rgba(70,92,122,.17),-4px -4px 10px #ffffff; }
+#ten-comic-root[data-theme="cloud"] .ten-btn:active:not(:disabled) { transform: translateY(0); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root[data-theme="paper"] .ten-btn:hover:not(:disabled) { transform: translate(-1px,-1px); border-color: var(--ten-cyan); box-shadow: 3px 3px 0 #9db3d4; }
+#ten-comic-root[data-theme="paper"] .ten-btn:active:not(:disabled) { transform: translate(2px,2px); box-shadow: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-actions .is-danger { color: var(--ten-danger); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-state.is-failed,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-state.is-partial { color: var(--ten-danger); border-color: var(--ten-danger-border); background: var(--ten-danger-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-state.is-cancelled { color: var(--ten-muted); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-card:hover,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-history-card:hover { border-color: var(--ten-control-border); background: var(--ten-list-hover-bg); box-shadow: var(--ten-card-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-performance { color: var(--ten-muted); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-performance > span:first-child { color: var(--ten-cyan); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-progress,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-mini-progress { background: #dfe7f3; box-shadow: inset 1px 1px 3px rgba(47,66,94,.12); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-progress > i,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-mini-progress > i { background: linear-gradient(90deg,var(--ten-cyan),#6096e5); box-shadow: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-nav::before { border-color: var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-hover-bg); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-source,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-effect-level,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-history-filter,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-readtype,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-appearance-axis { border-color: var(--ten-line); background: var(--ten-input-bg); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-source::before { border-color: var(--ten-line); background: var(--ten-list-hover-bg); box-shadow: none; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-appearance-axis button.is-active,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-effect-level button.is-active,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-history-filter button.is-active,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-readtype button.is-active { color: var(--ten-cyan); border-color: var(--ten-primary-border); background: var(--ten-list-hover-bg); box-shadow: inset 0 0 0 1px var(--ten-line); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-mode,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-direct-flow-options button,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-templates,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-template-grid button { color: var(--ten-text); border-color: var(--ten-line); background: var(--ten-input-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-mode.is-active,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-direct-flow-options button.is-active,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-template-grid button.is-active { color: var(--ten-cyan); border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); box-shadow: var(--ten-focus-ring); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) #ten-search-site-trigger { color: var(--ten-text); border-color: var(--ten-control-border); background: var(--ten-input-bg); box-shadow: var(--ten-input-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-search-site-option.is-selected { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-list-hover-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-empty-orbit { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-list-hover-bg); box-shadow: var(--ten-component-shadow); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-manage,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-advanced { border-color: var(--ten-line); background: var(--ten-input-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-advanced summary,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-templates summary { color: var(--ten-text); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-advanced[open] summary { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-list-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-open { color: var(--ten-cyan); border-color: var(--ten-primary-border); background: var(--ten-primary-bg); box-shadow: var(--ten-component-shadow); }
+#ten-comic-root[data-theme="paper"] .ten-rule-guide-open { color: var(--ten-primary-text); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-content,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-content dd { color: var(--ten-text); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-content section { border-color: var(--ten-line); background: var(--ten-list-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-content code { color: var(--ten-cyan); border-color: var(--ten-line); background: var(--ten-list-hover-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-example,
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-example code { color: var(--ten-text); border-color: var(--ten-line); background: var(--ten-list-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-guide-warning { color: #854d0e; border-color: #e8cb7c; background: #fffbea; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-test-result { color: var(--ten-text); border-color: var(--ten-line); background: var(--ten-input-bg); }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-test-result.is-success { color: var(--ten-success); border-color: #a5d4c5; background: #f0fdf7; }
+#ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-rule-test-result.is-error { color: var(--ten-danger); border-color: var(--ten-danger-border); background: var(--ten-danger-bg); }
+#ten-comic-root[data-theme="paper"] #ten-panel { border-width: 2px; background-image: linear-gradient(rgba(37,88,213,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(37,88,213,.025) 1px,transparent 1px); background-size: 24px 24px; }
+#ten-comic-root[data-theme="paper"] .ten-card,
+#ten-comic-root[data-theme="paper"] .ten-task-group { border-width: 1.5px; }
+#ten-comic-root[data-theme="paper"] .ten-input,
+#ten-comic-root[data-theme="paper"] .ten-textarea { border-width: 1.5px; }
+
+#ten-comic-root .ten-theme-choice[data-theme-choice="cloud"] { color: #26354a; border-color: #d0dceb; background: #f4f7fc; box-shadow: inset 3px 0 #7895bb,3px 3px 8px rgba(70,92,122,.12); }
+#ten-comic-root .ten-theme-choice[data-theme-choice="paper"] { color: #1c2d48; border-color: #93a8c8; background: #ffffff; box-shadow: inset 3px 0 #2558d5,3px 3px 0 #dce5f3; }
+#ten-comic-root .ten-theme-choice:is([data-theme-choice="cloud"],[data-theme-choice="paper"])[aria-pressed="true"] { color: #204b92; border-color: #2558d5; outline: 2px solid #2558d5; outline-offset: 1px; background: #eaf1ff; }
+
+@media (max-width: 400px) {
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-group:not([data-task-group="history"]) .ten-task-header { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 5px 8px; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-group:not([data-task-group="history"]) .ten-task-title-button { grid-column: 1; grid-row: 1; white-space: nowrap; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-group:not([data-task-group="history"]) .ten-task-control-group { display: contents; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-group:not([data-task-group="history"]) .ten-task-arrow-button { grid-column: 2; grid-row: 1; justify-self: end; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-bulk { grid-row: 2; width: 100%; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-card,
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-history-card { display: flex; flex-wrap: wrap; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-card > .ten-name,
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-history-card > .ten-name { flex: 1 0 100%; min-width: 0; }
+  #ten-comic-root:is([data-theme="cloud"],[data-theme="paper"]) .ten-task-actions { min-width: 0; max-width: 100%; margin-left: auto; flex-wrap: wrap; }
+}

@@ -31,6 +31,11 @@ async function main() {
           assert.ok(geometry.viewScrollWidth <= geometry.viewWidth + 2, `horizontal overflow ${viewport.width}/${tab}: ${JSON.stringify(geometry)}`)
           await page.screenshot({ animations: 'disabled', path: path.join(directory, `${viewport.width}x${viewport.height}-${tab}.png`) })
           if (tab === 'settings') {
+            assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), true)
+            await page.locator('#ten-download-settings > summary').click()
+            assert.equal(await page.locator('#ten-max-chapters').isVisible(), false)
+            await page.screenshot({ animations: 'disabled', path: path.join(directory, `${viewport.width}x${viewport.height}-settings-all-collapsed.png`) })
+            await page.locator('#ten-download-settings > summary').click()
             for (const id of ['ten-theme-settings', 'ten-rule-editor-card']) {
               await page.locator(`#${id} > summary`).click()
               const fits = await page.locator('.ten-view.is-active').evaluate(view => view.scrollWidth <= view.clientWidth + 2)

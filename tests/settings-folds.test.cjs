@@ -5,6 +5,52 @@ let browser
 before(async () => { browser = await chromium.launch({ headless: true }) })
 after(async () => { await browser?.close() })
 
+test('download settings starts expanded and preserves values when collapsed and reopened', async () => {
+  const { page, context, errors } = await openComic(browser)
+  try {
+    await page.locator('[data-tab="settings"]').click()
+    assert.equal(await page.locator('details#ten-download-settings').count(), 1)
+    assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), true)
+    await page.locator('#ten-max-chapters').fill('3')
+    await page.locator('#ten-max-chapters').press('Tab')
+    await page.locator('#ten-concurrent-images').fill('5')
+    await page.locator('#ten-concurrent-images').press('Tab')
+    await page.locator('#ten-digits').fill('4')
+    await page.locator('#ten-digits').press('Tab')
+    await page.locator('#ten-default-mode-trigger').click()
+    await page.locator('[data-default-mode="1"]').click()
+    const summary = page.locator('#ten-download-settings > summary')
+    await summary.click()
+    assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), false)
+    assert.equal(await page.locator('#ten-max-chapters').isVisible(), false)
+    await summary.press('Enter')
+    assert.equal(await page.locator('#ten-max-chapters').inputValue(), '3')
+    assert.equal(await page.locator('#ten-concurrent-images').inputValue(), '5')
+    assert.equal(await page.locator('#ten-digits').inputValue(), '4')
+    assert.equal(await page.locator('#ten-default-mode-label').textContent(), '压缩下载')
+    assert.deepEqual(await page.evaluate(() => [window.__gmValues.maxChapterNum, window.__gmValues.maxPictureNum, window.__gmValues.imgIndexBitNum, window.__gmValues.downType]), [3, 5, 4, 1])
+    assert.deepEqual(errors, [])
+  } finally { await context.close() }
+})
+
+test('download disclosure supports keyboard toggling on narrow screens with other groups still closed', async () => {
+  const { page, context } = await openComic(browser, { viewport: { width: 390, height: 844 } })
+  try {
+    await page.locator('[data-tab="settings"]').click()
+    assert.equal(await page.locator('details#ten-download-settings').count(), 1)
+    const summary = page.locator('#ten-download-settings > summary')
+    assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), true)
+    await summary.press('Space')
+    assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), false)
+    assert.equal(await page.locator('#ten-history-limit').isVisible(), false)
+    await summary.press('Space')
+    assert.equal(await page.locator('#ten-download-settings').evaluate(element => element.open), true)
+    assert.equal(await page.locator('#ten-max-chapters').isVisible(), true)
+    assert.equal(await page.locator('#ten-theme-settings').evaluate(element => element.open), false)
+    assert.equal(await page.locator('#ten-rule-editor-card').evaluate(element => element.open), false)
+  } finally { await context.close() }
+})
+
 test('theme and custom rules are collapsed by default, with one combined theme group', async () => {
   const { page, context, errors } = await openComic(browser)
   try {

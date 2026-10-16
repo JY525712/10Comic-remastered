@@ -62,9 +62,10 @@ id="ten-clear-history" class="ten-icon-btn" type="button" title="清空记录">'
 class="ten-task-arrow"></span></button></div></div><div class="ten-task-body"><div class="ten-list ten-history-wrap"><div id="ten-history-filter" \
 class="ten-history-filter" role="group" aria-label="下载记录筛选"><button type="button" data-history-filter="all">全部</button><button type="button" \
 data-history-filter="completed">完成</button><button type="button" data-history-filter="failed">失败</button><button type="button" \
-data-history-filter="cancelled">取消</button></div><div id="ten-history" class="ten-list"></div></div></div></div></section>' ].join(""), [ '<section class="ten-view" data-view="settings">', renderThemeSettings(), [ '<div class="ten-card ten-settings-card ten-settings-download"><div class="ten-card-title">下载</div><div class="ten-setting"><label \
-for="ten-max-chapters">同时下载章节</label><input id="ten-max-chapters" class="ten-input" type="number" min="1" max="3"></div><div class="ten-setting"><label \
-for="ten-concurrent-images">每章并发图片</label><input id="ten-concurrent-images" cl', 'ass="ten-input" type="number" min="1" max="5"></div><div class="ten-setting"><label for="ten-default-mode-trigger">默认方式</label><div id="ten-default-mode" \
+data-history-filter="cancelled">取消</button></div><div id="ten-history" class="ten-list"></div></div></div></div></section>' ].join(""), [ '<section class="ten-view" data-view="settings">', renderThemeSettings(), [ '<details id="ten-download-settings" class="ten-card ten-settings-card ten-settings-download ten-settings-disclosure" open><summary \
+class="ten-settings-summary">下载</summary><div class="ten-settings-disclosure-body"><div class="ten-setting"><label for="ten-max-chapters">同时下载章节</label><input \
+id="ten-max-chapters" class="ten-input" type="number" min="1" max="3"></div><div class="ten-setting"><label for="ten-concurrent-images">每章并发图片</label><input \
+id="ten-concurrent-images" cl', 'ass="ten-input" type="number" min="1" max="5"></div><div class="ten-setting"><label for="ten-default-mode-trigger">默认方式</label><div id="ten-default-mode" \
 class="ten-setting-select"><button id="ten-default-mode-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span \
 id="ten-default-mode-label">直接下载</span><span class="ten-picker-arrow"></spa', 'n></button><div id="ten-default-mode-menu" class="ten-setting-select-menu" role="listbox" hidden><button type="button" data-default-mode="0"><span \
 class="ten-mode-option-mark"></span><span><strong>直接下载</strong><small>逐张保存图片</small></span></button><button type="button" data-default-mode="1"><span \
@@ -79,7 +80,7 @@ max="65530"></div><div class="ten-setting"><label for="ten-digits">图片序号�
 max="8"></div><div class="ten-setting"><label>图片下载范围</label><div class="ten-grid-2"><input id="ten-range-start" class="ten-input" type="number" min="1"><input \
 id="ten-range-end" class="ten-input" type="number" min="-1"></div></div>', settingCheck("ten-splice-page", "网站图片连续阅读"), settingCheck("ten-notify-complete", "下载完成通知"), '<div class="ten-setting"><label for="ten-history-limit">下载记录上限</label><input id="ten-history-limit" class="ten-input" type="number" min="10" \
 max="500"></div><div class="ten-setting"><label>本地保存目录</label><div class="ten-dir-control"><button id="ten-choose-dir" class="ten-btn is-small" \
-type="button">选择目录</button><span id="ten-dir-name" class="ten-file-name"></span></div></div></div>', '<details id="ten-rule-editor-card" class="ten-card ten-settings-card ten-settings-disclosure"><summary class="ten-settings-summary">自定义规则</summary><div \
+type="button">选择目录</button><span id="ten-dir-name" class="ten-file-name"></span></div></div></div></details>', '<details id="ten-rule-editor-card" class="ten-card ten-settings-card ten-settings-disclosure"><summary class="ten-settings-summary">自定义规则</summary><div \
 class="ten-settings-disclosure-body"><div class="ten-card-head"><span class="ten-meta">站点解析与规则导入</span><button id="ten-rule-guide-open" \
 class="ten-rule-guide-open" type="button" aria-label="自定义站点设置方法">' + icon("guide") + [ '<span>方法</span></button></div><div class="ten-rule-intro"><strong>简单填写</strong><span>普通卷轴漫画站只需填写名称、域名、章节列表和图片选择器</span></div><div class="ten-rule-fields"><div \
 class="ten-grid-2"><label>站点名称<input id="ten-rule-name" class="ten-input" placeholder="例如：示例漫画"></label><label>域名<input id="ten-rule-domain" class="ten-input" \

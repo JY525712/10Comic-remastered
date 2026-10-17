@@ -70,10 +70,10 @@ test('preset list replaces the two removed themes with two new white themes', as
     await page.locator('[data-tab="settings"]').click()
     await page.locator('#ten-theme-settings > summary').click()
     const presets = await page.locator('[data-theme-choice]').evaluateAll(elements => elements.map(element => ({ key: element.dataset.themeChoice, name: element.querySelector('strong').textContent })))
-    assert.deepEqual(presets.map(preset => preset.key), ['glass', 'mist', 'cloud', 'expressive', 'carbon', 'garden'])
+    assert.deepEqual(presets.map(preset => preset.key), ['glass', 'mist', 'cloud', 'liquid', 'carbon', 'garden'])
     assert.equal(presets.find(preset => preset.key === 'cloud').name, '云白浮雕')
     assert.equal(presets.find(preset => preset.key === 'garden').name, '晴白庭院')
-    assert.equal(presets.some(preset => ['白瓷简章', '墨竹书斋', '纸白蓝图'].includes(preset.name)), false)
+    assert.equal(presets.some(preset => ['白瓷简章', '墨竹书斋', '纸白蓝图', '星雾紫'].includes(preset.name)), false)
   } finally { await context.close() }
 })
 

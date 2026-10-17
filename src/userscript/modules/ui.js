@@ -18,7 +18,7 @@ module.exports = () => {
         glass: [ "深海流光", "青紫通透 · 经典" ],
         mist: [ "晨雾晶璃", "白色玻璃 · 柔光折射" ],
         cloud: [ "云白浮雕", "柔白拟态 · 轻盈触感" ],
-        expressive: [ "星雾紫", "柔和圆角 · 层叠色面" ],
+        liquid: [ "澄光琉璃", "液态玻璃 · 银蓝折光" ],
         carbon: [ "霓虹炭黑", "蓝粉边光 · 精密组件" ],
         garden: [ "晴白庭院", "暖白留光 · 鼠尾草绿" ]
     }, TAB_ORDER = [ "sites", "chapters", "tasks", "settings" ], TAB_TITLES = {
@@ -71,7 +71,7 @@ module.exports = () => {
         settings: null
     };
     function normalizeThemePreset(value) {
-        const preset = value === "porcelain" ? "cloud" : value === "ink" || value === "paper" ? "garden" : value;
+        const preset = value === "porcelain" ? "cloud" : value === "ink" || value === "paper" ? "garden" : value === "expressive" ? "liquid" : value;
         return Object.prototype.hasOwnProperty.call(THEMES, preset) ? preset : "glass";
     }
     function readSettings() {

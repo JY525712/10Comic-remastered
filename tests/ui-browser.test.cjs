@@ -212,7 +212,7 @@ test('resizing from a narrow drawer to desktop restores the options and releases
 
 test('scoping styles preserves the palettes of the unchanged original themes', async () => {
   const original = [], optimized = []
-  for (const theme of ['glass', 'mist', 'expressive', 'carbon']) {
+  for (const theme of ['glass', 'mist', 'carbon']) {
     for (const baseline of [true, false]) {
       const { page, context } = await openComic(browser, { baseline, count: 1, settings: { themePreset: theme } })
       try {

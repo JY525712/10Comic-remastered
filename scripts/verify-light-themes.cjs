@@ -10,7 +10,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true })
   const checks = []
   try {
-    for (const theme of ['cloud', 'garden']) {
+    for (const theme of ['cloud', 'garden', 'liquid']) {
       for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 568 }]) {
         const { page, context, errors } = await openComic(browser, { count: 8, requestDelay: -1, viewport, settings: { themePreset: theme, effectLevel: 1, appLoadDefault: { isShowUI: true, rightSize: 125 } } })
         try {

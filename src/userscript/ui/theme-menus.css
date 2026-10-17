@@ -1,0 +1,30 @@
+/* Menu states share the current theme, including nested radio indicators. */
+#ten-comic-root {
+  --ten-menu-selected-bg: #17344b; --ten-menu-hover-bg: #203e55;
+  --ten-menu-border: #397b92; --ten-menu-muted: #abc3d4; --ten-menu-mark-inner: #152b40;
+  --ten-menu-filter: blur(24px) saturate(1.3);
+}
+#ten-comic-root[data-theme="mist"] { --ten-menu-selected-bg: #e2f3fa; --ten-menu-hover-bg: #ecf7fc; --ten-menu-border: #83bace; --ten-menu-muted: #526c80; --ten-menu-mark-inner: #f6fbff; }
+#ten-comic-root[data-theme="cloud"] { --ten-menu-selected-bg: #eaf1fc; --ten-menu-hover-bg: #f0f5fc; --ten-menu-border: #b1c5e0; --ten-menu-muted: #53647a; --ten-menu-mark-inner: #ffffff; --ten-menu-filter: none; }
+#ten-comic-root[data-theme="liquid"] { --ten-menu-selected-bg: #e0f1fa; --ten-menu-hover-bg: #eef8ff; --ten-menu-border: #a0c8dd; --ten-menu-muted: #4b6376; --ten-menu-mark-inner: #f5faff; --ten-menu-filter: blur(28px) saturate(1.45); }
+#ten-comic-root[data-theme="carbon"] { --ten-menu-selected-bg: #202d42; --ten-menu-hover-bg: #19273a; --ten-menu-border: #4a7eae; --ten-menu-muted: #adbbcf; --ten-menu-mark-inner: #111821; }
+#ten-comic-root[data-theme="garden"] { --ten-menu-selected-bg: #edf4e9; --ten-menu-hover-bg: #f3f8ef; --ten-menu-border: #b4cbab; --ten-menu-muted: #596a5f; --ten-menu-mark-inner: #ffffff; --ten-menu-filter: none; }
+#ten-comic-root[data-theme] .ten-setting-select-menu,
+#ten-comic-root[data-theme] .ten-search-site-menu { backdrop-filter: var(--ten-menu-filter); -webkit-backdrop-filter: var(--ten-menu-filter); }
+#ten-comic-root[data-theme] #ten-default-mode-trigger,
+#ten-comic-root[data-theme] #ten-search-site-trigger { color: var(--ten-text); border-color: var(--ten-control-border); background: var(--ten-input-bg); border-radius: var(--ten-radius-control); }
+#ten-comic-root[data-theme] #ten-default-mode-trigger:hover,
+#ten-comic-root[data-theme] .ten-setting-select.is-open #ten-default-mode-trigger,
+#ten-comic-root[data-theme] #ten-search-site-trigger:hover,
+#ten-comic-root[data-theme] .ten-search-site-picker.is-open #ten-search-site-trigger { border-color: var(--ten-cyan); background: var(--ten-input-bg); box-shadow: var(--ten-focus-ring); }
+#ten-comic-root[data-theme] .ten-setting-select-menu button,
+#ten-comic-root[data-theme] .ten-search-site-option { color: var(--ten-text); border-radius: max(7px,calc(var(--ten-radius-control) - 3px)); }
+#ten-comic-root[data-theme] .ten-setting-select-menu button small,
+#ten-comic-root[data-theme] .ten-search-site-option small { color: var(--ten-menu-muted); }
+#ten-comic-root[data-theme] .ten-setting-select-menu button:hover,
+#ten-comic-root[data-theme] .ten-search-site-option:hover:not(:disabled) { color: var(--ten-text); border-color: var(--ten-menu-border); background: var(--ten-menu-hover-bg); }
+#ten-comic-root[data-theme] .ten-setting-select-menu button.is-selected,
+#ten-comic-root[data-theme] .ten-search-site-option.is-selected { color: var(--ten-text); border-color: var(--ten-menu-border); background: var(--ten-menu-selected-bg); }
+#ten-comic-root[data-theme] .ten-mode-option-mark { border-color: var(--ten-menu-border); background: transparent; box-shadow: inset 0 0 0 2px var(--ten-menu-mark-inner); }
+#ten-comic-root[data-theme] .ten-setting-select-menu button.is-selected .ten-mode-option-mark { border-color: var(--ten-cyan); background: var(--ten-cyan); box-shadow: inset 0 0 0 2px var(--ten-menu-mark-inner); }
+#ten-comic-root[data-theme] .ten-search-site-menu::-webkit-scrollbar-thumb { background: var(--ten-scroll-thumb); }

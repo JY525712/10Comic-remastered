@@ -1,0 +1,97 @@
+/*
+Minimized launcher effects adapted and recomposed from:
+https://uiverse.io/aadium/bright-lion-66
+https://uiverse.io/imtausef/neat-donkey-42
+
+MIT License
+Copyright (c) 2026 aadium (Aadi Umrani)
+Copyright (c) 2026 imtausef (Muhammad Tauseef)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+#ten-comic-root[data-theme="aurora"] {
+  --ten-launcher-fx-name: ten-launcher-fx-aurora;
+  --ten-launcher-fx-period: 7s;
+  --ten-launcher-fx-gradient: conic-gradient(from 90deg,#8aeaff,#a8c3ff 28%,#dbbaff 52%,#b1eeff 78%,#8aeaff);
+  --ten-launcher-fx-line: rgba(255,255,255,.75);
+}
+#ten-comic-root[data-theme="cloud"] {
+  --ten-launcher-fx-name: ten-launcher-fx-cloud;
+  --ten-launcher-fx-period: 5.4s;
+  --ten-launcher-fx-gradient: radial-gradient(ellipse at 50% 50%,transparent 55%,#a1bddf 90%);
+  --ten-launcher-fx-line: rgba(255,255,255,.9);
+}
+#ten-comic-root[data-theme="obsidian"] {
+  --ten-launcher-fx-name: ten-launcher-fx-obsidian;
+  --ten-launcher-fx-period: 8s;
+  --ten-launcher-fx-gradient: conic-gradient(from 30deg,transparent 0deg 230deg,#765f32 260deg,#ffe7a3 280deg,#bda15c 300deg,transparent 330deg 360deg);
+  --ten-launcher-fx-line: rgba(255,222,151,.18);
+}
+#ten-comic-root[data-theme="carbon"] {
+  --ten-launcher-fx-name: ten-launcher-fx-carbon;
+  --ten-launcher-fx-period: 4.8s;
+  --ten-launcher-fx-gradient: conic-gradient(from 0deg,transparent 0deg 55deg,#46bcff 85deg,transparent 125deg 235deg,#ff66b0 265deg,transparent 305deg 360deg);
+  --ten-launcher-fx-line: rgba(117,180,232,.2);
+}
+#ten-comic-root[data-theme="titanium"] {
+  --ten-launcher-fx-name: ten-launcher-fx-titanium;
+  --ten-launcher-fx-period: 6s;
+  --ten-launcher-fx-gradient: linear-gradient(110deg,transparent 32%,rgba(124,197,255,.12) 42%,#b4e5ff 50%,rgba(124,197,255,.12) 58%,transparent 68%);
+  --ten-launcher-fx-line: rgba(158,203,237,.2);
+}
+
+/* Mist is deliberately excluded; keep its original launcher unchanged. */
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher { isolation: isolate; }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher::before {
+  content: ""; display: block; position: absolute; z-index: 0; inset: -65%; pointer-events: none;
+  border: 0; border-radius: 0; background: var(--ten-launcher-fx-gradient);
+  opacity: var(--ten-launcher-fx-alpha,.9);
+  animation: var(--ten-launcher-fx-name) calc(var(--ten-launcher-fx-period) * var(--ten-launcher-fx-speed,1)) linear infinite;
+}
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher::after {
+  content: ""; display: block; position: absolute; z-index: 1; inset: 2px; pointer-events: none;
+  border: 1px solid var(--ten-launcher-fx-line); border-radius: max(4px,calc(var(--ten-radius-launcher) - 2px)); background: var(--ten-launcher-bg);
+}
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher span { z-index: 2; }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher:hover { box-shadow: var(--ten-launcher-shadow),var(--ten-focus-ring); }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"])[data-effects="1"] { --ten-launcher-fx-speed: 1.6; --ten-launcher-fx-alpha: .52; }
+#ten-comic-root[data-theme="cloud"] #ten-comic-launcher::before { inset: 0; border-radius: inherit; animation-timing-function: ease-in-out; }
+#ten-comic-root[data-theme="titanium"] #ten-comic-launcher::before { inset: -30%; animation-timing-function: ease-in-out; }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher.is-hidden::before { animation-play-state: paused; }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]):is([data-effects="0"],[data-motion="calm"]) #ten-comic-launcher::before,
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]):is([data-effects="0"],[data-motion="calm"]) #ten-comic-launcher::after { display: none; animation: none; }
+
+@keyframes ten-launcher-fx-aurora { to { transform: rotate(360deg); } }
+@keyframes ten-launcher-fx-cloud {
+  0%,100% { transform: scale(.94); opacity: calc(var(--ten-launcher-fx-alpha,.9) * .3); }
+  50% { transform: scale(1); opacity: var(--ten-launcher-fx-alpha,.9); }
+}
+@keyframes ten-launcher-fx-obsidian { to { transform: rotate(360deg); } }
+@keyframes ten-launcher-fx-carbon { to { transform: rotate(-360deg); } }
+@keyframes ten-launcher-fx-titanium {
+  0%,12% { transform: translateX(-100%) skewX(-18deg); opacity: 0; }
+  25% { opacity: var(--ten-launcher-fx-alpha,.9); }
+  65% { transform: translateX(100%) skewX(-18deg); opacity: var(--ten-launcher-fx-alpha,.9); }
+  72%,100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher::before,
+  #ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) #ten-comic-launcher::after { display: none; animation: none; }
+}

@@ -13,7 +13,7 @@ function composeUI(source, sourceRoot) {
   if (!styleSlot) throw new Error('Missing UI style slot')
   let styles = fs.readFileSync(path.join(directory, 'styles.css'), 'utf8')
   if (styles.split('/*__THEME_COMPONENT_STYLES__*/').length !== 2) throw new Error('Expected one theme component style slot')
-  const themeStyles = ['light-themes.css', 'premium-themes.css', 'theme-menus.css'].map(name => fs.readFileSync(path.join(directory, name), 'utf8')).join('\n')
+  const themeStyles = ['light-themes.css', 'premium-themes.css', 'theme-menus.css', 'launcher-effects.css'].map(name => fs.readFileSync(path.join(directory, name), 'utf8')).join('\n')
   styles = styles.replace('/*__THEME_COMPONENT_STYLES__*/', () => themeStyles)
   replace(styleSlot[0], JSON.stringify(styles))
   for (const name of ['shell', 'sites', 'chapters', 'tasks', 'rules', 'accessibility']) {

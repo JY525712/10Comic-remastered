@@ -1,6 +1,6 @@
 # Third-party component notices
 
-These notices apply to the adapted white-theme component styles. The rest of the project retains its existing license.
+These notices apply to the adapted theme and minimized-launcher component styles. The rest of the project retains its existing license.
 
 White themes adapted and recomposed from Uiverse components:
 https://uiverse.io/adamgiebl/lucky-donkey-6
@@ -8,9 +8,15 @@ https://uiverse.io/adamgiebl/hot-cat-14
 https://uiverse.io/0xnihilism/thin-crab-36
 https://uiverse.io/0xnihilism/calm-baboon-55
 
+Minimized launcher effects adapted and recomposed from:
+https://uiverse.io/aadium/bright-lion-66
+https://uiverse.io/imtausef/neat-donkey-42
+
 MIT License
 Copyright (c) 2026 adamgiebl (Adam Giebl)
 Copyright (c) 2026 0xnihilism (0xNihilist)
+Copyright (c) 2026 aadium (Aadi Umrani)
+Copyright (c) 2026 imtausef (Muhammad Tauseef)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

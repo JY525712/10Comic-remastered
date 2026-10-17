@@ -27,6 +27,10 @@ async function main() {
   const filenames = JSON.parse(fs.readFileSync(path.join(directory, 'filename-compatibility.json')))
   assert.equal(filenames.sha256, sha256, 'native filename checks are for an earlier artifact')
   assert.ok(filenames.cases.length >= 100 && filenames.cases.every(row => row.result.directory === 'accepted' && row.result.file === 'accepted'), 'native filename checks failed')
+  const launchers = JSON.parse(fs.readFileSync(path.join(directory, 'launcher-effects-report.json')))
+  assert.equal(launchers.sha256, sha256, 'launcher previews are for an earlier artifact')
+  assert.equal(launchers.themes.length, 6)
+  assert.equal(launchers.frames, 80)
   const benchmark = JSON.parse(fs.readFileSync(path.join(directory, 'chapter-benchmark.json')))
   assert.equal(browser.sha256, sha256, 'browser checks are for an earlier artifact')
   assert.equal(benchmark.sha256, sha256, 'benchmark is for an earlier artifact')
@@ -41,6 +45,7 @@ async function main() {
     browser: { command: 'npm run verify:browser', checks: browser.checks.length },
     themes: { command: 'npm run verify:themes', checks: themes.checks.length },
     filenames: { browser: filenames.browser, cases: filenames.cases.length, scope: 'Windows disk files and real Chromium directory/file handle name validation; download-mode writes use offline fixtures' },
+    launchers: { command: 'npm run preview:launcher', themes: launchers.themes, frames: launchers.frames, controls: launchers.controls },
     benchmark: benchmark.summary,
     scope: 'Offline Chromium fixtures and native handle filename checks; unchanged adapters/queue/config and download AST outside approved filename cleanup; no live account or site availability claim'
   }

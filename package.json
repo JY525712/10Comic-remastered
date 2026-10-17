@@ -14,7 +14,8 @@
     "benchmark:chapters": "node scripts/benchmark-chapters.cjs",
     "format:ui": "node scripts/format-ui.cjs",
     "verify:themes": "node scripts/verify-light-themes.cjs",
-    "verify:light-themes": "node scripts/verify-light-themes.cjs"
+    "verify:light-themes": "node scripts/verify-light-themes.cjs",
+    "preview:launcher": "node scripts/preview-launcher-effects.cjs"
   },
   "devDependencies": {
     "@babel/generator": "7.29.8",

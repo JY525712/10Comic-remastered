@@ -4810,67 +4810,111 @@ button.is-selected,\n#ten-comic-root[data-theme] .ten-search-site-option.is-sele
 var(--ten-menu-selected-bg); }\n#ten-comic-root[data-theme] .ten-mode-option-mark { border-color: var(--ten-menu-border); background: transparent; box-shadow: \
 inset 0 0 0 2px var(--ten-menu-mark-inner); }\n#ten-comic-root[data-theme] .ten-setting-select-menu button.is-selected .ten-mode-option-mark { border-color: \
 var(--ten-cyan); background: var(--ten-cyan); box-shadow: inset 0 0 0 2px var(--ten-menu-mark-inner); }\n#ten-comic-root[data-theme] \
-.ten-search-site-menu::-webkit-scrollbar-thumb { background: var(--ten-scroll-thumb); }\n\n#ten-comic-root[data-shape="sharp"] { --ten-radius-panel: 14px; \
---ten-radius-card: 10px; --ten-radius-control: 7px; --ten-radius-launcher: 10px; }\n#ten-comic-root[data-shape="round"] { --ten-radius-panel: 30px; \
---ten-radius-card: 22px; --ten-radius-control: 15px; --ten-radius-launcher: 22px; }\n#ten-comic-root[data-density="compact"] #ten-panel { grid-template-rows: \
-52px minmax(0,1fr) 58px; }\n#ten-comic-root[data-density="compact"] .ten-view { padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-card { \
-margin-bottom: 6px; padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-list { gap: 5px; }\n#ten-comic-root[data-density="compact"] .ten-list-item { \
-min-height: 38px; padding: 7px 9px; }\n#ten-comic-root[data-density="comfortable"] .ten-view { padding: 16px; }\n#ten-comic-root[data-density="comfortable"] \
-.ten-card { margin-bottom: 12px; padding: 13px; }\n#ten-comic-root[data-density="comfortable"] .ten-list { gap: 9px; \
-}\n#ten-comic-root[data-density="comfortable"] .ten-list-item { min-height: 47px; padding: 11px 13px; }\n#ten-comic-root[data-motion="calm"] #ten-panel { \
-transition-duration: .25s; }\n#ten-comic-root[data-motion="calm"] .ten-task-body { transition-duration: .32s; }\n#ten-comic-root[data-motion="spring"] \
-#ten-panel { transition-timing-function: cubic-bezier(.16,1.35,.3,1); }\n#ten-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: \
-cubic-bezier(.16,1.25,.3,1); }\n\n@media (max-width: 380px) {\n:where(#ten-comic-root) .ten-theme-presets { grid-template-columns: 1fr; }\n}\n\n#ten-comic-root \
-#ten-panel { width: min(430px, calc((100vw - 28px) / var(--ten-scale))); height: min(780px, calc((100vh - 28px) / var(--ten-scale))); }\n/* Shared interaction \
-and layout refinements. Theme values remain authoritative. */\n#ten-comic-root {\n  --ten-space-1: 4px;\n  --ten-space-2: 8px;\n  --ten-space-3: 12px;\n  \
---ten-space-4: 16px;\n  --ten-readable-line-height: 1.6;\n  -webkit-tap-highlight-color: transparent;\n}\n#ten-comic-root .ten-confirm,\n#ten-comic-root \
-.ten-diagnostic { transition: opacity .2s ease; }\n#ten-comic-root :is(button, input, select, textarea, summary):focus-visible {\n  outline: 2px solid \
-var(--ten-cyan);\n  outline-offset: 3px;\n}\n#ten-comic-root .ten-card-title { line-height: 1.5; letter-spacing: .02em; }\n#ten-comic-root \
-.ten-meta,\n#ten-comic-root .ten-settings-hint,\n#ten-comic-root .ten-rule-simple-hint { line-height: var(--ten-readable-line-height); }\n#ten-comic-root \
-.ten-chapter-label { min-width: 0; overflow: hidden; }\n#ten-comic-root .ten-chapter-label .ten-name { display: block; overflow: hidden; text-overflow: \
-ellipsis; white-space: nowrap; }\n#ten-comic-root .ten-chapter-label .ten-input { width: 100%; min-width: 0; }\n#ten-comic-root .ten-list-item { transition: \
-background-color .16s, border-color .16s; }\n#ten-comic-root .ten-list-item.is-selected { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); \
-}\n#ten-comic-root .ten-list-item:focus-within { box-shadow: var(--ten-focus-ring); }\n#ten-comic-root input[type="checkbox"] { accent-color: var(--ten-cyan); \
-}\n#ten-comic-root .ten-result { min-width: 0; }\n#ten-comic-root .ten-result > span { overflow-wrap: anywhere; }\n#ten-comic-root .ten-task-title { \
-line-height: 1.55; }\n#ten-comic-root .ten-settings-card { scroll-margin-block: var(--ten-space-3); }\n#ten-comic-root .ten-settings-card .ten-card-title { \
-margin-bottom: var(--ten-space-3); }\n#ten-comic-root .ten-setting > label { min-width: 0; overflow-wrap: anywhere; }\n#ten-comic-root #ten-rule-guide \
-.ten-rule-guide-content { min-height: 0; overscroll-behavior: contain; }\n#ten-comic-root .ten-view,\n#ten-comic-root \
-.ten-search-panel-content,\n#ten-comic-root #ten-mobile-drawer-content { overscroll-behavior: contain; scrollbar-gutter: stable; }\n#ten-comic-root \
-#ten-panel:not(.is-open) *,\n#ten-comic-root #ten-panel:not(.is-open) *::before,\n#ten-comic-root #ten-panel:not(.is-open) \
-*::after,\n#ten-comic-root.is-page-hidden *,\n#ten-comic-root.is-page-hidden *::before,\n#ten-comic-root.is-page-hidden *::after { animation-play-state: paused \
-!important; }\n@supports (height: 100dvh) {\n  #ten-comic-root #ten-panel { height: min(780px, calc((100dvh - 28px) / var(--ten-scale))); }\n}\n@media \
-(max-width: 560px), (max-height: 720px) {\n  #ten-comic-root #ten-panel { width: calc((100vw - 16px) / var(--ten-scale)); max-width: calc(100vw - 16px); height: \
-calc((100vh - 16px) / var(--ten-scale)); }\n  @supports (height: 100dvh) {\n    #ten-comic-root #ten-panel { height: calc((100dvh - 16px) / var(--ten-scale)); \
-}\n    #ten-comic-root #ten-search-panel { height: calc(100dvh - 16px); }\n  }\n}\n@media (max-width: 560px) {\n  #ten-comic-root .ten-icon-btn { min-width: \
-40px; min-height: 40px; }\n  #ten-comic-root .ten-btn { min-height: 40px; }\n  #ten-comic-root .ten-list-item { min-height: 44px; }\n  #ten-comic-root \
-.ten-list-item input[type="checkbox"] { width: 18px; height: 18px; }\n  #ten-comic-root .ten-search-toolbar { min-width: 0; }\n  #ten-comic-root \
-.ten-search-toolbar > * { min-width: 0; }\n  #ten-comic-root .ten-setting { grid-template-columns: minmax(0, 1fr) minmax(100px, 1fr); gap: 8px; }\n  \
-#ten-comic-root .ten-mobile-drawer-sheet { padding-bottom: max(14px, env(safe-area-inset-bottom)); }\n  #ten-comic-root .ten-nav { padding-bottom: \
-env(safe-area-inset-bottom); }\n  #ten-comic-root .ten-diagnostic { padding: 10px; }\n  #ten-comic-root .ten-diagnostic-dialog { max-height: 94%; }\n}\n@media \
-(max-width: 360px) {\n  #ten-comic-root .ten-grid-2 { grid-template-columns: minmax(0, 1fr); }\n  #ten-comic-root .ten-rule-pick-actions { \
-grid-template-columns: minmax(0, 1fr); }\n}\n@media (max-height: 500px) {\n  #ten-comic-root #ten-panel { grid-template-rows: 48px minmax(0, 1fr) 50px; }\n  \
-#ten-comic-root .ten-view { padding: 8px; }\n  #ten-comic-root .ten-diagnostic-dialog { max-height: 100%; gap: 8px; padding: 10px; }\n  #ten-comic-root \
-#ten-diagnostic-content { min-height: 0; }\n  #ten-comic-root .ten-mobile-drawer-sheet { max-height: calc(100vh - 16px); }\n}\n\n#ten-comic-root \
-#ten-chapter-list { grid-template-columns: minmax(0, 1fr); }\n#ten-comic-root #ten-chapter-list .ten-list-item { min-width: 0; }\n#ten-comic-root \
-.ten-chapter-label { flex: 1 1 0; }\n#ten-comic-root .ten-btn { white-space: nowrap; }\n#ten-comic-root .ten-icon-btn { transition: color .18s, background-color \
-.18s, border-color .18s, transform .18s; }\n@media (max-width: 560px) {\n  #ten-comic-root .ten-chapter-tools { grid-template-columns: minmax(0, 1fr) auto; }\n  \
-#ten-comic-root .ten-chapter-tools > :last-child { grid-column: 1 / -1; width: 100%; justify-self: stretch; }\n  #ten-comic-root .ten-chapter-select-group { \
-flex-wrap: nowrap; }\n}\n\n@media (max-width: 560px) {\n  #ten-comic-root .ten-search-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; }\n  \
-#ten-comic-root .ten-search-site-picker { grid-column: 1 / -1; width: 100%; }\n  #ten-comic-root .ten-search-toolbar .ten-input { width: 100%; }\n}\n\n/* \
-Settings disclosures keep their controls in the original settings scope. */\n#ten-comic-root .ten-settings-disclosure { padding: 0; }\n#ten-comic-root \
-.ten-settings-disclosure > .ten-settings-summary {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  min-height: \
-46px;\n  padding: 12px 14px;\n  color: var(--ten-text);\n  font-size: 13px;\n  font-weight: 750;\n  line-height: 1.5;\n  list-style: none;\n  cursor: pointer;\n \
- user-select: none;\n  border-radius: inherit;\n}\n#ten-comic-root .ten-settings-summary::-webkit-details-marker { display: none; }\n#ten-comic-root \
-.ten-settings-disclosure > .ten-settings-summary::after {\n  content: "";\n  flex: 0 0 7px;\n  width: 7px;\n  height: 7px;\n  margin: -3px 2px 0 0;\n  \
-border-right: 1.5px solid currentColor;\n  border-bottom: 1.5px solid currentColor;\n  transform: rotate(45deg);\n  transition: transform .18s \
-ease;\n}\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:hover { background: var(--ten-control-hover-bg); }\n#ten-comic-root \
-.ten-settings-disclosure > .ten-settings-summary:focus-visible { outline-offset: -3px; }\n#ten-comic-root .ten-settings-disclosure[open] > .ten-settings-summary \
-{\n  border-bottom: 1px solid var(--ten-line);\n  border-bottom-left-radius: 0;\n  border-bottom-right-radius: 0;\n}\n#ten-comic-root \
-.ten-settings-disclosure[open] > .ten-settings-summary::after { transform: rotate(225deg); margin-top: 3px; }\n#ten-comic-root .ten-settings-disclosure-body { \
-min-width: 0; padding: 12px; }\n#ten-comic-root .ten-settings-section { min-width: 0; }\n#ten-comic-root .ten-settings-section + .ten-settings-section { \
-margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ten-line); }\n#ten-comic-root .ten-settings-section > .ten-card-title { margin-bottom: 10px; \
-font-size: 11px; }\n#ten-comic-root .ten-settings-section .ten-setting:last-child { margin-bottom: 0; }\n@media (max-width: 560px) {\n  #ten-comic-root \
-.ten-settings-disclosure > .ten-settings-summary { min-height: 48px; padding: 12px; }\n  #ten-comic-root .ten-settings-disclosure-body { padding: 10px; }\n}\n', 
+.ten-search-site-menu::-webkit-scrollbar-thumb { background: var(--ten-scroll-thumb); }\n\n/*\nMinimized launcher effects adapted and recomposed \
+from:\nhttps://uiverse.io/aadium/bright-lion-66\nhttps://uiverse.io/imtausef/neat-donkey-42\n\nMIT License\nCopyright (c) 2026 aadium (Aadi Umrani)\nCopyright \
+(c) 2026 imtausef (Muhammad Tauseef)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated \
+documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, \
+publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the \
+following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE \
+SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A \
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN \
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE \
+SOFTWARE.\n*/\n\n#ten-comic-root[data-theme="aurora"] {\n  --ten-launcher-fx-name: ten-launcher-fx-aurora;\n  --ten-launcher-fx-period: 7s;\n  \
+--ten-launcher-fx-gradient: conic-gradient(from 90deg,#8aeaff,#a8c3ff 28%,#dbbaff 52%,#b1eeff 78%,#8aeaff);\n  --ten-launcher-fx-line: \
+rgba(255,255,255,.75);\n}\n#ten-comic-root[data-theme="cloud"] {\n  --ten-launcher-fx-name: ten-launcher-fx-cloud;\n  --ten-launcher-fx-period: 5.4s;\n  \
+--ten-launcher-fx-gradient: radial-gradient(ellipse at 50% 50%,transparent 55%,#a1bddf 90%);\n  --ten-launcher-fx-line: \
+rgba(255,255,255,.9);\n}\n#ten-comic-root[data-theme="obsidian"] {\n  --ten-launcher-fx-name: ten-launcher-fx-obsidian;\n  --ten-launcher-fx-period: 8s;\n  \
+--ten-launcher-fx-gradient: conic-gradient(from 30deg,transparent 0deg 230deg,#765f32 260deg,#ffe7a3 280deg,#bda15c 300deg,transparent 330deg 360deg);\n  \
+--ten-launcher-fx-line: rgba(255,222,151,.18);\n}\n#ten-comic-root[data-theme="carbon"] {\n  --ten-launcher-fx-name: ten-launcher-fx-carbon;\n  \
+--ten-launcher-fx-period: 4.8s;\n  --ten-launcher-fx-gradient: conic-gradient(from 0deg,transparent 0deg 55deg,#46bcff 85deg,transparent 125deg 235deg,#ff66b0 \
+265deg,transparent 305deg 360deg);\n  --ten-launcher-fx-line: rgba(117,180,232,.2);\n}\n#ten-comic-root[data-theme="titanium"] {\n  --ten-launcher-fx-name: \
+ten-launcher-fx-titanium;\n  --ten-launcher-fx-period: 6s;\n  --ten-launcher-fx-gradient: linear-gradient(110deg,transparent 32%,rgba(124,197,255,.12) \
+42%,#b4e5ff 50%,rgba(124,197,255,.12) 58%,transparent 68%);\n  --ten-launcher-fx-line: rgba(158,203,237,.2);\n}\n\n/* Mist is deliberately excluded; keep its \
+original launcher unchanged. */\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher { isolation: isolate; }\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher::before {\n  content: ""; display: block; position: absolute; z-index: 0; inset: -65%; pointer-events: none;\n  border: 0; border-radius: 0; \
+background: var(--ten-launcher-fx-gradient);\n  opacity: var(--ten-launcher-fx-alpha,.9);\n  animation: var(--ten-launcher-fx-name) \
+calc(var(--ten-launcher-fx-period) * var(--ten-launcher-fx-speed,1)) linear infinite;\n}\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher::after {\n  content: ""; display: block; position: absolute; z-index: 1; inset: 2px; pointer-events: none;\n  border: 1px solid \
+var(--ten-launcher-fx-line); border-radius: max(4px,calc(var(--ten-radius-launcher) - 2px)); background: \
+var(--ten-launcher-bg);\n}\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher span { z-index: 2; }\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher:hover { box-shadow: var(--ten-launcher-shadow),var(--ten-focus-ring); \
+}\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"])[data-effects="1"] { \
+--ten-launcher-fx-speed: 1.6; --ten-launcher-fx-alpha: .52; }\n#ten-comic-root[data-theme="cloud"] #ten-comic-launcher::before { inset: 0; border-radius: \
+inherit; animation-timing-function: ease-in-out; }\n#ten-comic-root[data-theme="titanium"] #ten-comic-launcher::before { inset: -30%; animation-timing-function: \
+ease-in-out; }\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher.is-hidden::before { animation-play-state: paused; }\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]):is([data-effects="0"],[data-motion="calm"]) \
+#ten-comic-launcher::before,\n#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]):is([data-effects="0"],[data-motion="calm"]) \
+#ten-comic-launcher::after { display: none; animation: none; }\n\n@keyframes ten-launcher-fx-aurora { to { transform: rotate(360deg); } }\n@keyframes \
+ten-launcher-fx-cloud {\n  0%,100% { transform: scale(.94); opacity: calc(var(--ten-launcher-fx-alpha,.9) * .3); }\n  50% { transform: scale(1); opacity: \
+var(--ten-launcher-fx-alpha,.9); }\n}\n@keyframes ten-launcher-fx-obsidian { to { transform: rotate(360deg); } }\n@keyframes ten-launcher-fx-carbon { to { \
+transform: rotate(-360deg); } }\n@keyframes ten-launcher-fx-titanium {\n  0%,12% { transform: translateX(-100%) skewX(-18deg); opacity: 0; }\n  25% { opacity: \
+var(--ten-launcher-fx-alpha,.9); }\n  65% { transform: translateX(100%) skewX(-18deg); opacity: var(--ten-launcher-fx-alpha,.9); }\n  72%,100% { transform: \
+translateX(140%) skewX(-18deg); opacity: 0; }\n}\n@media (prefers-reduced-motion: reduce) {\n  \
+#ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher::before,\n  #ten-comic-root:is([data-theme="aurora"],[data-theme="cloud"],[data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) \
+#ten-comic-launcher::after { display: none; animation: none; }\n}\n\n#ten-comic-root[data-shape="sharp"] { --ten-radius-panel: 14px; --ten-radius-card: 10px; \
+--ten-radius-control: 7px; --ten-radius-launcher: 10px; }\n#ten-comic-root[data-shape="round"] { --ten-radius-panel: 30px; --ten-radius-card: 22px; \
+--ten-radius-control: 15px; --ten-radius-launcher: 22px; }\n#ten-comic-root[data-density="compact"] #ten-panel { grid-template-rows: 52px minmax(0,1fr) 58px; \
+}\n#ten-comic-root[data-density="compact"] .ten-view { padding: 9px; }\n#ten-comic-root[data-density="compact"] .ten-card { margin-bottom: 6px; padding: 9px; \
+}\n#ten-comic-root[data-density="compact"] .ten-list { gap: 5px; }\n#ten-comic-root[data-density="compact"] .ten-list-item { min-height: 38px; padding: 7px 9px; \
+}\n#ten-comic-root[data-density="comfortable"] .ten-view { padding: 16px; }\n#ten-comic-root[data-density="comfortable"] .ten-card { margin-bottom: 12px; \
+padding: 13px; }\n#ten-comic-root[data-density="comfortable"] .ten-list { gap: 9px; }\n#ten-comic-root[data-density="comfortable"] .ten-list-item { min-height: \
+47px; padding: 11px 13px; }\n#ten-comic-root[data-motion="calm"] #ten-panel { transition-duration: .25s; }\n#ten-comic-root[data-motion="calm"] .ten-task-body { \
+transition-duration: .32s; }\n#ten-comic-root[data-motion="spring"] #ten-panel { transition-timing-function: cubic-bezier(.16,1.35,.3,1); \
+}\n#ten-comic-root[data-motion="spring"] .ten-task-body { transition-timing-function: cubic-bezier(.16,1.25,.3,1); }\n\n@media (max-width: 380px) \
+{\n:where(#ten-comic-root) .ten-theme-presets { grid-template-columns: 1fr; }\n}\n\n#ten-comic-root #ten-panel { width: min(430px, calc((100vw - 28px) / \
+var(--ten-scale))); height: min(780px, calc((100vh - 28px) / var(--ten-scale))); }\n/* Shared interaction and layout refinements. Theme values remain \
+authoritative. */\n#ten-comic-root {\n  --ten-space-1: 4px;\n  --ten-space-2: 8px;\n  --ten-space-3: 12px;\n  --ten-space-4: 16px;\n  \
+--ten-readable-line-height: 1.6;\n  -webkit-tap-highlight-color: transparent;\n}\n#ten-comic-root .ten-confirm,\n#ten-comic-root .ten-diagnostic { transition: \
+opacity .2s ease; }\n#ten-comic-root :is(button, input, select, textarea, summary):focus-visible {\n  outline: 2px solid var(--ten-cyan);\n  outline-offset: \
+3px;\n}\n#ten-comic-root .ten-card-title { line-height: 1.5; letter-spacing: .02em; }\n#ten-comic-root .ten-meta,\n#ten-comic-root \
+.ten-settings-hint,\n#ten-comic-root .ten-rule-simple-hint { line-height: var(--ten-readable-line-height); }\n#ten-comic-root .ten-chapter-label { min-width: 0; \
+overflow: hidden; }\n#ten-comic-root .ten-chapter-label .ten-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; \
+}\n#ten-comic-root .ten-chapter-label .ten-input { width: 100%; min-width: 0; }\n#ten-comic-root .ten-list-item { transition: background-color .16s, \
+border-color .16s; }\n#ten-comic-root .ten-list-item.is-selected { border-color: var(--ten-cyan); background: var(--ten-list-hover-bg); }\n#ten-comic-root \
+.ten-list-item:focus-within { box-shadow: var(--ten-focus-ring); }\n#ten-comic-root input[type="checkbox"] { accent-color: var(--ten-cyan); }\n#ten-comic-root \
+.ten-result { min-width: 0; }\n#ten-comic-root .ten-result > span { overflow-wrap: anywhere; }\n#ten-comic-root .ten-task-title { line-height: 1.55; \
+}\n#ten-comic-root .ten-settings-card { scroll-margin-block: var(--ten-space-3); }\n#ten-comic-root .ten-settings-card .ten-card-title { margin-bottom: \
+var(--ten-space-3); }\n#ten-comic-root .ten-setting > label { min-width: 0; overflow-wrap: anywhere; }\n#ten-comic-root #ten-rule-guide .ten-rule-guide-content \
+{ min-height: 0; overscroll-behavior: contain; }\n#ten-comic-root .ten-view,\n#ten-comic-root .ten-search-panel-content,\n#ten-comic-root \
+#ten-mobile-drawer-content { overscroll-behavior: contain; scrollbar-gutter: stable; }\n#ten-comic-root #ten-panel:not(.is-open) *,\n#ten-comic-root \
+#ten-panel:not(.is-open) *::before,\n#ten-comic-root #ten-panel:not(.is-open) *::after,\n#ten-comic-root.is-page-hidden *,\n#ten-comic-root.is-page-hidden \
+*::before,\n#ten-comic-root.is-page-hidden *::after { animation-play-state: paused !important; }\n@supports (height: 100dvh) {\n  #ten-comic-root #ten-panel { \
+height: min(780px, calc((100dvh - 28px) / var(--ten-scale))); }\n}\n@media (max-width: 560px), (max-height: 720px) {\n  #ten-comic-root #ten-panel { width: \
+calc((100vw - 16px) / var(--ten-scale)); max-width: calc(100vw - 16px); height: calc((100vh - 16px) / var(--ten-scale)); }\n  @supports (height: 100dvh) {\n    \
+#ten-comic-root #ten-panel { height: calc((100dvh - 16px) / var(--ten-scale)); }\n    #ten-comic-root #ten-search-panel { height: calc(100dvh - 16px); }\n  \
+}\n}\n@media (max-width: 560px) {\n  #ten-comic-root .ten-icon-btn { min-width: 40px; min-height: 40px; }\n  #ten-comic-root .ten-btn { min-height: 40px; }\n  \
+#ten-comic-root .ten-list-item { min-height: 44px; }\n  #ten-comic-root .ten-list-item input[type="checkbox"] { width: 18px; height: 18px; }\n  #ten-comic-root \
+.ten-search-toolbar { min-width: 0; }\n  #ten-comic-root .ten-search-toolbar > * { min-width: 0; }\n  #ten-comic-root .ten-setting { grid-template-columns: \
+minmax(0, 1fr) minmax(100px, 1fr); gap: 8px; }\n  #ten-comic-root .ten-mobile-drawer-sheet { padding-bottom: max(14px, env(safe-area-inset-bottom)); }\n  \
+#ten-comic-root .ten-nav { padding-bottom: env(safe-area-inset-bottom); }\n  #ten-comic-root .ten-diagnostic { padding: 10px; }\n  #ten-comic-root \
+.ten-diagnostic-dialog { max-height: 94%; }\n}\n@media (max-width: 360px) {\n  #ten-comic-root .ten-grid-2 { grid-template-columns: minmax(0, 1fr); }\n  \
+#ten-comic-root .ten-rule-pick-actions { grid-template-columns: minmax(0, 1fr); }\n}\n@media (max-height: 500px) {\n  #ten-comic-root #ten-panel { \
+grid-template-rows: 48px minmax(0, 1fr) 50px; }\n  #ten-comic-root .ten-view { padding: 8px; }\n  #ten-comic-root .ten-diagnostic-dialog { max-height: 100%; \
+gap: 8px; padding: 10px; }\n  #ten-comic-root #ten-diagnostic-content { min-height: 0; }\n  #ten-comic-root .ten-mobile-drawer-sheet { max-height: calc(100vh - \
+16px); }\n}\n\n#ten-comic-root #ten-chapter-list { grid-template-columns: minmax(0, 1fr); }\n#ten-comic-root #ten-chapter-list .ten-list-item { min-width: 0; \
+}\n#ten-comic-root .ten-chapter-label { flex: 1 1 0; }\n#ten-comic-root .ten-btn { white-space: nowrap; }\n#ten-comic-root .ten-icon-btn { transition: color \
+.18s, background-color .18s, border-color .18s, transform .18s; }\n@media (max-width: 560px) {\n  #ten-comic-root .ten-chapter-tools { grid-template-columns: \
+minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-chapter-tools > :last-child { grid-column: 1 / -1; width: 100%; justify-self: stretch; }\n  #ten-comic-root \
+.ten-chapter-select-group { flex-wrap: nowrap; }\n}\n\n@media (max-width: 560px) {\n  #ten-comic-root .ten-search-toolbar { display: grid; \
+grid-template-columns: minmax(0, 1fr) auto; }\n  #ten-comic-root .ten-search-site-picker { grid-column: 1 / -1; width: 100%; }\n  #ten-comic-root \
+.ten-search-toolbar .ten-input { width: 100%; }\n}\n\n/* Settings disclosures keep their controls in the original settings scope. */\n#ten-comic-root \
+.ten-settings-disclosure { padding: 0; }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary {\n  display: flex;\n  align-items: center;\n  \
+justify-content: space-between;\n  gap: 12px;\n  min-height: 46px;\n  padding: 12px 14px;\n  color: var(--ten-text);\n  font-size: 13px;\n  font-weight: 750;\n  \
+line-height: 1.5;\n  list-style: none;\n  cursor: pointer;\n  user-select: none;\n  border-radius: inherit;\n}\n#ten-comic-root \
+.ten-settings-summary::-webkit-details-marker { display: none; }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary::after {\n  content: "";\n  \
+flex: 0 0 7px;\n  width: 7px;\n  height: 7px;\n  margin: -3px 2px 0 0;\n  border-right: 1.5px solid currentColor;\n  border-bottom: 1.5px solid currentColor;\n  \
+transform: rotate(45deg);\n  transition: transform .18s ease;\n}\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:hover { background: \
+var(--ten-control-hover-bg); }\n#ten-comic-root .ten-settings-disclosure > .ten-settings-summary:focus-visible { outline-offset: -3px; }\n#ten-comic-root \
+.ten-settings-disclosure[open] > .ten-settings-summary {\n  border-bottom: 1px solid var(--ten-line);\n  border-bottom-left-radius: 0;\n  \
+border-bottom-right-radius: 0;\n}\n#ten-comic-root .ten-settings-disclosure[open] > .ten-settings-summary::after { transform: rotate(225deg); margin-top: 3px; \
+}\n#ten-comic-root .ten-settings-disclosure-body { min-width: 0; padding: 12px; }\n#ten-comic-root .ten-settings-section { min-width: 0; }\n#ten-comic-root \
+.ten-settings-section + .ten-settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ten-line); }\n#ten-comic-root \
+.ten-settings-section > .ten-card-title { margin-bottom: 10px; font-size: 11px; }\n#ten-comic-root .ten-settings-section .ten-setting:last-child { \
+margin-bottom: 0; }\n@media (max-width: 560px) {\n  #ten-comic-root .ten-settings-disclosure > .ten-settings-summary { min-height: 48px; padding: 12px; }\n  \
+#ten-comic-root .ten-settings-disclosure-body { padding: 10px; }\n}\n', 
                 (document.head || document.documentElement).appendChild(e);
             }(), (0, siteRules.HL)(window.location.href);
             const t = document.createElement("div");

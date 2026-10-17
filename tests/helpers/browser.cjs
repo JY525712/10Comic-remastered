@@ -12,7 +12,8 @@ async function openComic(browser, options = {}) {
   const context = await browser.newContext({ viewport: options.viewport || { width: 1280, height: 900 }, reducedMotion: options.reducedMotion || 'no-preference' })
   const html = `<!doctype html><html><head><meta charset="utf-8"></head><body><h1 id="fixture-title">测试漫画</h1><div id="fixture-chapters">${Array.from({ length: count }, (_, i) => `<a href="/chapter/${i + 1}">第 ${i + 1} 话 很长的漫画章节名称用于测试换行与省略</a>`).join('')}</div><div id="fixture-results"><div class="fixture-result"><a href="/series/1" title="搜索结果漫画"><img src="https://img.test/search.png"></a></div></div><button id="outside">宿主网页按钮</button></body></html>`
   await context.route('**/*', route => route.fulfill({ status: 200, contentType: route.request().url().includes('img.test') ? 'image/png' : 'text/html; charset=utf-8', body: route.request().url().includes('img.test') ? pixel : html }))
-  await context.addInitScript(({ settings, supported, requestDelay }) => {
+  await context.addInitScript(({ settings, supported, requestDelay, history }) => {
+    if (history) localStorage.setItem('ylComicDownHistory', JSON.stringify(history))
     const values = {
       appLoadDefault: { isShowUI: true, loadHotKey: 'V', rightSize: 100 },
       userWebInfo: supported ? [{ domain: 'comic.test', homepage: 'https://comic.test/', webName: '本地验证站点', comicNameCss: '#fixture-title', chapterCss: '#fixture-chapters', readtype: 1, useFrame: false, getImgs: 'async function(){return ["https://img.test/1.png","https://img.test/2.png"]}' }] : [],
@@ -64,12 +65,12 @@ async function openComic(browser, options = {}) {
       } })
     })
     window.showDirectoryPicker = async () => directory('')
-  }, { settings: options.settings || {}, supported: options.supported !== false, requestDelay: options.requestDelay || 0 })
+  }, { settings: options.settings || {}, supported: options.supported !== false, requestDelay: options.requestDelay || 0, history: options.history })
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('https://comic.test/title')
-  const sourcePath = options.baseline ? path.join(root, 'baseline/original-2.0.11.user.js') : (process.env.USERSCRIPT_PATH || path.join(root, '10漫画—重制版.user.js'))
+  const sourcePath = options.sourcePath || (options.baseline ? path.join(root, 'baseline/original-2.0.11.user.js') : (process.env.USERSCRIPT_PATH || path.join(root, '10漫画—重制版.user.js')))
   await page.addScriptTag({ content: fs.readFileSync(sourcePath, 'utf8') })
   if (options.supported !== false && options.settings?.appLoadDefault?.isShowUI !== false) await page.locator('#ten-panel.is-open').waitFor()
   return { page, context, errors }

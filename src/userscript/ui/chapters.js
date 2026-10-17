@@ -32,11 +32,12 @@ async function loadChapters() {
             e;
         }()), String(siteRules.Po.homepage || "").includes("zerobyw33.com") && e[0]?.comicName && (state.comicName = e[0].comicName, 
         byId("ten-current-comic").value = state.comicName), state.chapters = e.map(normalizeChapter).filter(e => e.chapterName), 
-        state.lastSelected = null, renderChapters(), updateChapterStatus(`${state.webName} · ${state.comicName} · ${state.chapters.length} 章`);
+        state.lastSelected = null, await renderChapters(), updateChapterStatus(`${state.webName} · ${state.comicName} · ${state.chapters.length} 章`);
     } catch (e) {
         console.error("10漫画：章节加载失败。", e), updateChapterStatus("章节读取失败，请检查站点规则"), toast("网站规则可能已经失效");
     } finally {
         state.chaptersLoading = !1, e.disabled = !1, e.textContent = "重新加载章节";
+        if (state.chaptersReloadRequested) state.chaptersReloadRequested = !1, reloadChapters();
     }
 }
 
@@ -98,11 +99,11 @@ function handleChapterClick(event) {
         const first = Math.min(state.lastSelected, index);
         const last = Math.max(state.lastSelected, index);
         for (let cursor = first; cursor <= last; cursor++) {
-            if (canSelectChapter(state.chapters[cursor])) state.chapters[cursor].isSelect = true;
+            if (canSelectChapter(state.chapters[cursor])) setChapterSelected(state.chapters[cursor], true);
         }
-    } else chapter.isSelect = selected;
+    } else setChapterSelected(chapter, selected);
     state.lastSelected = selected ? index : null;
-    renderChapters();
+    syncChapterControls(byId("ten-chapter-list"));
 }
 
 function handleChapterNameChange(event) {
@@ -112,27 +113,51 @@ function handleChapterNameChange(event) {
     if (chapter) chapter.chapterName = event.target.value;
 }
 
-function renderChapters() {
-    const list = byId("ten-chapter-list");
+function syncChapterControls(list) {
     const hasChapters = state.chapters.length > 0;
-    const hasSelectable = state.chapters.some(canSelectChapter);
-    const hasSelected = state.chapters.some(chapter => chapter.isSelect && canSelectChapter(chapter));
     byId("ten-chapter-empty").hidden = hasChapters;
     byId("ten-chapter-loaded").hidden = !hasChapters;
-    byId("ten-select-all").disabled = !hasSelectable;
-    byId("ten-clear-select").disabled = !hasSelected;
-    byId("ten-download-selected").disabled = !hasSelected;
+    byId("ten-select-all").disabled = !list._tenSelectableCount;
+    byId("ten-clear-select").disabled = !list._tenSelectedCount;
+    byId("ten-download-selected").disabled = !list._tenSelectedCount;
     setText(byId("ten-chapter-count"), hasChapters ? `章节列表 · ${state.chapters.length}` : "章节列表");
     byId("ten-edit-list").classList.toggle("is-active", state.editMode);
+}
+
+function setChapterSelected(chapter, selected) {
+    if (Boolean(chapter.isSelect) === selected) return;
+    const list = byId("ten-chapter-list");
+    chapter.isSelect = selected;
+    if (canSelectChapter(chapter)) list._tenSelectedCount += selected ? 1 : -1;
+    const row = list._tenRows?.get(chapter);
+    if (row) {
+        row._tenCheckbox.checked = selected;
+        row.classList.toggle("is-selected", selected && canSelectChapter(chapter));
+    }
+}
+
+async function renderChapters() {
+    const list = byId("ten-chapter-list"), chapters = state.chapters.slice();
+    const generation = list._tenRenderGeneration = (list._tenRenderGeneration || 0) + 1;
+    const rows = list._tenRows || (list._tenRows = new Map), retained = new Set(chapters);
+    list._tenSelectableCount = 0, list._tenSelectedCount = 0;
+    for (const [chapter, row] of rows) if (!retained.has(chapter)) row.remove(), rows.delete(chapter);
+    chapters.forEach((chapter, index) => {
+        if (canSelectChapter(chapter)) list._tenSelectableCount++, chapter.isSelect && list._tenSelectedCount++;
+        const row = rows.get(chapter);
+        if (row) setAttribute(row, "data-index", index);
+    });
+    syncChapterControls(list);
     if (!list._tenEventsBound) {
         list.addEventListener("click", handleChapterClick);
         list.addEventListener("change", handleChapterNameChange);
         list._tenEventsBound = true;
     }
-    const previous = list._tenRows || new Map;
-    const current = new Map;
-    state.chapters.forEach((chapter, index) => {
-        let row = previous.get(chapter);
+    setAttribute(list, "aria-busy", chapters.length >= 500 ? "true" : "false");
+    let anchor = list.firstElementChild, sliceStarted = performance.now(), sliceRows = 0;
+    for (let index = 0; index < chapters.length; index++) {
+        const chapter = chapters[index];
+        let row = rows.get(chapter);
         if (!row) {
             row = document.createElement("div");
             row.className = "ten-list-item";
@@ -164,22 +189,29 @@ function renderChapters() {
         } else setText(row._tenName, name);
         setAttribute(row._tenName, "title", name);
         setText(row._tenMeta, chapter.isUnavailable ? chapter.unavailableReason || "未解锁" : chapter.isPay ? "付费" : chapter.characterType === "many" ? "分卷" : "");
-        current.set(chapter, row);
-        if (list.children[index] !== row) list.insertBefore(row, list.children[index] || null);
-    });
-    for (const [chapter, row] of previous) if (!current.has(chapter)) row.remove();
-    list._tenRows = current;
+        rows.set(chapter, row);
+        if (anchor !== row) list.insertBefore(row, anchor);
+        anchor = row.nextElementSibling;
+        sliceRows++;
+        if (chapters.length >= 500 && index + 1 < chapters.length && (sliceRows >= 200 || sliceRows % 50 === 0 && performance.now() - sliceStarted >= 8)) {
+            await yieldToBrowser(0);
+            if (!list.isConnected || generation !== list._tenRenderGeneration) return;
+            sliceStarted = performance.now(), sliceRows = 0;
+        }
+    }
+    setAttribute(list, "aria-busy", "false");
 }
 
 function reloadChapters() {
+    if (state.chaptersLoading) return void (state.chaptersReloadRequested = !0);
     state.chapters = [], state.lastSelected = null, state.editMode = !1, byId("ten-edit-list").classList.remove("is-active"), 
     renderChapters(), detectComicInfo(), loadChapters();
 }
 
 function selectAllChapters(e) {
     state.chapters.forEach(t => {
-        t.isSelect = Boolean(e && canSelectChapter(t));
-    }), state.lastSelected = null, renderChapters();
+        setChapterSelected(t, Boolean(e && canSelectChapter(t)));
+    }), state.lastSelected = null, syncChapterControls(byId("ten-chapter-list"));
 }
 
 function reverseChapters() {

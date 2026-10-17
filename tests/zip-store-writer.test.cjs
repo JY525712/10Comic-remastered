@@ -16,7 +16,7 @@ assert.notEqual(end,-1,"无法定位原生 STORE ZIP 写入器结尾");
 
 const chunks=[];
 let cancelController=null,aborted=false,closed=false;
-const file={async createWritable(){return{async write(blob){assert.ok(blob instanceof Blob);chunks.push(new Uint8Array(await blob.arrayBuffer()));if(cancelController)cancelController.abort()},async close(){closed=true},async abort(){aborted=true}}}};
+const file={async createWritable(){return{async write(data){assert.ok(data instanceof Blob||ArrayBuffer.isView(data));chunks.push(data instanceof Blob?new Uint8Array(await data.arrayBuffer()):new Uint8Array(data.buffer,data.byteOffset,data.byteLength));if(cancelController)cancelController.abort()},async close(){closed=true},async abort(){aborted=true}}}};
 const leaf={async getFileHandle(name,options){assert.equal(name,"chapter.zip");assert.equal(options.create,true);return file}};
 const root={async getDirectoryHandle(name,options){assert.equal(name,"10Comic");assert.equal(options.create,true);return leaf}};
 const writer=vm.runInNewContext(`(()=>{${source.slice(start,end)};return writeStoreZipToDirectoryV2})()`,{Promise,Uint8Array,ArrayBuffer,DataView,Blob,TextEncoder,Error,getDirectoryHandle:async()=>root,sanitizeDownloadPath:value=>value,addZeroForNum:(value,digits)=>String(value).padStart(digits,"0"),delay:async()=>{}});

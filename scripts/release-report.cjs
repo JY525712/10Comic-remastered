@@ -32,6 +32,8 @@ async function main() {
   assert.equal(launchers.themes.length, 6)
   assert.equal(launchers.frames, 80)
   const benchmark = JSON.parse(fs.readFileSync(path.join(directory, 'chapter-benchmark.json')))
+  const runtime = JSON.parse(fs.readFileSync(path.join(directory, 'runtime-benchmark.json')))
+  assert.equal(runtime.sha256, sha256, 'runtime benchmark is for an earlier artifact')
   assert.equal(browser.sha256, sha256, 'browser checks are for an earlier artifact')
   assert.equal(benchmark.sha256, sha256, 'benchmark is for an earlier artifact')
   assert.equal(browser.checks.length, 27)
@@ -47,7 +49,8 @@ async function main() {
     filenames: { browser: filenames.browser, cases: filenames.cases.length, scope: 'Windows disk files and real Chromium directory/file handle name validation; download-mode writes use offline fixtures' },
     launchers: { command: 'npm run preview:launcher', themes: launchers.themes, frames: launchers.frames, controls: launchers.controls },
     benchmark: benchmark.summary,
-    scope: 'Offline Chromium fixtures and native handle filename checks; unchanged adapters/queue/config and download AST outside approved filename cleanup; no live account or site availability claim'
+    runtimeBenchmark: runtime,
+    scope: 'Offline Chromium fixtures, real browser ZIP stream writes and native handle filename checks; unchanged adapters/config and queue operations apart from structural revision counters; download AST unchanged outside approved filename cleanup and byte-tested ZIP optimization; no live account or site availability claim'
   }
   fs.writeFileSync(path.join(directory, 'release-report.json'), JSON.stringify(report, null, 2))
   fs.copyFileSync(path.join(root, '10漫画—重制版.user.js'), path.join(root, 'dist/10漫画—重制版.user.js'))

@@ -463,8 +463,8 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             t.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport), t;
         }(e));
         e.length ? (enqueueDownloads(e), state.chapters.forEach(e => {
-            e.isSelect = !1;
-        }), renderChapters()) : toast("请先选择章节");
+            setChapterSelected(e, !1);
+        }), syncChapterControls(byId("ten-chapter-list"))) : toast("请先选择章节");
     }
     function downloadCurrentChapter() {
         if (!siteRules.Po) return void toast("当前网站没有匹配规则");
@@ -532,12 +532,13 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
     }
     function scheduleTaskPersist() {
-        clearTimeout(state.persistTimer), state.persistTimer = setTimeout(persistQueueState, 750);
+        null === state.persistTimer && (state.persistTimer = setTimeout(persistQueueState, 750));
     }
     function persistQueueState() {
         clearTimeout(state.persistTimer), state.persistTimer = null;
         const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
-        (0, configModule.po)(PENDING_TASKS_KEY, uniqueTaskSnapshots(n.concat(a)));
+        const snapshots = uniqueTaskSnapshots(n.concat(a));
+        JSON.stringify(t) !== JSON.stringify(snapshots) && (0, configModule.po)(PENDING_TASKS_KEY, snapshots);
     }
     function handlePageHide() {
         (state.queue || state.recoveryTasks.length) && persistQueueState();

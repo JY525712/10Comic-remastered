@@ -52,15 +52,21 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
       for (let bit = 0; bit < 8; bit++) value = 1 & value ? 3988292384 ^ value >>> 1 : value >>> 1;
       crcTable[index] = value >>> 0;
     }
-    const crc32 = bytes => {
+    const crc32 = async bytes => {
       let value = 4294967295;
-      for (const byte of bytes) value = crcTable[255 & (value ^ byte)] ^ value >>> 8;
+      for (let start = 0; start < bytes.length; start += 4194304) {
+        const end = Math.min(start + 4194304, bytes.length);
+        for (let index = start; index < end; index++) value = crcTable[255 & (value ^ bytes[index])] ^ value >>> 8;
+        if (end < bytes.length) {
+          if ("undefined" != typeof scheduler && "function" == typeof scheduler.yield) await scheduler.yield();
+          else await delay(0);
+          throwIfAborted();
+        }
+      }
       return (4294967295 ^ value) >>> 0;
     };
     const view = bytes => new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength),
-      write = bytes => writable.write(new Blob([bytes], {
-        type: "application/octet-stream"
-      }));
+      write = bytes => writable.write(bytes);
     let offset = 0;
     const centralRecords = [];
     try {
@@ -79,7 +85,7 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
         entry.blob = null;
         throwIfAborted();
         const nameBytes = encoder.encode(addZeroForNum(imageIndex, digits) + (isText ? ".txt" : "." + entry.suffix)),
-          checksum = crc32(bytes),
+          checksum = await crc32(bytes),
           size = bytes.length;
         if (size >= 4294967295 || offset + 30 + nameBytes.length + size >= 4294967295) throw new Error("ZIP 文件超过 4GB 格式限制");
         const localHeader = new Uint8Array(30),

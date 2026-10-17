@@ -11,6 +11,7 @@ module.exports = class DownloadQueue {
   }
   addList(list) {
     for (const t of list) this.list.unshift(t);
+    list.length && (this.waitingRevision = (this.waitingRevision || 0) + 1);
     this.refresh();
   }
   refresh() {
@@ -18,7 +19,7 @@ module.exports = class DownloadQueue {
   }
   moveWaiting(index, direction) {
     const n = "up" === direction ? index + 1 : index - 1;
-    return !(!this.list[index] || !this.list[n] || ([this.list[index], this.list[n]] = [this.list[n], this.list[index]], this.refresh(), 0));
+    return !(!this.list[index] || !this.list[n] || ([this.list[index], this.list[n]] = [this.list[n], this.list[index]], this.waitingRevision = (this.waitingRevision || 0) + 1, this.refresh(), 0));
   }
   setAllPaused(paused) {
     let t = 0;
@@ -34,7 +35,7 @@ module.exports = class DownloadQueue {
   }
   clearWaiting() {
     const e = this.list.length;
-    return e ? (this.list.length = 0, this.refresh(), e) : 0;
+    return e ? (this.list.length = 0, this.waitingRevision = (this.waitingRevision || 0) + 1, this.refresh(), e) : 0;
   }
   pendingTasks() {
     const e = this.worker.filter(Boolean).map(e => this.snapshotWorker(e)),
@@ -86,6 +87,7 @@ module.exports = class DownloadQueue {
     for (let e = 0; e < this.workerLen; e++) {
       if (this.worker[e] || !this.list.length) continue;
       const t = this.list.pop();
+      this.waitingRevision = (this.waitingRevision || 0) + 1;
       this.worker[e] = this.createWorker(t), this.workerDownInfo[e] = [], this.exeDown(e);
     }
     this.refresh();
@@ -180,7 +182,7 @@ module.exports = class DownloadQueue {
     return !(!t || t.cancelled || (t.cancelled = !0, t.paused = !1, t.status = "cancelling", t.stage = "正在取消", t.abortController.abort(), t.pauseWaiters.splice(0).forEach(e => e()), this.refresh(), 0));
   }
   cancelWaiting(index) {
-    return !!this.list[index] && (this.list.splice(index, 1), this.refresh(), !0);
+    return !!this.list[index] && (this.list.splice(index, 1), this.waitingRevision = (this.waitingRevision || 0) + 1, this.refresh(), !0);
   }
   async waitUntilRunnable(index) {
     let t = this.worker[index];

@@ -1509,14 +1509,19 @@
                     for (let bit = 0; bit < 8; bit++) value = 1 & value ? 3988292384 ^ value >>> 1 : value >>> 1;
                     crcTable[index] = value >>> 0;
                 }
-                const crc32 = bytes => {
+                const crc32 = async bytes => {
                     let value = 4294967295;
-                    for (const byte of bytes) value = crcTable[255 & (value ^ byte)] ^ value >>> 8;
+                    for (let start = 0; start < bytes.length; start += 4194304) {
+                        const end = Math.min(start + 4194304, bytes.length);
+                        for (let index = start; index < end; index++) value = crcTable[255 & (value ^ bytes[index])] ^ value >>> 8;
+                        if (end < bytes.length) {
+                            if ("undefined" != typeof scheduler && "function" == typeof scheduler.yield) await scheduler.yield(); else await delay(0);
+                            throwIfAborted();
+                        }
+                    }
                     return (4294967295 ^ value) >>> 0;
                 };
-                const view = bytes => new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), write = bytes => writable.write(new Blob([ bytes ], {
-                    type: "application/octet-stream"
-                }));
+                const view = bytes => new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), write = bytes => writable.write(bytes);
                 let offset = 0;
                 const centralRecords = [];
                 try {
@@ -1531,7 +1536,7 @@
                         const bytes = new Uint8Array(await source.arrayBuffer());
                         entry.blob = null;
                         throwIfAborted();
-                        const nameBytes = encoder.encode(addZeroForNum(imageIndex, digits) + (isText ? ".txt" : "." + entry.suffix)), checksum = crc32(bytes), size = bytes.length;
+                        const nameBytes = encoder.encode(addZeroForNum(imageIndex, digits) + (isText ? ".txt" : "." + entry.suffix)), checksum = await crc32(bytes), size = bytes.length;
                         if (size >= 4294967295 || offset + 30 + nameBytes.length + size >= 4294967295) throw new Error("ZIP 文件超过 4GB 格式限制");
                         const localHeader = new Uint8Array(30), localView = view(localHeader);
                         localView.setUint32(0, 67324752, !0);
@@ -1970,6 +1975,7 @@
             }
             addList(list) {
                 for (const t of list) this.list.unshift(t);
+                list.length && (this.waitingRevision = (this.waitingRevision || 0) + 1);
                 this.refresh();
             }
             refresh() {
@@ -1978,7 +1984,7 @@
             moveWaiting(index, direction) {
                 const n = "up" === direction ? index + 1 : index - 1;
                 return !(!this.list[index] || !this.list[n] || ([this.list[index], this.list[n]] = [ this.list[n], this.list[index] ], 
-                this.refresh(), 0));
+                this.waitingRevision = (this.waitingRevision || 0) + 1, this.refresh(), 0));
             }
             setAllPaused(paused) {
                 let t = 0;
@@ -1999,7 +2005,8 @@
             }
             clearWaiting() {
                 const e = this.list.length;
-                return e ? (this.list.length = 0, this.refresh(), e) : 0;
+                return e ? (this.list.length = 0, this.waitingRevision = (this.waitingRevision || 0) + 1, 
+                this.refresh(), e) : 0;
             }
             pendingTasks() {
                 const e = this.worker.filter(Boolean).map(e => this.snapshotWorker(e)), t = this.list.slice().reverse().map(e => this.snapshotTask(e));
@@ -2051,6 +2058,7 @@
                 for (let e = 0; e < this.workerLen; e++) {
                     if (this.worker[e] || !this.list.length) continue;
                     const t = this.list.pop();
+                    this.waitingRevision = (this.waitingRevision || 0) + 1;
                     this.worker[e] = this.createWorker(t), this.workerDownInfo[e] = [], this.exeDown(e);
                 }
                 this.refresh();
@@ -2145,7 +2153,8 @@
                 this.refresh(), 0));
             }
             cancelWaiting(index) {
-                return !!this.list[index] && (this.list.splice(index, 1), this.refresh(), !0);
+                return !!this.list[index] && (this.list.splice(index, 1), this.waitingRevision = (this.waitingRevision || 0) + 1, 
+                this.refresh(), !0);
             }
             async waitUntilRunnable(index) {
                 let t = this.worker[index];
@@ -3025,11 +3034,12 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                     e;
                 }()), String(siteRules.Po.homepage || "").includes("zerobyw33.com") && e[0]?.comicName && (state.comicName = e[0].comicName, 
                 byId("ten-current-comic").value = state.comicName), state.chapters = e.map(normalizeChapter).filter(e => e.chapterName), 
-                state.lastSelected = null, renderChapters(), updateChapterStatus(`${state.webName} · ${state.comicName} · ${state.chapters.length} 章`);
+                state.lastSelected = null, await renderChapters(), updateChapterStatus(`${state.webName} · ${state.comicName} · ${state.chapters.length} 章`);
             } catch (e) {
                 console.error("10漫画：章节加载失败。", e), updateChapterStatus("章节读取失败，请检查站点规则"), toast("网站规则可能已经失效");
             } finally {
                 state.chaptersLoading = !1, e.disabled = !1, e.textContent = "重新加载章节";
+                if (state.chaptersReloadRequested) state.chaptersReloadRequested = !1, reloadChapters();
             }
         }
         function collectFromSelector(e, t, r) {
@@ -3087,11 +3097,11 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                 const first = Math.min(state.lastSelected, index);
                 const last = Math.max(state.lastSelected, index);
                 for (let cursor = first; cursor <= last; cursor++) {
-                    if (canSelectChapter(state.chapters[cursor])) state.chapters[cursor].isSelect = true;
+                    if (canSelectChapter(state.chapters[cursor])) setChapterSelected(state.chapters[cursor], true);
                 }
-            } else chapter.isSelect = selected;
+            } else setChapterSelected(chapter, selected);
             state.lastSelected = selected ? index : null;
-            renderChapters();
+            syncChapterControls(byId("ten-chapter-list"));
         }
         function handleChapterNameChange(event) {
             if (!event.target.matches(".ten-chapter-name")) return;
@@ -3099,27 +3109,49 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
             const chapter = state.chapters[Number(row && row.dataset.index)];
             if (chapter) chapter.chapterName = event.target.value;
         }
-        function renderChapters() {
-            const list = byId("ten-chapter-list");
+        function syncChapterControls(list) {
             const hasChapters = state.chapters.length > 0;
-            const hasSelectable = state.chapters.some(canSelectChapter);
-            const hasSelected = state.chapters.some(chapter => chapter.isSelect && canSelectChapter(chapter));
             byId("ten-chapter-empty").hidden = hasChapters;
             byId("ten-chapter-loaded").hidden = !hasChapters;
-            byId("ten-select-all").disabled = !hasSelectable;
-            byId("ten-clear-select").disabled = !hasSelected;
-            byId("ten-download-selected").disabled = !hasSelected;
+            byId("ten-select-all").disabled = !list._tenSelectableCount;
+            byId("ten-clear-select").disabled = !list._tenSelectedCount;
+            byId("ten-download-selected").disabled = !list._tenSelectedCount;
             setText(byId("ten-chapter-count"), hasChapters ? `章节列表 · ${state.chapters.length}` : "章节列表");
             byId("ten-edit-list").classList.toggle("is-active", state.editMode);
+        }
+        function setChapterSelected(chapter, selected) {
+            if (Boolean(chapter.isSelect) === selected) return;
+            const list = byId("ten-chapter-list");
+            chapter.isSelect = selected;
+            if (canSelectChapter(chapter)) list._tenSelectedCount += selected ? 1 : -1;
+            const row = list._tenRows?.get(chapter);
+            if (row) {
+                row._tenCheckbox.checked = selected;
+                row.classList.toggle("is-selected", selected && canSelectChapter(chapter));
+            }
+        }
+        async function renderChapters() {
+            const list = byId("ten-chapter-list"), chapters = state.chapters.slice();
+            const generation = list._tenRenderGeneration = (list._tenRenderGeneration || 0) + 1;
+            const rows = list._tenRows || (list._tenRows = new Map), retained = new Set(chapters);
+            list._tenSelectableCount = 0, list._tenSelectedCount = 0;
+            for (const [chapter, row] of rows) if (!retained.has(chapter)) row.remove(), rows.delete(chapter);
+            chapters.forEach((chapter, index) => {
+                if (canSelectChapter(chapter)) list._tenSelectableCount++, chapter.isSelect && list._tenSelectedCount++;
+                const row = rows.get(chapter);
+                if (row) setAttribute(row, "data-index", index);
+            });
+            syncChapterControls(list);
             if (!list._tenEventsBound) {
                 list.addEventListener("click", handleChapterClick);
                 list.addEventListener("change", handleChapterNameChange);
                 list._tenEventsBound = true;
             }
-            const previous = list._tenRows || new Map;
-            const current = new Map;
-            state.chapters.forEach((chapter, index) => {
-                let row = previous.get(chapter);
+            setAttribute(list, "aria-busy", chapters.length >= 500 ? "true" : "false");
+            let anchor = list.firstElementChild, sliceStarted = performance.now(), sliceRows = 0;
+            for (let index = 0; index < chapters.length; index++) {
+                const chapter = chapters[index];
+                let row = rows.get(chapter);
                 if (!row) {
                     row = document.createElement("div");
                     row.className = "ten-list-item";
@@ -3151,20 +3183,27 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                 } else setText(row._tenName, name);
                 setAttribute(row._tenName, "title", name);
                 setText(row._tenMeta, chapter.isUnavailable ? chapter.unavailableReason || "未解锁" : chapter.isPay ? "付费" : chapter.characterType === "many" ? "分卷" : "");
-                current.set(chapter, row);
-                if (list.children[index] !== row) list.insertBefore(row, list.children[index] || null);
-            });
-            for (const [chapter, row] of previous) if (!current.has(chapter)) row.remove();
-            list._tenRows = current;
+                rows.set(chapter, row);
+                if (anchor !== row) list.insertBefore(row, anchor);
+                anchor = row.nextElementSibling;
+                sliceRows++;
+                if (chapters.length >= 500 && index + 1 < chapters.length && (sliceRows >= 200 || sliceRows % 50 === 0 && performance.now() - sliceStarted >= 8)) {
+                    await yieldToBrowser(0);
+                    if (!list.isConnected || generation !== list._tenRenderGeneration) return;
+                    sliceStarted = performance.now(), sliceRows = 0;
+                }
+            }
+            setAttribute(list, "aria-busy", "false");
         }
         function reloadChapters() {
+            if (state.chaptersLoading) return void (state.chaptersReloadRequested = !0);
             state.chapters = [], state.lastSelected = null, state.editMode = !1, byId("ten-edit-list").classList.remove("is-active"), 
             renderChapters(), detectComicInfo(), loadChapters();
         }
         function selectAllChapters(e) {
             state.chapters.forEach(t => {
-                t.isSelect = Boolean(e && canSelectChapter(t));
-            }), state.lastSelected = null, renderChapters();
+                setChapterSelected(t, Boolean(e && canSelectChapter(t)));
+            }), state.lastSelected = null, syncChapterControls(byId("ten-chapter-list"));
         }
         function reverseChapters() {
             state.chapters.reverse(), state.lastSelected = null, updateChapterSequence();
@@ -3184,18 +3223,17 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
             const e = state.queue ? state.queue.worker.map((e, t) => e ? {
                 item: e,
                 index: t
-            } : null).filter(Boolean) : [], t = state.queue ? state.queue.list.map((e, t) => ({
-                item: e,
-                index: t
-            })).reverse() : [];
-            syncMiniTaskBar(e, t.length), state.visible && "tasks" === state.activeTab && (setText(byId("ten-active-count"), e.length), 
-            setText(byId("ten-waiting-count"), t.length), function(e, t) {
+            } : null).filter(Boolean) : [], t = state.queue ? state.queue.list.length : 0;
+            syncMiniTaskBar(e, t);
+            if (!state.visible || "tasks" !== state.activeTab) return;
+            setText(byId("ten-active-count"), e.length), setText(byId("ten-waiting-count"), t), 
+            function(e, t) {
                 const n = byId("ten-toggle-all-active"), r = e.map(e => e.item).filter(e => !e.cancelled && "cancelling" !== e.status), a = r.length > 0 && r.every(e => e.paused || "paused" === e.status);
                 n.hidden = 0 === r.length, byId("ten-cancel-all-active").hidden = 0 === r.length;
                 const i = a ? "resume" : "pause";
                 n.dataset.bulkAction !== i && (n.dataset.bulkAction = i), setText(n, a ? "全部继续" : "全部暂停"), 
                 byId("ten-remove-all-waiting").hidden = 0 === t;
-            }(e, t.length), function(e) {
+            }(e, t), function(e) {
                 const t = byId("ten-active-tasks");
                 if (!e.length) return void renderStaticTaskList("ten-active-tasks", [], empty("当前没有下载任务"));
                 delete t.dataset.renderKey;
@@ -3228,16 +3266,14 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                     const i = t.children[r];
                     i !== a && t.insertBefore(a, i || null);
                 });
-            }(e), renderStaticTaskList("ten-waiting-tasks", t.map(({item: e}) => [ e.url, e.comicName, e.downChapterName ]), () => t.length ? t.map(({item: e, index: n}, r) => taskCard(e, "waiting", n, r, t.length)).join("") : empty("等待队列为空")), 
-            function() {
+            }(e), renderWaitingTasks(state.queue), function() {
                 const e = readHistory(), t = `${state.historyFilter}|${state.historyRaw}`;
                 if (t === state.historyRenderKey) return;
                 state.historyRenderKey = t;
                 const n = function(e) {
                     return "completed" === state.historyFilter ? e.filter(e => "completed" === e.status || !e.status && !e.hasError) : "failed" === state.historyFilter ? e.filter(e => "failed" === e.status || "partial" === e.status || e.hasError) : "cancelled" === state.historyFilter ? e.filter(e => "cancelled" === e.status) : e;
                 }(e);
-                setText(byId("ten-history-count"), e.length), renderStaticTaskList("ten-history", [ state.historyFilter, ...n.map(e => [ e.id, e.status, e.comicName, e.downChapterName, e.failedImages?.length ]) ], n.length ? n.map(historyCard).join("") : empty(e.length ? "没有符合筛选条件的记录" : "暂无下载记录")), 
-                all("[data-history-filter]").forEach(e => {
+                setText(byId("ten-history-count"), e.length), renderHistoryRows(n, e.length), all("[data-history-filter]").forEach(e => {
                     const t = e.dataset.historyFilter === state.historyFilter;
                     e.classList.toggle("is-active", t), setAttribute(e, "aria-pressed", String(t));
                 }), function(e) {
@@ -3250,7 +3286,7 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                         state.lastHistoryId = n;
                     } else state.lastHistoryId = n;
                 }(e);
-            }(), syncTaskGroup("active", e.length), syncTaskGroup("waiting", t.length));
+            }(), syncTaskGroup("active", e.length), syncTaskGroup("waiting", t);
         }
         function syncMiniTaskBar(e, t) {
             if (!state.ready && !byId("ten-mini-task")) return;
@@ -3327,6 +3363,68 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
         function renderStaticTaskList(e, t, n) {
             const r = byId(e), a = JSON.stringify(t);
             r.dataset.renderKey !== a && (r.innerHTML = "function" == typeof n ? n() : n, r.dataset.renderKey = a);
+        }
+        const waitingTaskIds = new WeakMap;
+        let waitingTaskSequence = 0;
+        function renderTaskRows(id, entries, emptyMarkup) {
+            const list = byId(id), previous = list._tenKeyedRows || new Map, current = new Map;
+            if (!entries.length) {
+                if (list._tenEmptyMarkup !== emptyMarkup || previous.size) list.innerHTML = emptyMarkup;
+                list._tenEmptyMarkup = emptyMarkup, list._tenKeyedRows = current;
+                return;
+            }
+            one(".ten-empty", list)?.remove(), delete list._tenEmptyMarkup;
+            let anchor = list.firstElementChild;
+            for (const entry of entries) {
+                let row = previous.get(entry.key);
+                if (!row || row.signature !== entry.signature) {
+                    const template = document.createElement("template");
+                    template.innerHTML = entry.render();
+                    const node = template.content.firstElementChild;
+                    if (row) {
+                        if (anchor === row.node) anchor = node;
+                        row.node.replaceWith(node);
+                    }
+                    row = {
+                        node: node,
+                        signature: entry.signature
+                    };
+                }
+                if (anchor !== row.node) list.insertBefore(row.node, anchor);
+                anchor = row.node.nextElementSibling;
+                current.set(entry.key, row);
+            }
+            for (const [key, row] of previous) if (!current.has(key)) row.node.remove();
+            list._tenKeyedRows = current;
+        }
+        function renderWaitingTasks(queue) {
+            const list = byId("ten-waiting-tasks"), count = queue ? queue.list.length : 0, revision = queue ? queue.waitingRevision || 0 : 0;
+            if (list._tenWaitingQueue === queue && list._tenWaitingRevision === revision && list._tenWaitingCount === count) return;
+            const entries = [];
+            for (let index = count - 1; index >= 0; index--) {
+                const task = queue.list[index], position = count - 1 - index;
+                if (!waitingTaskIds.has(task)) waitingTaskIds.set(task, ++waitingTaskSequence);
+                entries.push({
+                    key: waitingTaskIds.get(task),
+                    signature: JSON.stringify([ index, position === 0, position === count - 1, task.url, task.comicName, task.downChapterName, task.chapterName ]),
+                    render: () => taskCard(task, "waiting", index, position, count)
+                });
+            }
+            renderTaskRows("ten-waiting-tasks", entries, empty("等待队列为空"));
+            list._tenWaitingQueue = queue, list._tenWaitingRevision = revision, list._tenWaitingCount = count;
+        }
+        function renderHistoryRows(records, total) {
+            const entries = [], occurrences = new Map;
+            for (const record of records) {
+                const base = JSON.stringify([ record.id, record.comicName, record.downChapterName ]), occurrence = occurrences.get(base) || 0;
+                occurrences.set(base, occurrence + 1);
+                entries.push({
+                    key: base + "|" + occurrence,
+                    signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
+                    render: () => historyCard(record)
+                });
+            }
+            renderTaskRows("ten-history", entries, empty(total ? "没有符合筛选条件的记录" : "暂无下载记录"));
         }
         function taskCardNodes(e) {
             return {
@@ -3407,7 +3505,8 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
             renderTasks(), n && toast(`已移出 ${n} 个等待任务`, () => restoreWaitingTasks(t));
         }
         function restoreWaitingTasks(e) {
-            state.queue && e.length && (state.queue.list.push(...e), state.queue.run(), renderTasks());
+            state.queue && e.length && (state.queue.list.push(...e), state.queue.waitingRevision = (state.queue.waitingRevision || 0) + 1, 
+            state.queue.run(), renderTasks());
         }
         function taskCard(e, t, n, r = 0, a = 0) {
             const i = Math.max(0, Math.min(100, Number(e.progress || 0))), o = "active" === t, s = "paused" === e.status, c = o ? `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-toggle data-task-action="${s ? "resume" : "pause"}" data-worker-index="${n}" title="${s ? "继续" : "暂停"}">${icon(s ? "play" : "pause")}</button><button class="ten-icon-btn" type="button" data-task-action="diagnostic" data-worker-index="${n}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel" data-worker-index="${n}" title="取消任务">${icon("close")}</button></div>` : `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-action="waiting-up" data-waiting-index="${n}" title="提前一个位置" ${0 === r ? "disabled" : ""}>${icon("up")}</button><button class="ten-icon-btn" type="button" data-task-action="waiting-down" data-waiting-index="${n}" title="延后一个位置" ${r === a - 1 ? "disabled" : ""}>${icon("down")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel-waiting" data-waiting-index="${n}" title="移出队列">${icon("close")}</button></div>`;
@@ -5233,8 +5332,8 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
                 t.heavyCanvasExport = Boolean(siteRules.Po && siteRules.Po.heavyCanvasExport), t;
             }(e));
             e.length ? (enqueueDownloads(e), state.chapters.forEach(e => {
-                e.isSelect = !1;
-            }), renderChapters()) : toast("请先选择章节");
+                setChapterSelected(e, !1);
+            }), syncChapterControls(byId("ten-chapter-list"))) : toast("请先选择章节");
         }
         function downloadCurrentChapter() {
             if (!siteRules.Po) return void toast("当前网站没有匹配规则");
@@ -5302,12 +5401,13 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
         }
         function scheduleTaskPersist() {
-            clearTimeout(state.persistTimer), state.persistTimer = setTimeout(persistQueueState, 750);
+            null === state.persistTimer && (state.persistTimer = setTimeout(persistQueueState, 750));
         }
         function persistQueueState() {
             clearTimeout(state.persistTimer), state.persistTimer = null;
             const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
-            (0, configModule.po)(PENDING_TASKS_KEY, uniqueTaskSnapshots(n.concat(a)));
+            const snapshots = uniqueTaskSnapshots(n.concat(a));
+            JSON.stringify(t) !== JSON.stringify(snapshots) && (0, configModule.po)(PENDING_TASKS_KEY, snapshots);
         }
         function handlePageHide() {
             (state.queue || state.recoveryTasks.length) && persistQueueState();

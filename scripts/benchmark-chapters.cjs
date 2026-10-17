@@ -11,6 +11,7 @@ async function main() {
       const { page, context } = await openComic(browser, { baseline, count: report.count })
       try {
         await page.locator('#ten-load-chapters').click()
+        await page.waitForFunction(count => document.querySelectorAll('#ten-chapter-list [data-index]').length === count && document.getElementById('ten-chapter-list').getAttribute('aria-busy') !== 'true', report.count)
         const measurement = await page.evaluate(() => {
           const list = document.getElementById('ten-chapter-list')
           const observer = new MutationObserver(() => {})

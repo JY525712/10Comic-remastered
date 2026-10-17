@@ -11,18 +11,17 @@ function renderTasks() {
     const e = state.queue ? state.queue.worker.map((e, t) => e ? {
         item: e,
         index: t
-    } : null).filter(Boolean) : [], t = state.queue ? state.queue.list.map((e, t) => ({
-        item: e,
-        index: t
-    })).reverse() : [];
-    syncMiniTaskBar(e, t.length), state.visible && "tasks" === state.activeTab && (setText(byId("ten-active-count"), e.length), 
-    setText(byId("ten-waiting-count"), t.length), function(e, t) {
+    } : null).filter(Boolean) : [], t = state.queue ? state.queue.list.length : 0;
+    syncMiniTaskBar(e, t);
+    if (!state.visible || "tasks" !== state.activeTab) return;
+    (setText(byId("ten-active-count"), e.length), 
+    setText(byId("ten-waiting-count"), t), function(e, t) {
         const n = byId("ten-toggle-all-active"), r = e.map(e => e.item).filter(e => !e.cancelled && "cancelling" !== e.status), a = r.length > 0 && r.every(e => e.paused || "paused" === e.status);
         n.hidden = 0 === r.length, byId("ten-cancel-all-active").hidden = 0 === r.length;
         const i = a ? "resume" : "pause";
         n.dataset.bulkAction !== i && (n.dataset.bulkAction = i), setText(n, a ? "全部继续" : "全部暂停"), 
         byId("ten-remove-all-waiting").hidden = 0 === t;
-    }(e, t.length), function(e) {
+    }(e, t), function(e) {
         const t = byId("ten-active-tasks");
         if (!e.length) return void renderStaticTaskList("ten-active-tasks", [], empty("当前没有下载任务"));
         delete t.dataset.renderKey;
@@ -55,7 +54,7 @@ function renderTasks() {
             const i = t.children[r];
             i !== a && t.insertBefore(a, i || null);
         });
-    }(e), renderStaticTaskList("ten-waiting-tasks", t.map(({item: e}) => [ e.url, e.comicName, e.downChapterName ]), () => t.length ? t.map(({item: e, index: n}, r) => taskCard(e, "waiting", n, r, t.length)).join("") : empty("等待队列为空")), 
+    }(e), renderWaitingTasks(state.queue), 
     function() {
         const e = readHistory(), t = `${state.historyFilter}|${state.historyRaw}`;
         if (t === state.historyRenderKey) return;
@@ -63,7 +62,7 @@ function renderTasks() {
         const n = function(e) {
             return "completed" === state.historyFilter ? e.filter(e => "completed" === e.status || !e.status && !e.hasError) : "failed" === state.historyFilter ? e.filter(e => "failed" === e.status || "partial" === e.status || e.hasError) : "cancelled" === state.historyFilter ? e.filter(e => "cancelled" === e.status) : e;
         }(e);
-        setText(byId("ten-history-count"), e.length), renderStaticTaskList("ten-history", [ state.historyFilter, ...n.map(e => [ e.id, e.status, e.comicName, e.downChapterName, e.failedImages?.length ]) ], n.length ? n.map(historyCard).join("") : empty(e.length ? "没有符合筛选条件的记录" : "暂无下载记录")), 
+        setText(byId("ten-history-count"), e.length), renderHistoryRows(n, e.length), 
         all("[data-history-filter]").forEach(e => {
             const t = e.dataset.historyFilter === state.historyFilter;
             e.classList.toggle("is-active", t), setAttribute(e, "aria-pressed", String(t));
@@ -77,7 +76,7 @@ function renderTasks() {
                 state.lastHistoryId = n;
             } else state.lastHistoryId = n;
         }(e);
-    }(), syncTaskGroup("active", e.length), syncTaskGroup("waiting", t.length));
+    }(), syncTaskGroup("active", e.length), syncTaskGroup("waiting", t));
 }
 
 function syncMiniTaskBar(e, t) {
@@ -163,6 +162,69 @@ function toggleTaskGroup(e) {
 function renderStaticTaskList(e, t, n) {
     const r = byId(e), a = JSON.stringify(t);
     r.dataset.renderKey !== a && (r.innerHTML = "function" == typeof n ? n() : n, r.dataset.renderKey = a);
+}
+
+const waitingTaskIds = new WeakMap;
+let waitingTaskSequence = 0;
+
+function renderTaskRows(id, entries, emptyMarkup) {
+    const list = byId(id), previous = list._tenKeyedRows || new Map, current = new Map;
+    if (!entries.length) {
+        if (list._tenEmptyMarkup !== emptyMarkup || previous.size) list.innerHTML = emptyMarkup;
+        list._tenEmptyMarkup = emptyMarkup, list._tenKeyedRows = current;
+        return;
+    }
+    one(".ten-empty", list)?.remove(), delete list._tenEmptyMarkup;
+    let anchor = list.firstElementChild;
+    for (const entry of entries) {
+        let row = previous.get(entry.key);
+        if (!row || row.signature !== entry.signature) {
+            const template = document.createElement("template");
+            template.innerHTML = entry.render();
+            const node = template.content.firstElementChild;
+            if (row) {
+                if (anchor === row.node) anchor = node;
+                row.node.replaceWith(node);
+            }
+            row = { node: node, signature: entry.signature };
+        }
+        if (anchor !== row.node) list.insertBefore(row.node, anchor);
+        anchor = row.node.nextElementSibling;
+        current.set(entry.key, row);
+    }
+    for (const [key, row] of previous) if (!current.has(key)) row.node.remove();
+    list._tenKeyedRows = current;
+}
+
+function renderWaitingTasks(queue) {
+    const list = byId("ten-waiting-tasks"), count = queue ? queue.list.length : 0, revision = queue ? queue.waitingRevision || 0 : 0;
+    if (list._tenWaitingQueue === queue && list._tenWaitingRevision === revision && list._tenWaitingCount === count) return;
+    const entries = [];
+    for (let index = count - 1; index >= 0; index--) {
+        const task = queue.list[index], position = count - 1 - index;
+        if (!waitingTaskIds.has(task)) waitingTaskIds.set(task, ++waitingTaskSequence);
+        entries.push({
+            key: waitingTaskIds.get(task),
+            signature: JSON.stringify([ index, position === 0, position === count - 1, task.url, task.comicName, task.downChapterName, task.chapterName ]),
+            render: () => taskCard(task, "waiting", index, position, count)
+        });
+    }
+    renderTaskRows("ten-waiting-tasks", entries, empty("等待队列为空"));
+    list._tenWaitingQueue = queue, list._tenWaitingRevision = revision, list._tenWaitingCount = count;
+}
+
+function renderHistoryRows(records, total) {
+    const entries = [], occurrences = new Map;
+    for (const record of records) {
+        const base = JSON.stringify([ record.id, record.comicName, record.downChapterName ]), occurrence = occurrences.get(base) || 0;
+        occurrences.set(base, occurrence + 1);
+        entries.push({
+            key: base + "|" + occurrence,
+            signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
+            render: () => historyCard(record)
+        });
+    }
+    renderTaskRows("ten-history", entries, empty(total ? "没有符合筛选条件的记录" : "暂无下载记录"));
 }
 
 function taskCardNodes(e) {
@@ -257,7 +319,7 @@ async function removeAllWaitingTasks() {
 }
 
 function restoreWaitingTasks(e) {
-    state.queue && e.length && (state.queue.list.push(...e), state.queue.run(), renderTasks());
+    state.queue && e.length && (state.queue.list.push(...e), state.queue.waitingRevision = (state.queue.waitingRevision || 0) + 1, state.queue.run(), renderTasks());
 }
 
 function taskCard(e, t, n, r = 0, a = 0) {

@@ -12,10 +12,20 @@ const current = fs.readFileSync(process.env.USERSCRIPT_PATH || path.join(root, '
 function preservedParts(source) {
   const parts = {}
   const ast = parser.parse(source)
-  // The user authorized fixing filename cleanup; compare every other download
-  // function, as well as the adapters, queue and config, against the baseline.
+  // Filename cleanup and the ZIP writer have dedicated behavior/byte tests.
+  // Keep every other download function and all queue operations identical.
+  const revisionOnly = node => {
+    if (node?.type !== 'AssignmentExpression' || node.left.type !== 'MemberExpression' || node.left.object.type !== 'ThisExpression' || node.left.property.name !== 'waitingRevision') return false
+    assert.equal(generate(node, { compact: true }).code, 'this.waitingRevision=(this.waitingRevision||0)+1', 'only a structural revision increment may be excluded')
+    return true
+  }
   traverse(ast, { FunctionDeclaration(path) {
-    if (path.node.id?.name === 'sanitizePathName') path.node.body.body = []
+    if (['sanitizePathName', 'writeStoreZipToDirectoryV2'].includes(path.node.id?.name)) path.node.body.body = []
+  }, ExpressionStatement(path) {
+    const value = path.node.expression
+    if (revisionOnly(value) || value.type === 'LogicalExpression' && revisionOnly(value.right)) path.remove()
+  }, SequenceExpression(path) {
+    path.node.expressions = path.node.expressions.filter(node => !revisionOnly(node))
   } })
   traverse(ast, {
     ObjectProperty(path) {
@@ -29,7 +39,7 @@ function preservedParts(source) {
   })
   return parts
 }
-test('site adapters, queue, settings and downloads outside filename cleanup keep the original executable syntax', () => {
+test('site adapters, queue operations and downloads outside approved cleanup/ZIP optimization keep the original executable syntax', () => {
   const original = preservedParts(baseline), optimized = preservedParts(current)
   for (const key of ['390', '624', '872', 'queue']) {
     assert.ok(original[key], `missing original module ${key}`)

@@ -12,6 +12,7 @@
     "verify:compat": "node --test tests/compatibility.test.cjs",
     "test:browser": "node --test tests/ui-browser.test.cjs tests/download-browser.test.cjs",
     "benchmark:chapters": "node scripts/benchmark-chapters.cjs",
+    "benchmark:runtime": "node scripts/benchmark-runtime.cjs",
     "format:ui": "node scripts/format-ui.cjs",
     "verify:themes": "node scripts/verify-light-themes.cjs",
     "verify:light-themes": "node scripts/verify-light-themes.cjs",

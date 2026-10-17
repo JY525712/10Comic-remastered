@@ -1,7 +1,7 @@
 {
   "name": "10comic-remastered-userscript",
   "private": true,
-  "version": "2.0.15",
+  "version": "2.0.16",
   "scripts": {
     "build": "node scripts/build-vertical-userscript.cjs",
     "build:vertical": "node scripts/build-vertical-userscript.cjs --dist",

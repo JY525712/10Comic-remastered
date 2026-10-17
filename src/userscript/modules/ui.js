@@ -20,7 +20,7 @@ module.exports = () => {
         cloud: [ "云白浮雕", "柔白拟态 · 轻盈触感" ],
         expressive: [ "星雾紫", "柔和圆角 · 层叠色面" ],
         carbon: [ "霓虹炭黑", "蓝粉边光 · 精密组件" ],
-        paper: [ "纸白蓝图", "纯白线框 · 蓝色秩序" ]
+        garden: [ "晴白庭院", "暖白留光 · 鼠尾草绿" ]
     }, TAB_ORDER = [ "sites", "chapters", "tasks", "settings" ], TAB_TITLES = {
         sites: [ "漫画站点", "站点索引" ],
         chapters: [ "章节选择", "章节管理" ],
@@ -71,7 +71,7 @@ module.exports = () => {
         settings: null
     };
     function normalizeThemePreset(value) {
-        const preset = value === "porcelain" ? "cloud" : value === "ink" ? "paper" : value;
+        const preset = value === "porcelain" ? "cloud" : value === "ink" || value === "paper" ? "garden" : value;
         return Object.prototype.hasOwnProperty.call(THEMES, preset) ? preset : "glass";
     }
     function readSettings() {

@@ -10,7 +10,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true })
   const checks = []
   try {
-    for (const theme of ['cloud', 'paper']) {
+    for (const theme of ['cloud', 'garden']) {
       for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 568 }]) {
         const { page, context, errors } = await openComic(browser, { count: 8, requestDelay: -1, viewport, settings: { themePreset: theme, effectLevel: 1, appLoadDefault: { isShowUI: true, rightSize: 125 } } })
         try {
@@ -48,9 +48,9 @@ async function main() {
       await page.locator('#ten-panel').screenshot({ animations: 'disabled', path: path.join(directory, `${theme}-preview.png`) })
       await context.close()
     }
-    const panels = ['cloud', 'paper'].map((theme, index) => {
+    const panels = ['cloud', 'garden'].map((theme, index) => {
       const image = fs.readFileSync(path.join(directory, `${theme}-preview.png`)).toString('base64')
-      return `<section><h2>${index === 0 ? '云白浮雕' : '纸白蓝图'}</h2><p>${index === 0 ? '柔白拟态 · 轻盈触感' : '纯白线框 · 蓝色秩序'}</p><img src="data:image/png;base64,${image}" alt="${theme}"></section>`
+      return `<section><h2>${index === 0 ? '云白浮雕' : '晴白庭院'}</h2><p>${index === 0 ? '柔白拟态 · 轻盈触感' : '暖白留光 · 鼠尾草绿'}</p><img src="data:image/png;base64,${image}" alt="${theme}"></section>`
     }).join('')
     const preview = await browser.newPage({ viewport: { width: 960, height: 920 } })
     await preview.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:24px;box-sizing:border-box;background:#e8eef7;font-family:'Microsoft YaHei',sans-serif;color:#203451;display:flex;gap:24px;justify-content:center}section{width:430px}h2{font-size:21px;margin:0 0 6px}p{font-size:12px;color:#53647a;margin:0 0 15px}img{width:430px;display:block}</style>${panels}`)

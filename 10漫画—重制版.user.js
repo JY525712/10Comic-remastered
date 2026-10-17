@@ -1614,8 +1614,14 @@
                 return e;
             }
             function sanitizePathName(e) {
-                let t = String(null == e ? "" : e).replace(/[\x00-\x1f<>:"/\\|?*]/g, " ").replace(/\s+/g, " ").replace(/[. ]+$/g, "").trim();
-                return t || (t = "未命名"), /^(con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])(?:\..*)?$/i.test(t) ? "_" + t : t;
+                // Native browser handles also reject format/non-characters and some '~'
+                // names that Windows Explorer accepts. Keep ordinary punctuation intact.
+                let t = String(null == e ? "" : e).replace(/[\p{Cf}\p{Cs}\ufdd0-\ufdef]/gu, "").replace(/[\p{Cc}<>:"/\\|?*]/gu, " ");
+                t = Array.from(t).filter(c => (c.codePointAt(0) & 65535) < 65534).join("").replace(/\s+/g, " ").replace(/[. ]+$/g, "").trim().replace(/^[. ]+/, ".") || "未命名";
+                const component = t.startsWith(".") ? t.slice(1) : t, dot = component.indexOf(".");
+                const shortName = component.length <= 12 && !/[\s"\\/:+|<>=;?,*]/u.test(component) && (dot < 0 ? component.length <= 8 : dot > 0 && dot <= 8 && dot === component.lastIndexOf(".") && component.length - dot <= 4);
+                if (component.includes("~") && (/^~|~$/u.test(component) || shortName)) t = t.replace(/~/g, "～");
+                return /^(con|prn|aux|nul|clock\$|com[1-9¹²³]|lpt[1-9¹²³])(?:\..*)?$/i.test(t) || /^(conin\$|conout\$|desktop\.ini|thumbs\.db)$/i.test(t) ? "_" + t : t;
             }
             function pathName(e) {
                 return !1 === (0, configModule.cF)("sanitizePathNames") ? String(null == e ? "" : e) : sanitizePathName(e);
@@ -2830,8 +2836,8 @@ class="ten-mode-option-mark"></span><span><strong>图片拼接</strong><small>�
 ten-direct-flow-setting"><label>直接下载流程</label><div class="ten-direct-flow-options" role="group" aria-label="直接下载流程"><button type="button" \
 data-direct-flow="0"><strong>兼容流程</strong><small>GM_xmlhttpRequest → Blob → 保存；兼容性优先</small></button><button type="button" \
 data-direct-flow="1"><strong>快速直连</strong><small>GM_download → 直接保存；失败自动回退兼容流程</small></button></div></div><div class="ten-setting ten-setting-check \
-ten-path-sanitize-setting"><div><label for="ten-sanitize-paths">自动清理文件夹和文件名</label><small>默认开启；去除尾部空格、句点和系统禁用字符，仅影响保存路径</small></div><input \
-id="ten-sanitize-paths" type="checkbox"></div>' ].join(""), '<div class="ten-setting"><label for="ten-max-height">拼接最大高度</label><input id="ten-max-height" class="ten-input" type="number" min="10000" \
+ten-path-sanitize-setting"><div><label for="ten-sanitize-paths">自动清理文件夹和文件名</label><small>默认开启；修正系统和浏览器不兼容名称，仅影响保存路径</small></div><input id="ten-sanitize-paths" \
+type="checkbox"></div>' ].join(""), '<div class="ten-setting"><label for="ten-max-height">拼接最大高度</label><input id="ten-max-height" class="ten-input" type="number" min="10000" \
 max="65530"></div><div class="ten-setting"><label for="ten-digits">图片序号位数</label><input id="ten-digits" class="ten-input" type="number" min="1" \
 max="8"></div><div class="ten-setting"><label>图片下载范围</label><div class="ten-grid-2"><input id="ten-range-start" class="ten-input" type="number" min="1"><input \
 id="ten-range-end" class="ten-input" type="number" min="-1"></div></div>', settingCheck("ten-splice-page", "网站图片连续阅读"), settingCheck("ten-notify-complete", "下载完成通知"), '<div class="ten-setting"><label for="ten-history-limit">下载记录上限</label><input id="ten-history-limit" class="ten-input" type="number" min="10" \

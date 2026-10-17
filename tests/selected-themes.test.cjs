@@ -115,7 +115,10 @@ test('decorative highlights cannot scroll the button label or its settings panel
       await page.locator('#ten-panel').evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)))
       await page.locator('[data-tab="settings"]').click()
       const button = page.locator('#ten-default-mode-trigger')
-      await button.hover()
+      // Locator actions may scroll an animated target before dispatching any
+      // pointer event. Use real pointer coordinates to test application focus.
+      const rect = await button.boundingBox()
+      await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2)
       await button.evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)))
       const labelShift = await button.evaluate(element => {
         const label = element.querySelector('#ten-default-mode-label')
@@ -125,7 +128,7 @@ test('decorative highlights cannot scroll the button label or its settings panel
       })
       assert.equal(labelShift, 0, `${theme} makes its decorative highlight a scrollable container`)
       const before = await page.locator('.ten-view.is-active').evaluate(element => element.scrollTop)
-      await button.click()
+      await page.mouse.click(rect.x + rect.width / 2, rect.y + rect.height / 2)
       await page.locator('#ten-default-mode-menu').evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)))
       assert.equal(await page.locator('.ten-view.is-active').evaluate(element => element.scrollTop), before, `${theme} focus scrolls the clipped highlight into view`)
     } finally { await context.close() }

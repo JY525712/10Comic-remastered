@@ -11,7 +11,13 @@ const current = fs.readFileSync(process.env.USERSCRIPT_PATH || path.join(root, '
 
 function preservedParts(source) {
   const parts = {}
-  traverse(parser.parse(source), {
+  const ast = parser.parse(source)
+  // The user authorized fixing filename cleanup; compare every other download
+  // function, as well as the adapters, queue and config, against the baseline.
+  traverse(ast, { FunctionDeclaration(path) {
+    if (path.node.id?.name === 'sanitizePathName') path.node.body.body = []
+  } })
+  traverse(ast, {
     ObjectProperty(path) {
       if ([390, 624, 872].includes(path.node.key.value) && path.node.value.type === 'ArrowFunctionExpression') {
         parts[path.node.key.value] = generate(path.node.value, { compact: true, comments: false }).code
@@ -23,7 +29,7 @@ function preservedParts(source) {
   })
   return parts
 }
-test('site adapters, download engine, queue and settings keep the original executable syntax', () => {
+test('site adapters, queue, settings and downloads outside filename cleanup keep the original executable syntax', () => {
   const original = preservedParts(baseline), optimized = preservedParts(current)
   for (const key of ['390', '624', '872', 'queue']) {
     assert.ok(original[key], `missing original module ${key}`)

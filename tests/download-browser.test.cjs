@@ -85,6 +85,8 @@ test('pause and resume keep an active download available, cancellation finishes 
     const result = await finish(page)
     assert.equal(result.history.status, 'cancelled')
     assert.equal(result.saved.length, 0)
+    // History persistence can precede the batched UI refresh by one frame.
+    await page.locator('[data-worker-card]').waitFor({ state: 'detached' })
     assert.equal(await page.locator('[data-worker-card]').count(), 0)
   } finally { await context.close() }
 })

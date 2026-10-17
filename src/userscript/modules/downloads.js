@@ -169,8 +169,14 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
     return e;
   }
   function sanitizePathName(e) {
-    let t = String(null == e ? "" : e).replace(/[\x00-\x1f<>:"/\\|?*]/g, " ").replace(/\s+/g, " ").replace(/[. ]+$/g, "").trim();
-    return t || (t = "未命名"), /^(con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])(?:\..*)?$/i.test(t) ? "_" + t : t;
+    // Native browser handles also reject format/non-characters and some '~'
+    // names that Windows Explorer accepts. Keep ordinary punctuation intact.
+    let t = String(null == e ? "" : e).replace(/[\p{Cf}\p{Cs}\ufdd0-\ufdef]/gu, "").replace(/[\p{Cc}<>:"/\\|?*]/gu, " ");
+    t = Array.from(t).filter(c => (c.codePointAt(0) & 65535) < 65534).join("").replace(/\s+/g, " ").replace(/[. ]+$/g, "").trim().replace(/^[. ]+/, ".") || "未命名";
+    const component = t.startsWith(".") ? t.slice(1) : t, dot = component.indexOf(".");
+    const shortName = component.length <= 12 && !/[\s"\\/:+|<>=;?,*]/u.test(component) && (dot < 0 ? component.length <= 8 : dot > 0 && dot <= 8 && dot === component.lastIndexOf(".") && component.length - dot <= 4);
+    if (component.includes("~") && (/^~|~$/u.test(component) || shortName)) t = t.replace(/~/g, "～");
+    return /^(con|prn|aux|nul|clock\$|com[1-9¹²³]|lpt[1-9¹²³])(?:\..*)?$/i.test(t) || /^(conin\$|conout\$|desktop\.ini|thumbs\.db)$/i.test(t) ? "_" + t : t;
   }
   function pathName(e) {
     return !1 === (0, configModule.cF)("sanitizePathNames") ? String(null == e ? "" : e) : sanitizePathName(e);

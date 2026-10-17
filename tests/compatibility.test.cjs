@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..')
 const baseline = fs.readFileSync(path.join(root, 'baseline/original-2.0.11.user.js'), 'utf8')
 const current = fs.readFileSync(process.env.USERSCRIPT_PATH || path.join(root, '10漫画—重制版.user.js'), 'utf8')
 
-function preservedParts(source) {
+function preservedParts(source, sfacgDescription) {
   const parts = {}
   const ast = parser.parse(source)
   // Filename cleanup and the ZIP writer have dedicated behavior/byte tests.
@@ -19,7 +19,13 @@ function preservedParts(source) {
     assert.equal(generate(node, { compact: true }).code, 'this.waitingRevision=(this.waitingRevision||0)+1', 'only a structural revision increment may be excluded')
     return true
   }
-  traverse(ast, { FunctionDeclaration(path) {
+  traverse(ast, { ObjectExpression(path) {
+    const property = name => path.node.properties.find(node => node.type === 'ObjectProperty' && (node.key.name || node.key.value) === name)
+    if (property('domain')?.value.value !== 'manhua.sfacg.com') return
+    const description = property('webDesc')
+    assert.equal(description?.value.value, sfacgDescription, 'SF description must match the explicitly approved text')
+    description.value = { type: 'StringLiteral', value: '' }
+  }, FunctionDeclaration(path) {
     if (['sanitizePathName', 'writeStoreZipToDirectoryV2'].includes(path.node.id?.name)) path.node.body.body = []
   }, ExpressionStatement(path) {
     const value = path.node.expression
@@ -39,8 +45,8 @@ function preservedParts(source) {
   })
   return parts
 }
-test('site adapters, queue operations and downloads outside approved cleanup/ZIP optimization keep the original executable syntax', () => {
-  const original = preservedParts(baseline), optimized = preservedParts(current)
+test('site adapters, queue operations and downloads outside approved SF description/cleanup/ZIP optimization keep the original executable syntax', () => {
+  const original = preservedParts(baseline, '在作品页加载章节；仅下载当前账号可正常阅读的章节。'), optimized = preservedParts(current, '打开站点')
   for (const key of ['390', '624', '872', 'queue']) {
     assert.ok(original[key], `missing original module ${key}`)
     assert.equal(optimized[key], original[key], `behavior-sensitive module ${key} changed`)

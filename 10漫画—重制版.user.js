@@ -1305,7 +1305,7 @@
                 domain: "manhua.sfacg.com",
                 homepage: "https://manhua.sfacg.com/",
                 webName: "SF菠萝包漫画",
-                webDesc: "在作品页加载章节；仅下载当前账号可正常阅读的章节。",
+                webDesc: "打开站点",
                 comicNameCss: 'h1, .Reduction_left a[href^="/mh/"]',
                 chapterCss: ".comic_Serial_list",
                 readtype: 1,

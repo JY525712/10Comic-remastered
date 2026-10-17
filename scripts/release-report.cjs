@@ -21,6 +21,9 @@ async function main() {
   assert.ok(total > 25 && total === passed && failed === 0, 'full test suite is not green')
   const directory = path.join(root, 'dist/verification')
   const browser = JSON.parse(fs.readFileSync(path.join(directory, 'browser-report.json')))
+  const themes = JSON.parse(fs.readFileSync(path.join(directory, 'themes-report.json')))
+  assert.equal(themes.sha256, sha256, 'theme checks are for an earlier artifact')
+  assert.equal(themes.checks.length, 72)
   const benchmark = JSON.parse(fs.readFileSync(path.join(directory, 'chapter-benchmark.json')))
   assert.equal(browser.sha256, sha256, 'browser checks are for an earlier artifact')
   assert.equal(benchmark.sha256, sha256, 'benchmark is for an earlier artifact')
@@ -33,6 +36,7 @@ async function main() {
     tests: { command: 'npm test', total, passed, failed },
     build: 'matches source; uniform LF; node --check verified separately',
     browser: { command: 'npm run verify:browser', checks: browser.checks.length },
+    themes: { command: 'npm run verify:themes', checks: themes.checks.length },
     benchmark: benchmark.summary,
     scope: 'Offline Chromium fixtures, unchanged adapter/download/queue/config AST, no live account or site availability claim'
   }

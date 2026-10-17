@@ -59,7 +59,7 @@ test('theme and custom rules are collapsed by default, with one combined theme g
     assert.equal(await page.locator('details#ten-rule-editor-card').count(), 1)
     assert.equal(await page.locator('#ten-theme-settings').evaluate(element => element.open), false)
     assert.equal(await page.locator('#ten-rule-editor-card').evaluate(element => element.open), false)
-    assert.equal(await page.locator('[data-theme-choice="glass"]').isVisible(), false)
+    assert.equal(await page.locator('[data-theme-choice="aurora"]').isVisible(), false)
     assert.equal(await page.locator('#ten-rule-name').isVisible(), false)
     const titles = await page.locator('.ten-view[data-view="settings"] > .ten-settings-card').evaluateAll(cards => cards.map(card => card.querySelector(':scope > summary, :scope > .ten-card-title').textContent.trim()))
     assert.deepEqual(titles, ['主题', '下载', '自定义规则', '设置与规则备份'])

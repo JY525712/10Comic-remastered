@@ -65,7 +65,7 @@ test('image range keeps the original sequence number and legacy settings remain 
     const result = await finish(page)
     assert.equal(result.saved.length, 1)
     assert.ok(result.saved[0].name.endsWith('/0002.png'))
-    assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), 'garden')
+    assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), 'titanium')
     await page.locator('[data-tab="settings"]').click()
     assert.equal(await page.locator('#ten-digits').inputValue(), '4')
     assert.equal(await page.locator('#ten-range-start').inputValue(), '2')

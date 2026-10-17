@@ -15,12 +15,12 @@ module.exports = () => {
     /*__QUEUE_CLASS__*/    class DownloadQueue {}
     var siteRules = __webpack_require__(872);
     const ROOT_ID = "ten-comic-root", PANEL_ID = "ten-panel", LAUNCHER_ID = "ten-comic-launcher", PENDING_TASKS_KEY = "pendingTasks", BACKUP_KEYS = [ "appLoadDefault", "maxChapterNum", "maxPictureNum", "downType", "directDownloadFlow", "sanitizePathNames", "maxSplicingHeight", "imgIndexBitNum", "imgSplicingFlag", "imgDownRange", "historyLimit", "downloadNotification", "effectLevel", "themePreset", "appearanceAxes" ], THEMES = {
-        glass: [ "深海流光", "青紫通透 · 经典" ],
+        aurora: [ "极光流银", "冰透流光 · 银蓝折射" ],
         mist: [ "晨雾晶璃", "白色玻璃 · 柔光折射" ],
         cloud: [ "云白浮雕", "柔白拟态 · 轻盈触感" ],
-        liquid: [ "澄光琉璃", "液态玻璃 · 银蓝折光" ],
+        obsidian: [ "黑曜鎏金", "深邃烟晶 · 香槟金辉" ],
         carbon: [ "霓虹炭黑", "蓝粉边光 · 精密组件" ],
-        garden: [ "晴白庭院", "暖白留光 · 鼠尾草绿" ]
+        titanium: [ "深空钛蓝", "冷峻钛金 · 钢蓝微光" ]
     }, TAB_ORDER = [ "sites", "chapters", "tasks", "settings" ], TAB_TITLES = {
         sites: [ "漫画站点", "站点索引" ],
         chapters: [ "章节选择", "章节管理" ],
@@ -71,8 +71,9 @@ module.exports = () => {
         settings: null
     };
     function normalizeThemePreset(value) {
-        const preset = value === "porcelain" ? "cloud" : value === "ink" || value === "paper" ? "garden" : value === "expressive" ? "liquid" : value;
-        return Object.prototype.hasOwnProperty.call(THEMES, preset) ? preset : "glass";
+        const aliases = { glass: "aurora", liquid: "obsidian", expressive: "obsidian", garden: "titanium", ink: "titanium", paper: "titanium", porcelain: "cloud" };
+        const preset = Object.prototype.hasOwnProperty.call(aliases, value) ? aliases[value] : value;
+        return Object.prototype.hasOwnProperty.call(THEMES, preset) ? preset : "aurora";
     }
     function readSettings() {
         const e = safeGet("appLoadDefault", {}), t = e && "object" == typeof e ? e : {}, n = safeGet("imgDownRange", [ 1, -1 ]), r = Array.isArray(n) && n.length >= 2 ? n : [ 1, -1 ], a = safeGet("themePreset", "glass"), i = safeGet("appearanceAxes", {}), o = i && "object" == typeof i ? i : {};
@@ -317,11 +318,31 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
     function syncQueueLimits() {
         state.queue && state.queue.updateLimits(state.settings.maxChapters, state.settings.concurrentImages);
     }
+    function fitPickerMenu(menu, trigger) {
+        for (const property of [ "top", "bottom", "left", "right", "width", "maxWidth", "maxHeight" ]) menu.style[property] = "";
+        const bounds = { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
+        for (let ancestor = menu.parentElement; ancestor && ancestor.id !== ROOT_ID; ancestor = ancestor.parentElement) {
+            const style = getComputedStyle(ancestor), rect = ancestor.getBoundingClientRect();
+            if (/auto|scroll|hidden|clip/.test(style.overflowX)) bounds.left = Math.max(bounds.left, rect.left), bounds.right = Math.min(bounds.right, rect.right);
+            if (/auto|scroll|hidden|clip/.test(style.overflowY)) bounds.top = Math.max(bounds.top, rect.top), bounds.bottom = Math.min(bounds.bottom, rect.bottom);
+        }
+        const parent = menu.offsetParent || menu.parentElement, parentRect = parent.getBoundingClientRect(), triggerRect = trigger.getBoundingClientRect();
+        const scale = parent.offsetWidth ? parentRect.width / parent.offsetWidth : 1, gap = 6 * scale;
+        const width = Math.min(Math.max(menu.offsetWidth, 190), Math.max(1, (bounds.right - bounds.left - gap * 2) / scale));
+        menu.style.width = width + "px", menu.style.right = "auto";
+        const below = Math.max(0, bounds.bottom - triggerRect.bottom - gap), above = Math.max(0, triggerRect.top - bounds.top - gap);
+        const opensUp = menu.offsetHeight * scale > below && above > below, space = opensUp ? above : below;
+        menu.style.maxHeight = Math.max(1, space / scale) + "px";
+        const height = menu.offsetHeight * scale, left = Math.max(bounds.left + gap, Math.min(parentRect.left, bounds.right - gap - width * scale));
+        menu.style.left = (left - parentRect.left) / scale + "px", menu.style.bottom = "auto";
+        menu.style.top = ((opensUp ? triggerRect.top - gap - height : triggerRect.bottom + gap) - parentRect.top) / scale + "px";
+        menu.style.transformOrigin = opensUp ? "bottom center" : "top center";
+    }
     function toggleDefaultModeMenu(e) {
         e.stopPropagation();
         const t = byId("ten-default-mode"), n = byId("ten-default-mode-menu"), r = n.hidden;
         n.hidden = !r, t.classList.toggle("is-open", r), byId("ten-default-mode-trigger").setAttribute("aria-expanded", String(r)), 
-        r && closeSearchSiteMenu();
+        r && (closeSearchSiteMenu(), fitPickerMenu(n, byId("ten-default-mode-trigger")));
     }
     function chooseDefaultMode(e) {
         const t = e.target.closest("[data-default-mode]");

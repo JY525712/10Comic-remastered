@@ -13,7 +13,7 @@ async function colors(locator) {
 }
 
 test('white theme dropdown selection, hover and radio marks use the active palette', async () => {
-  for (const theme of ['cloud', 'garden']) {
+  for (const theme of ['cloud', 'aurora']) {
     const { page, context } = await openComic(browser, { settings: { themePreset: theme } })
     try {
       await page.locator('[data-tab="settings"]').click()
@@ -23,7 +23,7 @@ test('white theme dropdown selection, hover and radio marks use the active palet
       const rgba = selection.background.match(/[\d.]+/g).map(Number)
       assert.equal(rgba[3] ?? 1, 1, `${theme} selected item must have its own light background: ${JSON.stringify(selection)}`)
       assert.equal(selection.image, 'none', `${theme} must not inherit the cyan-purple gradient`)
-      assert.ok(theme === 'garden' ? rgba[1] > rgba[2] : rgba[2] > rgba[0], `${theme} has the wrong selection color`)
+      assert.ok(rgba[2] > rgba[0], `${theme} has the wrong selection color`)
       const mark = await selected.locator('.ten-mode-option-mark').evaluate(element => getComputedStyle(element).boxShadow)
       assert.equal(mark.includes('7, 18, 34'), false, `${theme} radio mark retains the dark theme inset`)
       await page.locator('[data-default-mode="1"]').hover()
@@ -32,7 +32,7 @@ test('white theme dropdown selection, hover and radio marks use the active palet
       const hover = await colors(page.locator('[data-default-mode="1"]'))
       const channels = hover.background.match(/[\d.]+/g).map(Number)
       assert.equal(channels[3] ?? 1, 1, `${theme} hover still uses the shared cyan wash`)
-      assert.ok(theme === 'garden' ? channels[1] > channels[2] : channels[2] > channels[0])
+      assert.ok(channels[2] > channels[0])
       await page.locator('[data-default-mode="1"]').click()
       assert.equal(await page.evaluate(() => window.__gmValues.downType), 1)
       assert.equal(await page.locator('#ten-default-mode-menu').isVisible(), false)
@@ -46,7 +46,7 @@ test('download and search dropdowns update their selection and hover palettes wi
     await page.locator('[data-tab="settings"]').click()
     await page.locator('#ten-theme-settings > summary').click()
     const backgrounds = []
-    for (const theme of ['garden', 'cloud', 'liquid', 'carbon', 'mist', 'glass']) {
+    for (const theme of ['titanium', 'cloud', 'obsidian', 'carbon', 'mist', 'aurora']) {
       await page.locator(`[data-theme-choice="${theme}"]`).click()
       await page.locator('#ten-default-mode-trigger').click()
       const selected = page.locator('#ten-default-mode-menu .is-selected')
@@ -79,10 +79,10 @@ test('download and search dropdowns update their selection and hover palettes wi
   } finally { await context.close() }
 })
 
-test('the old purple theme restores as liquid glass while preserving appearance settings', async () => {
+test('the old purple theme restores as obsidian gold while preserving appearance settings', async () => {
   const { page, context } = await openComic(browser, { settings: { themePreset: 'expressive', appearanceAxes: { density: 'compact', shape: 'round', motion: 'calm' } } })
   try {
-    assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), 'liquid')
+    assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), 'obsidian')
     assert.equal(await page.locator('#ten-comic-root').getAttribute('data-density'), 'compact')
     assert.equal(await page.locator('#ten-comic-root').getAttribute('data-shape'), 'round')
     assert.equal(await page.locator('#ten-comic-root').getAttribute('data-motion'), 'calm')

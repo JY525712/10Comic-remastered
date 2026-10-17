@@ -74,6 +74,7 @@ function toggleSearchSiteMenu(e) {
     e.stopPropagation();
     const t = byId("ten-search-site-menu"), n = t.hidden;
     t.hidden = !n, byId("ten-search-site-picker").classList.toggle("is-open", n), byId("ten-search-site-trigger").setAttribute("aria-expanded", String(n));
+    n && (closeDefaultModeMenu(), fitPickerMenu(t, byId("ten-search-site-trigger")));
 }
 
 function handleSearchSiteChoice(e) {

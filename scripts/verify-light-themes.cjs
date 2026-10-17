@@ -10,7 +10,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true })
   const checks = []
   try {
-    for (const theme of ['cloud', 'garden', 'liquid']) {
+    for (const theme of ['aurora', 'mist', 'cloud', 'obsidian', 'carbon', 'titanium']) {
       for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 568 }]) {
         const { page, context, errors } = await openComic(browser, { count: 8, requestDelay: -1, viewport, settings: { themePreset: theme, effectLevel: 1, appLoadDefault: { isShowUI: true, rightSize: 125 } } })
         try {
@@ -44,20 +44,21 @@ async function main() {
       }
       // The preview uses only the real settings panel against a quiet page.
       const { page, context } = await openComic(browser, { settings: { themePreset: theme }, count: 1 })
+      await page.addStyleTag({content: 'body > :not(#ten-comic-root){visibility:hidden}body{background:#eef3f7}'})
       await page.locator('[data-tab="settings"]').click()
       await page.locator('#ten-panel').screenshot({ animations: 'disabled', path: path.join(directory, `${theme}-preview.png`) })
       await context.close()
     }
-    const panels = ['cloud', 'garden'].map((theme, index) => {
+    const panels = ['aurora', 'obsidian', 'titanium'].map((theme, index) => {
       const image = fs.readFileSync(path.join(directory, `${theme}-preview.png`)).toString('base64')
-      return `<section><h2>${index === 0 ? '云白浮雕' : '晴白庭院'}</h2><p>${index === 0 ? '柔白拟态 · 轻盈触感' : '暖白留光 · 鼠尾草绿'}</p><img src="data:image/png;base64,${image}" alt="${theme}"></section>`
+      return `<section><h2>${['极光流银', '黑曜鎏金', '深空钛蓝'][index]}</h2><p>${['冰透流光 · 银蓝折射', '深邃烟晶 · 香槟金辉', '冷峻钛金 · 钢蓝微光'][index]}</p><img src="data:image/png;base64,${image}" alt="${theme}"></section>`
     }).join('')
-    const preview = await browser.newPage({ viewport: { width: 960, height: 920 } })
+    const preview = await browser.newPage({ viewport: { width: 1410, height: 920 } })
     await preview.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:24px;box-sizing:border-box;background:#e8eef7;font-family:'Microsoft YaHei',sans-serif;color:#203451;display:flex;gap:24px;justify-content:center}section{width:430px}h2{font-size:21px;margin:0 0 6px}p{font-size:12px;color:#53647a;margin:0 0 15px}img{width:430px;display:block}</style>${panels}`)
-    await preview.screenshot({ path: path.join(directory, 'white-themes-preview.png') })
+    await preview.screenshot({ path: path.join(directory, 'selected-themes-preview.png') })
     await preview.close()
-    fs.writeFileSync(path.join(directory, 'light-themes-report.json'), JSON.stringify({ sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(root, '10漫画—重制版.user.js'))).digest('hex'), checks }, null, 2))
-    console.log(`PASS ${checks.length} light-theme viewport/view checks, plus preset and guide states`)
+    fs.writeFileSync(path.join(directory, 'themes-report.json'), JSON.stringify({ sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(root, '10漫画—重制版.user.js'))).digest('hex'), checks }, null, 2))
+    console.log(`PASS ${checks.length} theme viewport/view checks, plus preset and guide states`)
   } finally { await browser.close() }
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

@@ -6,7 +6,7 @@ before(async () => { browser = await chromium.launch({ headless: true }) })
 after(async () => { await browser?.close() })
 
 test('original preset cards retain opaque individual palettes under either white theme', async () => {
-  for (const theme of ['cloud', 'garden']) {
+  for (const theme of ['cloud', 'aurora']) {
     const { page, context } = await openComic(browser, { settings: { themePreset: theme } })
     try {
       await page.locator('[data-tab="settings"]').click()
@@ -64,21 +64,21 @@ test('all six preset palettes remain readable and stable while switching, hoveri
   } finally { await context.close() }
 })
 
-test('preset list replaces the two removed themes with two new white themes', async () => {
+test('preset list contains the three approved designs and the three retained themes', async () => {
   const { page, context } = await openComic(browser)
   try {
     await page.locator('[data-tab="settings"]').click()
     await page.locator('#ten-theme-settings > summary').click()
     const presets = await page.locator('[data-theme-choice]').evaluateAll(elements => elements.map(element => ({ key: element.dataset.themeChoice, name: element.querySelector('strong').textContent })))
-    assert.deepEqual(presets.map(preset => preset.key), ['glass', 'mist', 'cloud', 'liquid', 'carbon', 'garden'])
+    assert.deepEqual(presets.map(preset => preset.key), ['aurora', 'mist', 'cloud', 'obsidian', 'carbon', 'titanium'])
     assert.equal(presets.find(preset => preset.key === 'cloud').name, '云白浮雕')
-    assert.equal(presets.find(preset => preset.key === 'garden').name, '晴白庭院')
-    assert.equal(presets.some(preset => ['白瓷简章', '墨竹书斋', '纸白蓝图', '星雾紫'].includes(preset.name)), false)
+    assert.equal(presets.find(preset => preset.key === 'titanium').name, '深空钛蓝')
+    assert.equal(presets.some(preset => ['白瓷简章', '墨竹书斋', '纸白蓝图', '星雾紫', '深海流光', '澄光琉璃', '晴白庭院'].includes(preset.name)), false)
   } finally { await context.close() }
 })
 
-test('old saved theme choices map to the new white presets without losing appearance settings', async () => {
-  for (const [oldTheme, theme] of [['porcelain', 'cloud'], ['ink', 'garden'], ['paper', 'garden']]) {
+test('old saved theme choices map to the replacement presets without losing appearance settings', async () => {
+  for (const [oldTheme, theme] of [['porcelain', 'cloud'], ['ink', 'titanium'], ['paper', 'titanium']]) {
     const { page, context } = await openComic(browser, { settings: { themePreset: oldTheme, appearanceAxes: { density: 'compact', shape: 'round', motion: 'calm' } } })
     try {
       assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), theme)
@@ -89,8 +89,8 @@ test('old saved theme choices map to the new white presets without losing appear
   }
 })
 
-test('both white themes have opaque light surfaces and readable text throughout the interface', async () => {
-  for (const theme of ['cloud', 'garden']) {
+test('opaque cloud surfaces remain light and readable throughout the interface', async () => {
+  for (const theme of ['cloud']) {
     const { page, context, errors } = await openComic(browser, { settings: { themePreset: theme } })
     try {
       assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), theme)
@@ -126,7 +126,7 @@ test('new preset choices save correctly and preserve the independent shape contr
     await page.locator('[data-tab="settings"]').click()
     await page.locator('#ten-theme-settings > summary').click()
     const shadows = []
-    for (const theme of ['garden', 'cloud']) {
+    for (const theme of ['aurora', 'cloud']) {
       await page.locator(`[data-theme-choice="${theme}"]`).click()
       assert.equal(await page.evaluate(() => window.__gmValues.themePreset), theme)
       shadows.push(await page.locator('#ten-backup-export').evaluate(element => getComputedStyle(element).boxShadow))
@@ -143,7 +143,7 @@ test('new preset choices save correctly and preserve the independent shape contr
 })
 
 test('white theme help sections remain light inside the modal', async () => {
-  for (const theme of ['cloud', 'garden']) {
+  for (const theme of ['cloud', 'aurora']) {
     const { page, context } = await openComic(browser, { settings: { themePreset: theme } })
     try {
       await page.locator('[data-tab="settings"]').click()
@@ -157,8 +157,8 @@ test('white theme help sections remain light inside the modal', async () => {
   }
 })
 
-test('narrow white task cards keep titles readable and speed text contrasting', async () => {
-  for (const theme of ['cloud', 'garden']) {
+test('narrow themed task cards keep titles readable and speed text contrasting', async () => {
+  for (const theme of ['cloud', 'aurora', 'obsidian', 'titanium']) {
     const { page, context } = await openComic(browser, { count: 2, requestDelay: -1, viewport: { width: 320, height: 568 }, settings: { themePreset: theme, appLoadDefault: { isShowUI: true, rightSize: 125 } } })
     try {
       await page.locator('#ten-load-chapters').click()

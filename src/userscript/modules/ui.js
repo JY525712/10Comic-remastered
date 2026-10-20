@@ -13,6 +13,7 @@ module.exports = () => {
         }, t.port2.postMessage(0);
     }) : Promise.resolve();
     /*__QUEUE_CLASS__*/    class DownloadQueue {}
+    /*__RECOVERY_STORE__*/ class RecoveryStore {}
     var siteRules = __webpack_require__(872);
     const ROOT_ID = "ten-comic-root", PANEL_ID = "ten-panel", LAUNCHER_ID = "ten-comic-launcher", PENDING_TASKS_KEY = "pendingTasks", BACKUP_KEYS = [ "appLoadDefault", "maxChapterNum", "maxPictureNum", "downType", "directDownloadFlow", "sanitizePathNames", "maxSplicingHeight", "imgIndexBitNum", "imgSplicingFlag", "imgDownRange", "historyLimit", "downloadNotification", "effectLevel", "themePreset", "appearanceAxes" ], THEMES = {
         aurora: [ "极光流银", "冰透流光 · 银蓝折射" ],
@@ -280,11 +281,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             } catch (e) {
                 byId("ten-dir-name").textContent = "请重新选择目录";
             }
-        }(), state.ready = !0, function() {
-            const e = safeGet(PENDING_TASKS_KEY, []), t = window.location.hostname.toLowerCase();
-            state.recoveryTasks = uniqueTaskSnapshots(Array.isArray(e) ? e : []).filter(e => taskHost(e) === t), 
-            renderRecoveryTasks();
-        }(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
+        }(), state.ready = !0, initializeTaskRecovery(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
     }
     function icon(e) {
         return `<svg class="ten-icon" aria-hidden="true"><use href="#ten-i-${e}"></use></svg>`;
@@ -485,7 +482,27 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             heavyCanvasExport: Boolean(siteRules.Po.heavyCanvasExport)
         } ]), state.optionsOpen = !1, byId("ten-options").classList.remove("is-open")) : toast("请输入漫画名和章节名");
     }
-    async function enqueueDownloads(e) {
+    function enqueueDownloads(e, options = {}) {
+        const pending = (state.enqueueChain || Promise.resolve()).then(() => enqueueDownloadBatch(e, options));
+        state.enqueueChain = pending.catch(error => { console.error("10漫画：加入队列失败。", error); toast(error.message || "加入下载队列失败"); });
+        return pending;
+    }
+    async function enqueueDownloadBatch(e, options = {}) {
+        e = e.map(task => ({ ...task, taskId: options.recovery && task.taskId ? task.taskId : newTaskId(), imageRange: task.imageRange || state.settings.imageRange.slice() }));
+        const active = state.queue ? [...state.queue.list, ...state.queue.worker.filter(worker => worker && !worker.cancelled).map(worker => worker.task)] : [];
+        const completed = readHistory().filter(record => record.status === "completed" && !record.hasError && record.task && !record.task.retryImages?.length).map(record => record.task);
+        const keys = new Set(active.concat(completed).map(DownloadQueue.taskKey)), unique = [], duplicates = [];
+        for (const task of e) {
+            const key = DownloadQueue.taskKey(task);
+            if (keys.has(key)) duplicates.push(task); else unique.push(task);
+            keys.add(key);
+        }
+        let allowDuplicates = false;
+        if (!options.recovery && duplicates.length) {
+            allowDuplicates = await showConfirm("检测到重复下载", `${duplicates.length} 个章节已在队列、已完成或在本次选择中重复。可跳过重复章节，也可仍然下载；下载记录不代表文件仍在磁盘。`, "仍然下载", "跳过重复");
+            if (!allowDuplicates) e = unique;
+        }
+        if (!e.length) return toast("已跳过重复章节"), false;
         siteRules.Po && void 0 !== siteRules.Po.batchDelay && e.forEach(e => {
             void 0 === e.batchDelay && (e.batchDelay = siteRules.Po.batchDelay);
         }), e.forEach(e => {
@@ -498,9 +515,18 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             getHistoryData: renderTasks,
             $forceUpdate: scheduleTaskRender,
             persistTasks: scheduleTaskPersist,
+            storageError: reportTaskStorageError,
             notifyTask: notifyDownloadTask
-        })), state.queue, state.queue.addList(e), state.queue.run(), activateTab("tasks"), 
+        })), state.historyVolatile && (state.queue.historyFallback = state.historyVolatile, state.historyVolatile = null), state.queue.addList(e, allowDuplicates), state.queue.run(), activateTab("tasks"), 
         renderTasks();
+        return true;
+    }
+    function reportTaskStorageError(error) {
+        console.warn("10漫画：任务记录保存失败。", error);
+        if (!state.storageWarning) state.storageWarning = true, toast("记录保存失败，任务仍会继续；本次记录暂存于当前页面，请及时备份诊断信息");
+    }
+    function newTaskId() {
+        return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
     }
     function taskHost(e) {
         if (e && e.originHost) return String(e.originHost).toLowerCase();
@@ -514,7 +540,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         const t = new Set;
         return e.filter(e => {
             if (!e || !e.url) return !1;
-            const n = JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url ]);
+            const n = e.taskId || JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url, e.downType || 0, e.imageRange || [1,-1], e.retryImages || [] ]);
             return !t.has(n) && (t.add(n), !0);
         });
     }
@@ -523,22 +549,60 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         byId("ten-recovery-count").textContent = state.recoveryTasks.length ? `${state.recoveryTasks.length} 个任务可恢复` : "");
     }
     async function restorePendingTasks() {
-        const e = state.recoveryTasks.slice();
-        e.length && (state.recoveryTasks = [], renderRecoveryTasks(), await enqueueDownloads(e), 
-        toast(`已恢复 ${e.length} 个任务`));
+        if (!state.recoveryStore || state.recoveryBusy) return;
+        state.recoveryBusy = true;
+        try {
+            await state.recoveryStore.claim(state.recoveryRefs || [], async tasks => {
+                const previous = state.recoveryStaging || [];
+                state.recoveryStaging = uniqueTaskSnapshots(previous.concat(tasks));
+                if (!persistQueueState()) { state.recoveryStaging = previous; throw new Error("恢复记录保存失败，未移除原记录"); }
+            });
+            for (const error of state.recoveryStore.warnings || []) reportTaskStorageError(error);
+            const tasks = (state.recoveryStaging || []).slice();
+            if (tasks.length && await enqueueDownloads(tasks, { recovery: true })) {
+                state.recoveryStaging = [], persistQueueState(), toast(`已恢复 ${tasks.length} 个任务`);
+            }
+        } catch (error) { reportTaskStorageError(error); }
+        finally { state.recoveryBusy = false; await refreshRecoveryTasks(); }
     }
     async function discardPendingTasks() {
-        state.recoveryTasks.length && await showConfirm("放弃未完成任务", `将删除当前站点的 ${state.recoveryTasks.length} 个恢复点。`, "放弃任务") && (state.recoveryTasks = [], 
-        persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
+        if (!state.recoveryTasks.length || state.recoveryBusy || !await showConfirm("放弃未完成任务", `将删除当前显示的 ${state.recoveryTasks.length} 个恢复点，其他标签页的活动任务保留。`, "放弃任务")) return;
+        state.recoveryBusy = true;
+        try {
+            await state.recoveryStore.claim(state.recoveryRefs || [], async () => {}, true);
+            state.recoveryStaging = [], persistQueueState(), toast("未完成任务已放弃");
+        } catch (error) { reportTaskStorageError(error); }
+        finally { state.recoveryBusy = false; await refreshRecoveryTasks(); }
+    }
+    function initializeTaskRecovery() {
+        if (!state.recoveryStore) state.recoveryStore = new RecoveryStore({
+            get: key => GM_getValue(key), set: (key, value) => GM_setValue(key, value), remove: key => GM_deleteValue(key),
+            keys: () => typeof GM_listValues === "function" ? GM_listValues() : []
+        }, { id: newTaskId(), host: window.location.hostname.toLowerCase(), origin: window.location.origin, locks: navigator.locks });
+        if (!state.recoveryHeartbeat) state.recoveryHeartbeat = setInterval(() => {
+            if (state.queue || state.recoveryStaging?.length) persistQueueState();
+            if (!state.recoveryBusy) refreshRecoveryTasks();
+        }, 30000);
+        refreshRecoveryTasks();
+    }
+    async function refreshRecoveryTasks() {
+        if (!state.recoveryStore || state.recoveryBusy) return;
+        try {
+            state.recoveryRefs = await state.recoveryStore.candidates();
+            state.recoveryTasks = uniqueTaskSnapshots((state.recoveryStaging || []).concat(state.recoveryRefs.flatMap(ref => ref.tasks)));
+            renderRecoveryTasks();
+        } catch (error) { reportTaskStorageError(error); }
     }
     function scheduleTaskPersist() {
         null === state.persistTimer && (state.persistTimer = setTimeout(persistQueueState, 750));
     }
     function persistQueueState() {
         clearTimeout(state.persistTimer), state.persistTimer = null;
-        const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
-        const snapshots = uniqueTaskSnapshots(n.concat(a));
-        JSON.stringify(t) !== JSON.stringify(snapshots) && (0, configModule.po)(PENDING_TASKS_KEY, snapshots);
+        try {
+            const tasks = state.queue ? state.queue.pendingTasks() : [];
+            state.recoveryStore?.persist(uniqueTaskSnapshots(tasks.concat(state.recoveryStaging || [])));
+            return Boolean(state.recoveryStore);
+        } catch (error) { reportTaskStorageError(error); return false; }
     }
     function handlePageHide() {
         (state.queue || state.recoveryTasks.length) && persistQueueState();
@@ -575,9 +639,10 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             }
         }();
     }();
-        function showConfirm(e, t, n = "确认") {
+        function showConfirm(e, t, n = "确认", cancelText = "取消") {
         state.confirmResolve && closeConfirm(!1), byId("ten-confirm-title").textContent = e, 
         byId("ten-confirm-message").textContent = t, byId("ten-confirm-ok").textContent = n;
+        byId("ten-confirm-cancel").textContent = cancelText;
         const r = byId("ten-confirm");
         return r.classList.add("is-open"), r.setAttribute("aria-hidden", "false"), activateModalFocus(r.id, "#ten-confirm-cancel"), 
         new Promise(e => {
@@ -739,6 +804,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
     function refreshQueueOnVisibility() {
         byId(ROOT_ID)?.classList.toggle("is-page-hidden", document.hidden);
         document.hidden || state.queue && state.queue.refresh();
+        if (!document.hidden) refreshRecoveryTasks();
     }
         async function resetSettings() {
         await showConfirm("重置全部设置", "界面、下载和规则设置都将恢复默认值。", "确认重置") && (await (0, configModule.zU)(), 

@@ -42,7 +42,7 @@ function renderTasks() {
                 const a = n.progress;
                 setStyle(a, "width", `${r}%`), setStyle(a, "--ten-energy-duration", `${energyFlowDuration(t.speedBps)}s`), 
                 a.classList.toggle("is-paused", Boolean(t.paused)), setText(n.stage, t.stage || "正在下载"), 
-                setText(n.stats, `${t.successNum || 0}/${t.totalNumber || "?"} · ${r}%`), setText(n.speed, t.paused ? "已暂停" : formatSpeed(t.speedBps)), 
+                setText(n.stats, `${t.processedNum ?? t.successNum ?? 0}/${t.totalNumber || "?"} · ${r}%`), setText(n.results, formatTaskCounts(t)), setText(n.speed, t.paused ? "已暂停" : formatSpeed(t.speedBps)), 
                 setText(n.eta, t.paused ? "剩余 --" : formatEta(t.etaSeconds));
                 const i = t.status || (t.paused ? "paused" : "running"), o = e.dataset.taskStatus;
                 !o || o === i || "paused" !== i && "running" !== i || playStateAnimation(e, "paused" === i ? "pause" : "resume"), 
@@ -220,7 +220,7 @@ function renderHistoryRows(records, total) {
         occurrences.set(base, occurrence + 1);
         entries.push({
             key: base + "|" + occurrence,
-            signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
+            signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, record.processedNum, record.successNum, record.failedNum, record.writtenNum, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
             render: () => historyCard(record)
         });
     }
@@ -230,6 +230,7 @@ function renderHistoryRows(records, total) {
 function taskCardNodes(e) {
     return {
         title: one("[data-task-title]", e),
+        results: one("[data-task-results]", e),
         progress: one("[data-task-progress]", e),
         stage: one("[data-task-stage]", e),
         stats: one("[data-task-stats]", e),
@@ -249,6 +250,11 @@ function playStateAnimation(e, t) {
 function formatSpeed(e) {
     const t = Number(e) || 0;
     return t <= 0 ? "速度计算中" : t < 1024 ? `${Math.round(t)} B/s` : t < 1048576 ? `${(t / 1024).toFixed(1)} KB/s` : `${(t / 1024 / 1024).toFixed(1)} MB/s`;
+}
+
+function formatTaskCounts(task) {
+    if (task.processedNum === undefined) return "";
+    return `成功取图 ${task.successNum || 0} · 失败 ${task.failedNum || 0} · 已保存 ${task.writtenNum || 0} 页`;
 }
 
 function energyFlowDuration(e) {
@@ -324,7 +330,7 @@ function restoreWaitingTasks(e) {
 
 function taskCard(e, t, n, r = 0, a = 0) {
     const i = Math.max(0, Math.min(100, Number(e.progress || 0))), o = "active" === t, s = "paused" === e.status, c = o ? `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-toggle data-task-action="${s ? "resume" : "pause"}" data-worker-index="${n}" title="${s ? "继续" : "暂停"}">${icon(s ? "play" : "pause")}</button><button class="ten-icon-btn" type="button" data-task-action="diagnostic" data-worker-index="${n}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel" data-worker-index="${n}" title="取消任务">${icon("close")}</button></div>` : `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-action="waiting-up" data-waiting-index="${n}" title="提前一个位置" ${0 === r ? "disabled" : ""}>${icon("up")}</button><button class="ten-icon-btn" type="button" data-task-action="waiting-down" data-waiting-index="${n}" title="延后一个位置" ${r === a - 1 ? "disabled" : ""}>${icon("down")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel-waiting" data-waiting-index="${n}" title="移出队列">${icon("close")}</button></div>`;
-    return `<div class="ten-list-item ten-task-card"${o ? ` data-worker-card="${n}"` : ""}><div class="ten-name"><div class="ten-task-title"${o ? " data-task-title" : ""}>${escapeHtml(e.downChapterName || e.chapterName || "未命名章节")}</div>${o ? `<div class="ten-progress"><i data-task-progress${e.paused ? ' class="is-paused"' : ""} style="width:${i}%;--ten-energy-duration:${energyFlowDuration(e.speedBps)}s"></i></div><div class="ten-task-meta"><span data-task-stage>${escapeHtml(e.stage || "正在下载")}</span><span data-task-stats>${e.successNum || 0}/${e.totalNumber || "?"} · ${i}%</span></div><div class="ten-task-performance"><span data-task-speed>${formatSpeed(e.speedBps)}</span><span data-task-eta>${formatEta(e.etaSeconds)}</span></div>` : '<div class="ten-meta">等待开始</div>'}</div>${c}</div>`;
+    return `<div class="ten-list-item ten-task-card"${o ? ` data-worker-card="${n}"` : ""}><div class="ten-name"><div class="ten-task-title"${o ? " data-task-title" : ""}>${escapeHtml(e.downChapterName || e.chapterName || "未命名章节")}</div>${o ? `<div class="ten-progress"><i data-task-progress${e.paused ? ' class="is-paused"' : ""} style="width:${i}%;--ten-energy-duration:${energyFlowDuration(e.speedBps)}s"></i></div><div class="ten-task-meta"><span data-task-stage>${escapeHtml(e.stage || "正在下载")}</span><span data-task-stats>${e.processedNum ?? e.successNum ?? 0}/${e.totalNumber || "?"} · ${i}%</span></div><div class="ten-task-performance"><span data-task-speed>${formatSpeed(e.speedBps)}</span><span data-task-eta>${formatEta(e.etaSeconds)}</span></div><div class="ten-meta" data-task-results>${formatTaskCounts(e)}</div>` : '<div class="ten-meta">等待开始</div>'}</div>${c}</div>`;
 }
 
 function historyCard(e) {
@@ -334,7 +340,7 @@ function historyCard(e) {
         failed: "失败",
         cancelled: "已取消"
     }[e.status] || (e.hasError ? "存在错误" : "已完成"), n = Array.isArray(e.failedImages) ? e.failedImages.filter(e => e && e.url) : [];
-    return `<div class="ten-list-item ten-history-card"><div class="ten-name"><div class="ten-task-title">${escapeHtml(e.downChapterName || "未命名章节")}</div><div class="ten-task-meta"><span>${formatHistoryTiming(e)}</span><span>${escapeHtml(e.flowUsed || "流程未记录")}</span><span class="ten-task-state is-${escapeAttr(e.status || (e.hasError ? "failed" : "completed"))}">${t}</span></div></div><div class="ten-task-actions">${n.length ? `<button class="ten-icon-btn" type="button" data-retry-history="${e.id}" title="仅重试 ${n.length} 张失败图片">${icon("refresh")}</button><button class="ten-icon-btn" type="button" data-copy-failures="${e.id}" title="复制失败清单">${icon("copy")}</button>` : ""}<button class="ten-icon-btn" type="button" data-diagnostic-history="${e.id}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn" type="button" data-delete-history="${e.id}" title="删除记录">${icon("trash")}</button></div></div>`;
+    return `<div class="ten-list-item ten-history-card"><div class="ten-name"><div class="ten-task-title">${escapeHtml(e.downChapterName || "未命名章节")}</div><div class="ten-task-meta"><span>${formatHistoryTiming(e)}</span><span>${escapeHtml(e.flowUsed || "流程未记录")}</span><span class="ten-task-state is-${escapeAttr(e.status || (e.hasError ? "failed" : "completed"))}">${t}</span></div>${e.processedNum !== undefined ? `<div class="ten-meta">${formatTaskCounts(e)}</div>` : ""}</div><div class="ten-task-actions">${n.length ? `<button class="ten-icon-btn" type="button" data-retry-history="${e.id}" title="仅重试 ${n.length} 张失败图片">${icon("refresh")}</button><button class="ten-icon-btn" type="button" data-copy-failures="${e.id}" title="复制失败清单">${icon("copy")}</button>` : ""}<button class="ten-icon-btn" type="button" data-diagnostic-history="${e.id}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn" type="button" data-delete-history="${e.id}" title="删除记录">${icon("trash")}</button></div></div>`;
 }
 
 function handleHistoryFilter(e) {
@@ -361,7 +367,10 @@ async function handleTaskAction(e) {
 }
 
 function readHistory() {
-    const e = localStorage.getItem("ylComicDownHistory") || "[]";
+    let e;
+    const fallback = state.queue?.historyFallback || state.historyVolatile;
+    try { e = fallback ? JSON.stringify(fallback) : localStorage.getItem("ylComicDownHistory") || "[]"; }
+    catch (error) { reportTaskStorageError(error); return state.historyCache; }
     if (e === state.historyRaw) return state.historyCache;
     try {
         const t = JSON.parse(e);
@@ -372,10 +381,11 @@ function readHistory() {
             e && void 0 === e.id && (e.id = r - t, n = !0);
         });
         const a = new Set, i = t.filter(e => {
-            const t = `${e.comicName || ""}\0${e.downChapterName || ""}`;
+            const t = DownloadQueue.historyKey(e);
             return !a.has(t) && (a.add(t), !0);
         }).slice(0, state.settings ? state.settings.historyLimit : boundedNumber(safeGet("historyLimit", 100), 100, 10, 500)), o = n || i.length !== t.length ? JSON.stringify(i) : e;
-        return o !== e && localStorage.setItem("ylComicDownHistory", o), state.historyRaw = o, 
+        if (o !== e && !fallback) try { localStorage.setItem("ylComicDownHistory", o); } catch (error) { state.historyVolatile = i; reportTaskStorageError(error); }
+        return state.historyRaw = o, 
         state.historyCache = i, i;
     } catch (t) {
         return state.historyRaw = e, state.historyCache = [], state.historyCache;
@@ -384,7 +394,13 @@ function readHistory() {
 
 function writeHistory(e) {
     const t = Array.isArray(e) ? e : [], n = JSON.stringify(t);
-    return localStorage.setItem("ylComicDownHistory", n), state.historyRaw = n, state.historyCache = t, 
+    try { localStorage.setItem("ylComicDownHistory", n); state.historyVolatile = null; if (state.queue) state.queue.historyFallback = null; }
+    catch (error) {
+        if (state.queue) state.queue.historyFallback = t, state.historyVolatile = null;
+        else state.historyVolatile = t;
+        reportTaskStorageError(error);
+    }
+    return state.historyRaw = n, state.historyCache = t, 
     state.historyRenderKey = "", t;
 }
 

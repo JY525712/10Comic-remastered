@@ -117,6 +117,7 @@ test('pending chapter snapshots restore through the existing recovery controls',
   const { page, context } = await openComic(browser, { settings: { pendingTasks: [task] } })
   try {
     await page.locator('[data-tab="tasks"]').click()
+    await page.locator('#ten-recovery').waitFor({ state: 'visible' })
     assert.equal(await page.locator('#ten-recovery-count').textContent(), '1 个任务可恢复')
     await page.locator('#ten-recovery-restore').click()
     const result = await finish(page)

@@ -50,7 +50,7 @@ async function main() {
     launchers: { command: 'npm run preview:launcher', themes: launchers.themes, frames: launchers.frames, controls: launchers.controls },
     benchmark: benchmark.summary,
     runtimeBenchmark: runtime,
-    scope: 'Offline Chromium fixtures, real browser ZIP stream writes and native handle filename checks; unchanged adapters/config and queue operations apart from structural revision counters; download AST unchanged outside approved filename cleanup and byte-tested ZIP optimization; no live account or site availability claim'
+    scope: 'Offline Chromium fixtures, two-tab recovery with real Web Locks, storage-failure injection, parser cancellation, image signature validation, real browser ZIP stream writes and native handle filename checks; adapter/config/reader-worker compatibility retained; queue and download changes limited to approved reliability work; no live account or site availability claim'
   }
   fs.writeFileSync(path.join(directory, 'release-report.json'), JSON.stringify(report, null, 2))
   fs.copyFileSync(path.join(root, '10漫画—重制版.user.js'), path.join(root, 'dist/10漫画—重制版.user.js'))

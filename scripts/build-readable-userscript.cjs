@@ -50,7 +50,9 @@ async function buildReadableUserscript() {
   const queueSlot = uiSource.match(/\/\*__QUEUE_CLASS__\*\/\s*class DownloadQueue\s*\{\s*\}/)
   if (!queueSlot) throw new Error('Missing UI queue slot')
   const ui = replaceOne(uiSource, queueSlot[0], moduleSource('queue'))
-  core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${ui})()`)
+  const recoverySlot = ui.match(/\/\*__RECOVERY_STORE__\*\/\s*class RecoveryStore\s*\{\s*\}/)
+  if (!recoverySlot) throw new Error('Missing recovery store slot')
+  core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${replaceOne(ui, recoverySlot[0], moduleSource('recovery'))})()`)
   const result = await terser.minify(core, {
     compress: false,
     mangle: false,

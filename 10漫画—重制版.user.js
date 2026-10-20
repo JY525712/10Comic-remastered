@@ -7,6 +7,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
+// @grant        GM_listValues
 // @grant        GM_setClipboard
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
@@ -1638,45 +1639,86 @@
             const getType = e => {
                 const t = typeof e;
                 return "object" !== t ? t : Object.prototype.toString.call(e).replace(/^\[object (\S+)\]$/, "$1");
-            }, getFrameContent = async (e, t) => new Promise((n, r) => {
+            }, getFrameContent = async (e, t, signal) => new Promise((n, r) => {
                 const a = document.createElement("iframe");
                 a.id = e, a.className = "ten-comic-frame", a.style.cssText = "position:fixed;left:-10000px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;";
+                const finish = (error, html) => {
+                    clearTimeout(i), signal?.removeEventListener?.("abort", abort);
+                    a.onload = null, a.onerror = null;
+                    if (error) a.remove(), r(error); else n(html);
+                }, abort = () => finish(new Error("下载已取消"));
                 const i = setTimeout(() => {
-                    a.remove(), r(new Error("iframe 加载超时"));
+                    finish(new Error("iframe 加载超时"));
                 }, 45e3);
+                if (signal && signal.aborted) return abort();
+                signal?.addEventListener?.("abort", abort, {
+                    once: true
+                });
                 a.onload = function() {
-                    clearTimeout(i);
                     try {
-                        n(a.contentDocument.body.outerHTML);
+                        finish(null, a.contentDocument.body.outerHTML);
                     } catch (e) {
-                        a.remove(), r(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
+                        finish(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
                     }
                 }, a.onerror = function() {
-                    clearTimeout(i), a.remove(), r(new Error("iframe 加载失败"));
+                    finish(new Error("iframe 加载失败"));
                 }, a.src = t, document.body.appendChild(a);
             }), getImage = async e => {
-                try {
-                    const t = e.url;
-                    let n = "";
-                    if (shouldLoadFrame(siteRules.Po, e)) {
-                        const r = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "g", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ], a = Math.round(25 * Math.random()) + 0, i = Math.round(25 * Math.random()) + 0, o = "ifr" + (new Date).getTime() + r[a] + r[i];
-                        n = await getFrameContent(o, t), e.frameId = o;
-                    } else if (siteRules.Po.useFrame || "manhuagui" === siteRules.Po.readerTabMode) n = ""; else {
-                        const r = await request({
-                            method: "get",
-                            url: t,
-                            useCookie: e.isPay,
-                            signal: e.signal
-                        });
-                        if (!r || "object" != typeof r) throw new Error("章节页面请求失败");
-                        n = r.response;
-                    }
-                    const r = await siteRules.Po.getImgs(n, e);
-                    return new Promise((e, t) => {
-                        e(r);
+                let ownedFrame = null, abort, retainFrame = false;
+                const signal = e.signal;
+                if (signal && signal.aborted) throw new Error("下载已取消");
+                const cancelled = new Promise((resolve, reject) => {
+                    abort = () => {
+                        ownedFrame && ownedFrame.remove();
+                        try {
+                            e.otherData && typeof e.otherData.cleanup === "function" && e.otherData.cleanup();
+                        } catch (ignored) {}
+                        reject(new Error("下载已取消"));
+                    };
+                    signal?.addEventListener?.("abort", abort, {
+                        once: true
                     });
+                });
+                try {
+                    const parse = async () => {
+                        const t = e.url;
+                        let n = "";
+                        if (shouldLoadFrame(siteRules.Po, e)) {
+                            const r = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "g", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ], a = Math.round(25 * Math.random()) + 0, i = Math.round(25 * Math.random()) + 0, o = "ifr" + (new Date).getTime() + r[a] + r[i];
+                            e.frameId = o;
+                            const loading = getFrameContent(o, t, signal);
+                            ownedFrame = document.getElementById(o);
+                            n = await loading;
+                        } else if (siteRules.Po.useFrame || "manhuagui" === siteRules.Po.readerTabMode) n = ""; else {
+                            const r = await request({
+                                method: "get",
+                                url: t,
+                                useCookie: e.isPay,
+                                signal: e.signal
+                            });
+                            if (!r || "object" != typeof r) throw new Error("章节页面请求失败");
+                            n = r.response;
+                        }
+                        if (signal && signal.aborted) throw new Error("下载已取消");
+                        const parsed = await siteRules.Po.getImgs(n, e);
+                        if (signal && signal.aborted) {
+                            try {
+                                parsed?.otherData?.cleanup?.();
+                            } catch (ignored) {}
+                            for (const url of Array.isArray(parsed) ? parsed : parsed?.imgUrlArr || []) if (typeof url === "string" && url.startsWith("blob:")) URL.revokeObjectURL(url);
+                            throw new Error("下载已取消");
+                        }
+                        return parsed;
+                    };
+                    const parsed = await Promise.race([ parse(), cancelled ]);
+                    retainFrame = Boolean(siteRules.Po.reuseParsedImages && parsed?.otherData && typeof parsed.otherData.cleanup === "function");
+                    return parsed;
                 } catch (e) {
+                    !retainFrame && ownedFrame && ownedFrame.remove();
                     throw console.log("getImageError: ", e), e;
+                } finally {
+                    signal?.removeEventListener?.("abort", abort);
+                    !retainFrame && ownedFrame && ownedFrame.remove();
                 }
             }, shouldLoadFrame = function(e, t) {
                 return Boolean(e && e.useFrame) && !(e.reuseParsedImages && t && t.otherData);
@@ -1973,13 +2015,45 @@
                 for (;this.worker.length < this.workerLen; ) this.worker.push(void 0), this.workerDownInfo.push(void 0);
                 this.run(), this.refresh();
             }
-            addList(list) {
-                for (const t of list) this.list.unshift(t);
-                list.length && (this.waitingRevision = (this.waitingRevision || 0) + 1);
+            static taskKey(item) {
+                let url = String(item.url || "");
+                try {
+                    const value = new URL(url, window.location.href);
+                    value.hash = "";
+                    url = value.href;
+                } catch (ignored) {}
+                const retry = Array.isArray(item.retryImages) ? item.retryImages.map(image => [ image.imgIndex, image.url ]).sort((a, b) => String(a).localeCompare(String(b))) : [];
+                return JSON.stringify([ url, item.comicName || "", Number(item.downType) || 0, item.imageRange || [ 1, -1 ], retry ]);
+            }
+            static historyKey(record) {
+                const identity = record.task?.url ? DownloadQueue.taskKey(record.task) : JSON.stringify([ record.comicName || "", record.downChapterName || "" ]);
+                const completed = !record.hasError && (record.status === "completed" || !record.status);
+                return JSON.stringify([ identity, completed ? "completed" : "attempt" ]);
+            }
+            addList(list, allowDuplicates = false) {
+                const keys = new Set([ ...this.list, ...this.worker.filter(Boolean).map(worker => worker.task) ].map(DownloadQueue.taskKey));
+                let added = 0;
+                for (const t of list) {
+                    const key = DownloadQueue.taskKey(t);
+                    if (!allowDuplicates && keys.has(key)) continue;
+                    keys.add(key), this.list.unshift(t), added++;
+                }
+                added && (this.waitingRevision = (this.waitingRevision || 0) + 1);
                 this.refresh();
+                return added;
             }
             refresh() {
-                this.Vue && (!document.hidden && this.Vue.$forceUpdate(), "function" == typeof this.Vue.persistTasks && this.Vue.persistTasks());
+                if (!this.Vue) return;
+                for (const callback of [ !document.hidden && this.Vue.$forceUpdate, this.Vue.persistTasks ]) if (typeof callback === "function") try {
+                    callback();
+                } catch (error) {
+                    this.reportStorageError(error);
+                }
+            }
+            reportStorageError(error) {
+                try {
+                    this.Vue && this.Vue.storageError && this.Vue.storageError(error);
+                } catch (ignored) {}
             }
             moveWaiting(index, direction) {
                 const n = "up" === direction ? index + 1 : index - 1;
@@ -2021,6 +2095,7 @@
                 }
                 return {
                     comicName: item.comicName,
+                    taskId: item.taskId,
                     chapterName: item.chapterName,
                     downChapterName: item.downChapterName,
                     url: item.url,
@@ -2035,19 +2110,22 @@
                     useDirectory: item.useDirectory,
                     heavyCanvasExport: Boolean(item.heavyCanvasExport),
                     retryImages: item.retryImages,
+                    imageRange: item.imageRange,
                     originHost: t
                 };
             }
             snapshotWorker(worker) {
                 const t = this.snapshotTask(worker.task), n = this.taskTiming(worker);
                 return t.resumeElapsedMs = n.activeMs, t.resumeWallStartedAt = worker.wallStartedAt, 
-                t.resumePaused = Boolean(worker.paused), worker.retryOnly ? t.retryImages = [ ...worker.inFlight, ...worker.retryPending ].map(e => ({
+                t.resumePaused = Boolean(worker.paused), t.resumeProcessed = worker.processedNum, 
+                t.resumeSucceeded = worker.successNum, t.resumeFailed = worker.failedNum, t.resumeWritten = worker.writtenNum, 
+                worker.retryOnly ? t.retryImages = [ ...worker.inFlight, ...worker.retryPending ].map(e => ({
                     url: e.url,
                     imgIndex: e.imgIndex
                 })) : 0 === Number(worker.downType) && 1 === Number(worker.readtype) && worker.totalNumber > 0 && (t.resumeImages = [ ...worker.inFlight, ...worker.imgs ].map(e => ({
                     url: e.url,
                     imgIndex: e.imgIndex
-                })), t.resumeTotal = worker.totalNumber, t.resumeCompleted = worker.successNum, 
+                })), t.resumeTotal = worker.totalNumber, t.resumeCompleted = worker.processedNum, 
                 t.resumeFailures = worker.failures.map(e => ({
                     ...e
                 })), t.resumeDiagnostics = worker.diagnostics.map(e => ({
@@ -2066,6 +2144,7 @@
             createWorker(item) {
                 const t = Array.isArray(item.retryImages) ? item.retryImages.filter(e => e && e.url) : [], n = Array.isArray(item.resumeImages) ? item.resumeImages.filter(e => e && e.url) : [], r = {
                     comicName: item.comicName,
+                    taskId: item.taskId,
                     chapterName: item.chapterName,
                     downChapterName: item.downChapterName,
                     url: item.url,
@@ -2078,19 +2157,27 @@
                     directRemoteDownload: item.directRemoteDownload,
                     useDirectory: item.useDirectory,
                     heavyCanvasExport: Boolean(item.heavyCanvasExport),
-                    retryImages: t
+                    retryImages: t,
+                    imageRange: item.imageRange
                 };
+                const processed = n.length ? Math.max(0, Number(item.resumeProcessed ?? item.resumeCompleted) || 0) : 0;
+                const failed = n.length ? Math.min(processed, Math.max(0, Number(item.resumeFailed ?? (item.resumeFailures || []).length) || 0)) : 0;
+                const succeeded = n.length ? Math.min(processed, Math.max(0, Number(item.resumeSucceeded ?? processed - failed) || 0)) : 0;
                 return {
                     ...r,
                     imgIndex: 0,
-                    successNum: n.length ? Math.max(0, Number(item.resumeCompleted) || 0) : 0,
+                    processedNum: processed,
+                    successNum: succeeded,
+                    failedNum: failed,
+                    writtenNum: n.length ? Math.max(0, Number(item.resumeWritten ?? succeeded) || 0) : 0,
+                    outputFiles: 0,
                     totalNumber: n.length ? Math.max(n.length, Number(item.resumeTotal) || 0) : t.length,
                     imgs: n.map(e => ({
                         url: e.url,
                         imgIndex: Number(e.imgIndex) || 0
                     })),
                     inFlight: [],
-                    progress: n.length && Number(item.resumeTotal) > 0 ? Math.min(100, Math.round((Number(item.resumeCompleted) || 0) / Number(item.resumeTotal) * 100)) : 0,
+                    progress: n.length && Number(item.resumeTotal) > 0 ? Math.min(100, Math.round(processed / Number(item.resumeTotal) * 100)) : 0,
                     downloadedBytes: 0,
                     byteImageCount: 0,
                     directRemoteCount: 0,
@@ -2206,12 +2293,15 @@
                     bytes: worker.downloadedBytes
                 } ];
             }
-            advance(index, imgurl, imgIndex, bytes = 0) {
+            advance(index, imgurl, imgIndex, bytes = 0, succeeded = false, written = false) {
                 const a = this.worker[index];
                 if (!a) return;
                 a.inFlight = a.inFlight.filter(e => e.imgIndex !== imgIndex || e.url !== imgurl);
                 const i = Math.max(0, Number(bytes) || 0);
-                i && (a.downloadedBytes += i, a.byteImageCount += 1), a.successNum += 1, a.progress = a.totalNumber > 0 ? Math.min(100, Math.round(a.successNum / a.totalNumber * 100)) : 0;
+                i && (a.downloadedBytes += i, a.byteImageCount += 1);
+                a.processedNum += 1, a.successNum += succeeded ? 1 : 0, a.failedNum += succeeded ? 0 : 1, 
+                a.writtenNum += written ? 1 : 0;
+                a.progress = a.totalNumber > 0 ? Math.min(100, Math.round(a.processedNum / a.totalNumber * 100)) : 0;
                 const o = Date.now();
                 for (a.speedSamples.push({
                     time: o,
@@ -2219,7 +2309,7 @@
                 }); a.speedSamples.length > 2 && a.speedSamples[1].time < o - 8e3; ) a.speedSamples.shift();
                 const s = a.speedSamples[0], c = (o - s.time) / 1e3, d = c >= .2 ? (a.downloadedBytes - s.bytes) / c : 0;
                 d > 0 && (a.speedBps = a.speedBps > 0 ? .65 * a.speedBps + .35 * d : d);
-                const l = Math.max(0, a.totalNumber - a.successNum), u = a.byteImageCount ? a.downloadedBytes / a.byteImageCount : 0;
+                const l = Math.max(0, a.totalNumber - a.processedNum), u = a.byteImageCount ? a.downloadedBytes / a.byteImageCount : 0;
                 a.etaSeconds = a.speedBps > 0 && u > 0 ? Math.ceil(l * u / a.speedBps) : null, this.refresh();
             }
             async exeDown(index) {
@@ -2240,7 +2330,7 @@
                         }
                         if (this.assertActive(index), !Array.isArray(a) || !a.length) throw this.addDiagnostic(index, "章节解析", "规则没有返回图片地址"), 
                         new Error("章节中没有可下载的图片");
-                        const i = (0, configModule.cF)("imgDownRange"), o = Array.isArray(i) ? Math.max(1, parseInt(i[0]) || 1) : 1, s = Array.isArray(i) ? parseInt(i[1]) : -1;
+                        const i = t.imageRange || (0, configModule.cF)("imgDownRange"), o = Array.isArray(i) ? Math.max(1, parseInt(i[0]) || 1) : 1, s = Array.isArray(i) ? parseInt(i[1]) : -1;
                         if (t.imgs = (-1 === s ? a.slice(o - 1) : a.slice(o - 1, s)).map((e, t) => ({
                             url: e,
                             imgIndex: o + t
@@ -2340,24 +2430,40 @@
                 this.advance(index, imgurl, imgIndex), !1;
                 const d = (0, downloadUtils.pN)(o.comicName) + "\\" + (0, downloadUtils.pN)(o.downChapterName) + "\\" + (0, 
                 downloadUtils.xo)(imgIndex, this.imgIndexBitNum) + ".";
+                let verifiedResponse;
                 if (1 === Number(o.directFlow) && o.directRemoteDownload && !o.useDirectory && /^https?:\/\//i.test(String(imgurl))) {
-                    const s = await (0, downloadUtils.zd)({
+                    verifiedResponse = await (0, downloadUtils.WY)({
+                        method: "get",
                         url: imgurl,
-                        name: d + this.getSuffix(imgurl, {}),
+                        responseType: "blob",
                         headers: newHeaders || {
                             referer: o.url
                         },
+                        timeout: 6e4,
                         signal: o.abortController.signal
                     });
-                    if (this.assertActive(index), s) return o.directRemoteCount = (Number(o.directRemoteCount) || 0) + 1, 
-                    this.advance(index, imgurl, imgIndex), !0;
-                    this.addDiagnostic(index, "快速直连", "直接保存失败，已回退兼容流程", {
-                        url: imgurl,
-                        imgIndex: imgIndex
-                    });
+                    const failure = await this.requestFailure(verifiedResponse);
+                    this.assertActive(index);
+                    if (!failure) {
+                        const s = await (0, downloadUtils.zd)({
+                            url: verifiedResponse.response,
+                            name: d + this.getSuffix(imgurl, verifiedResponse),
+                            headers: newHeaders || {
+                                referer: o.url
+                            },
+                            signal: o.abortController.signal
+                        });
+                        if (this.assertActive(index), s) return o.directRemoteCount = (Number(o.directRemoteCount) || 0) + 1, 
+                        this.advance(index, imgurl, imgIndex, verifiedResponse.response.size, true, true), 
+                        !0;
+                        this.addDiagnostic(index, "快速直连", "直接保存失败，已回退兼容流程", {
+                            url: imgurl,
+                            imgIndex: imgIndex
+                        });
+                    }
                 }
                 0 === retryTimes && (o.compatDownloadCount = (Number(o.compatDownloadCount) || 0) + 1);
-                const s = await (0, downloadUtils.WY)({
+                const s = verifiedResponse || await (0, downloadUtils.WY)({
                     method: "get",
                     url: imgurl,
                     responseType: "blob",
@@ -2368,7 +2474,8 @@
                     signal: o.abortController.signal
                 });
                 this.assertActive(index);
-                const c = this.requestFailure(s);
+                const c = await this.requestFailure(s);
+                this.assertActive(index);
                 if ((0, downloadUtils.sR)(imgurl, c, retryTimes)) return await this.controlledDelay(index, 500 * (retryTimes + 1)), 
                 this.addImgDownPromise(index, imgurl, imgIndex, newHeaders, retryTimes + 1);
                 let l, u;
@@ -2379,8 +2486,13 @@
                     type: "text/plain"
                 }), u = "txt") : (l = s.response, u = this.getSuffix(s.finalUrl || imgurl, s)), 
                 await this.waitUntilRunnable(index);
-                const p = await (0, downloadUtils.zd)(l, d + u);
-                return p || c || this.addFailure(index, imgurl, imgIndex, "文件写入失败，请检查目录权限"), this.advance(index, imgurl, imgIndex, c ? 0 : Number(s.response && s.response.size)), 
+                const p = await (0, downloadUtils.zd)({
+                    url: l,
+                    name: d + u,
+                    signal: o.abortController.signal
+                });
+                this.assertActive(index);
+                return p || c || this.addFailure(index, imgurl, imgIndex, "文件写入失败，请检查目录权限"), this.advance(index, imgurl, imgIndex, c ? 0 : Number(s.response && s.response.size), Boolean(p && !c), Boolean(p && !c)), 
                 p && !c;
             }
             async addImgPromise(index, imgurl, newHeaders, retryTimes = 0, imgIndex = 0) {
@@ -2403,7 +2515,8 @@
                     signal: o.abortController.signal
                 });
                 this.assertActive(index);
-                const c = this.requestFailure(s);
+                const c = await this.requestFailure(s);
+                this.assertActive(index);
                 return (0, downloadUtils.sR)(imgurl, c, retryTimes) ? (await this.controlledDelay(index, 500 * (retryTimes + 1)), 
                 this.addImgPromise(index, imgurl, newHeaders, retryTimes + 1, imgIndex)) : c ? (String(imgurl || "").startsWith("blob:") ? (o.hasError = !0, 
                 this.addDiagnostic(index, "图片下载", c, {
@@ -2415,7 +2528,7 @@
                     imgurl: imgurl,
                     suffix: "",
                     imgIndex: imgIndex
-                }) : (this.advance(index, imgurl, imgIndex, Number(s.response && s.response.size)), 
+                }) : (this.advance(index, imgurl, imgIndex, Number(s.response && s.response.size), true), 
                 {
                     blob: s.response,
                     imgurl: imgurl,
@@ -2423,10 +2536,27 @@
                     imgIndex: imgIndex
                 });
             }
-            requestFailure(response) {
-                return "abort" === response ? "请求已取消" : "timeout" === response ? "图片请求超时" : "onerror" !== response && response && "object" == typeof response ? Number(response.status) >= 400 ? "图片请求返回 HTTP " + response.status : response.response instanceof Blob ? "" : "图片响应不是有效文件" : "图片请求失败";
+            async requestFailure(response) {
+                const failure = "abort" === response ? "请求已取消" : "timeout" === response ? "图片请求超时" : "onerror" !== response && response && "object" == typeof response ? Number(response.status) >= 400 ? "图片请求返回 HTTP " + response.status : response.response instanceof Blob ? "" : "图片响应不是有效文件" : "图片请求失败";
+                if (failure) return failure;
+                const blob = response.response;
+                if (!blob.size) return "图片响应为空文件";
+                const bytes = new Uint8Array(await blob.slice(0, 512).arrayBuffer());
+                const ascii = (start, length) => String.fromCharCode(...bytes.slice(start, start + length));
+                const starts = values => values.every((value, index) => bytes[index] === value);
+                let suffix = starts([ 137, 80, 78, 71, 13, 10, 26, 10 ]) ? "png" : starts([ 255, 216, 255 ]) ? "jpg" : /^GIF8[79]a/.test(ascii(0, 6)) ? "gif" : ascii(0, 4) === "RIFF" && ascii(8, 4) === "WEBP" ? "webp" : ascii(0, 2) === "BM" ? "bmp" : [ "II*\0", "MM\0*" ].includes(ascii(0, 4)) ? "tiff" : starts([ 0, 0, 1, 0 ]) ? "ico" : "";
+                if (!suffix && ascii(4, 4) === "ftyp") {
+                    const brands = ascii(8, Math.min(56, bytes.length - 8));
+                    if (/avif|avis/.test(brands)) suffix = "avif"; else if (/heic|heix|hevc|hevx|mif1/.test(brands)) suffix = "heic";
+                }
+                const text = (new TextDecoder).decode(bytes).replace(/^\uFEFF/, "").trimStart();
+                if (!suffix && /^(?:<\?xml[^>]*>\s*)?<svg(?:\s|>)/i.test(text)) suffix = "svg";
+                if (!suffix) return "图片响应不是有效图片，可能是登录页、错误页或损坏文件";
+                response.imageSuffix = suffix;
+                return "";
             }
             getSuffix(url, response) {
+                if (response && response.imageSuffix) return response.imageSuffix;
                 const n = String(response && response.response && response.response.type || "").toLowerCase(), r = {
                     "image/jpeg": "jpg",
                     "image/png": "png",
@@ -2451,6 +2581,7 @@
                     downloadUtils.pN)(t.downChapterName) + ".zip", r, this.imgIndexBitNum, (e, n) => {
                         t.stage = "正在打包 " + e + "/" + n, this.refresh();
                     }, t.abortController && t.abortController.signal)) throw new Error("压缩下载需要先选择保存目录；请重新选择目录或改用原图下载");
+                    t.writtenNum = t.successNum, t.outputFiles = 1, this.refresh();
                     await yieldToBrowser(0), await this.waitUntilRunnable(workerId);
                 } finally {
                     r.forEach(e => {
@@ -2460,7 +2591,7 @@
             }
             async combineImages(workerId) {
                 const t = this.assertActive(workerId), a = Number((0, configModule.cF)("maxSplicingHeight")) || 2e4, o = e => Math.max(1, Math.min(a, 32760, Math.floor(4e7 / Math.max(1, e))));
-                let s = null, c = 0, f = null, g = new Set;
+                let s = null, c = 0, f = null, g = new Set, savedPages = new Set;
                 const d = async e => {
                     if ("function" == typeof createImageBitmap) try {
                         return await createImageBitmap(e);
@@ -2491,6 +2622,9 @@
                     }), u = (0, downloadUtils.pN)(t.comicName) + "\\" + (0, downloadUtils.pN)(t.downChapterName) + "\\" + (0, 
                     downloadUtils.xo)(++c, this.imgIndexBitNum) + ".jpg";
                     if (!await (0, downloadUtils.zd)(l, u)) throw new Error("拼接图 " + c + " 写入失败");
+                    this.assertActive(workerId);
+                    for (const part of s.parts) if (part.endsPage) savedPages.add(part.imgIndex);
+                    t.writtenNum = savedPages.size, t.outputFiles = c, this.refresh();
                     for (const e of s.resources) e !== r && "function" == typeof e.close && e.close();
                     a.width = 1, a.height = 1, s = null, await yieldToBrowser(0);
                 }, u = this.workerDownInfo[workerId];
@@ -2499,7 +2633,7 @@
                         await this.waitUntilRunnable(workerId);
                         const r = u.slice(y, y + this.pictureNum), a = await Promise.all(r.map(async (r, a) => {
                             const i = y + a, o = r.imgIndex || i + 1;
-                            if (!r.blob || 1 === r.blob || 0 === r.blob || !String(r.blob.type || "").includes("image")) return {
+                            if (!r.blob || 1 === r.blob || 0 === r.blob) return {
                                 item: r,
                                 imgIndex: o,
                                 invalid: !0
@@ -2532,6 +2666,7 @@
                                 continue;
                             }
                             if (v.error) {
+                                t.successNum = Math.max(0, t.successNum - 1), t.failedNum++;
                                 this.addFailure(workerId, r.imgurl, a, v.error.message);
                                 continue;
                             }
@@ -2539,6 +2674,7 @@
                             g.delete(i), f = i;
                             const p = i.width, h = i.height;
                             if (!p || !h) {
+                                t.successNum = Math.max(0, t.successNum - 1), t.failedNum++;
                                 this.addFailure(workerId, r.imgurl, a, "图片尺寸无效"), "function" == typeof i.close && i.close(), 
                                 f = null;
                                 continue;
@@ -2554,6 +2690,8 @@
                                 });
                                 const e = o(p), t = Math.min(h - m, e - s.height);
                                 s.parts.push({
+                                    imgIndex: a,
+                                    endsPage: m + t === h,
                                     image: i,
                                     sourceY: m,
                                     width: p,
@@ -2588,25 +2726,37 @@
             }
             async finishWorker(index) {
                 const t = this.assertActive(index);
-                t.status = t.hasError ? "partial" : "completed", t.stage = t.hasError ? "下载完成，部分图片失败" : t.retryOnly ? "失败图片补下载完成" : "下载完成", 
-                this.saveHistory(t), this.Vue && "function" == typeof this.Vue.notifyTask && this.Vue.notifyTask(t), 
-                this.worker[index] = void 0, this.workerDownInfo[index] = void 0, this.refresh(), 
-                setTimeout(() => this.run(), 350);
+                t.status = t.hasError ? "partial" : "completed", t.stage = t.hasError ? "下载完成，部分图片失败" : t.retryOnly ? "失败图片补下载完成" : "下载完成";
+                this.completeWorker(index, t, true);
             }
             failWorker(index, error) {
                 const n = this.worker[index];
                 if (!n) return;
                 const r = n.cancelled || error instanceof TaskCancelledError;
                 r || (n.hasError = !0, this.addDiagnostic(index, n.stage || "下载任务", error), console.error("10漫画：下载任务异常终止。", error)), 
-                n.status = r ? "cancelled" : "failed", n.stage = r ? "任务已取消" : "任务失败", this.saveHistory(n), 
-                !r && this.Vue && "function" == typeof this.Vue.notifyTask && this.Vue.notifyTask(n), 
-                this.worker[index] = void 0, this.workerDownInfo[index] = void 0, this.refresh(), 
-                setTimeout(() => this.run(), 350);
+                n.status = r ? "cancelled" : "failed", n.stage = r ? "任务已取消" : "任务失败";
+                this.completeWorker(index, n, !r);
+            }
+            completeWorker(index, worker, notify) {
+                try {
+                    this.saveHistory(worker);
+                    if (notify && this.Vue && typeof this.Vue.notifyTask === "function") try {
+                        this.Vue.notifyTask(worker);
+                    } catch (error) {
+                        console.warn("10漫画：完成通知失败。", error);
+                    }
+                } finally {
+                    for (const entry of this.workerDownInfo[index] || []) entry.blob = null;
+                    this.worker[index] = void 0, this.workerDownInfo[index] = void 0;
+                    this.refresh();
+                    setTimeout(() => this.run(), 350);
+                }
             }
             saveHistory(worker) {
                 let t = [];
                 try {
-                    t = JSON.parse(localStorage.getItem("ylComicDownHistory") || "[]"), Array.isArray(t) || (t = []);
+                    t = this.historyFallback || JSON.parse(localStorage.getItem("ylComicDownHistory") || "[]"), 
+                    Array.isArray(t) || (t = []);
                 } catch (e) {
                     t = [];
                 }
@@ -2621,22 +2771,206 @@
                     comicPageUrl: window.location.href,
                     hasError: worker.hasError || "failed" === worker.status,
                     status: worker.status,
+                    processedNum: worker.processedNum,
+                    successNum: worker.successNum,
+                    failedNum: worker.failedNum,
+                    writtenNum: worker.writtenNum,
+                    outputFiles: worker.outputFiles,
                     stage: worker.stage,
                     durationMs: timing.activeMs,
                     totalDurationMs: timing.totalMs,
                     pausedDurationMs: timing.pausedMs,
                     completedAt: completedAt,
                     directFlow: Number(worker.directFlow) || 0,
-                    flowUsed: Number(worker.directRemoteCount) > 0 ? Number(worker.compatDownloadCount) > 0 ? "混合流程" : "快速直连" : "兼容流程",
+                    flowUsed: Number(worker.directRemoteCount) > 0 ? Number(worker.compatDownloadCount) > 0 ? "混合流程" : "校验后直存" : "兼容流程",
                     failedImages: n,
                     diagnostics: worker.diagnostics,
                     task: worker.task
                 };
-                t = t.filter(e => e.comicName !== a.comicName || e.downChapterName !== a.downChapterName), 
+                t = t.filter(e => DownloadQueue.historyKey(e) !== DownloadQueue.historyKey(a)), 
                 t.unshift(a);
                 const i = Math.max(10, Math.min(500, Number((0, configModule.cF)("historyLimit")) || 100));
-                t = t.slice(0, i), localStorage.setItem("ylComicDownHistory", JSON.stringify(t)), 
-                this.Vue && this.Vue.getHistoryData();
+                t = t.slice(0, i);
+                try {
+                    localStorage.setItem("ylComicDownHistory", JSON.stringify(t));
+                    this.historyFallback = null;
+                } catch (error) {
+                    this.historyFallback = t;
+                    this.reportStorageError(error);
+                }
+                try {
+                    this.Vue && this.Vue.getHistoryData();
+                } catch (error) {
+                    this.reportStorageError(error);
+                }
+            }
+        }
+        class RecoveryStore {
+            constructor(storage, options) {
+                this.storage = storage;
+                this.host = options.host;
+                this.origin = options.origin;
+                this.id = options.id;
+                this.key = "pendingTasks.session." + this.id;
+                this.locks = options.locks;
+                this.protected = Boolean(this.locks && this.locks.request);
+                this.closed = false;
+                this.transfers = {};
+                this.ready = new Promise(resolve => {
+                    if (!this.protected) return resolve();
+                    try {
+                        this.locks.request(this.lockName(this.key), {
+                            ifAvailable: true
+                        }, lock => {
+                            if (!lock) {
+                                this.protected = false;
+                                resolve();
+                                return;
+                            }
+                            return new Promise(release => {
+                                this.release = release;
+                                resolve();
+                            });
+                        }).catch(() => {
+                            this.protected = false;
+                            resolve();
+                        });
+                    } catch (error) {
+                        this.protected = false;
+                        resolve();
+                    }
+                });
+            }
+            lockName(key) {
+                return "10comic-recovery:" + key;
+            }
+            persist(tasks) {
+                if (this.closed) return;
+                if (!tasks.length && !Object.keys(this.transfers).length) {
+                    this.storage.remove(this.key);
+                    return;
+                }
+                const previous = this.storage.get(this.key);
+                const next = {
+                    version: 1,
+                    host: this.host,
+                    origin: this.origin,
+                    updatedAt: Date.now(),
+                    protected: this.protected,
+                    transfers: {
+                        ...this.transfers
+                    },
+                    tasks: tasks
+                };
+                if (previous && JSON.stringify(previous.tasks) === JSON.stringify(tasks) && JSON.stringify(previous.transfers || {}) === JSON.stringify(this.transfers) && Date.now() - previous.updatedAt < 3e4) return;
+                this.storage.set(this.key, next);
+            }
+            read(key) {
+                if (key === "pendingTasks.legacy." + this.host) {
+                    const source = this.storage.get("pendingTasks"), marker = this.storage.get(key) || {};
+                    const tasks = (Array.isArray(source) ? source : []).filter(task => {
+                        let host = task && task.originHost;
+                        if (!host) try {
+                            host = new URL(task.url).hostname;
+                        } catch (ignored) {}
+                        return String(host || "").toLowerCase() === this.host;
+                    });
+                    const fingerprint = JSON.stringify(tasks);
+                    if (!tasks.length || marker.consumed === fingerprint) return null;
+                    return {
+                        claimedBy: marker.claimedBy,
+                        updatedAt: marker.updatedAt,
+                        host: this.host,
+                        origin: this.origin,
+                        tasks: tasks,
+                        legacy: true,
+                        fingerprint: fingerprint
+                    };
+                }
+                const record = this.storage.get(key);
+                return record && record.host === this.host && Array.isArray(record.tasks) && record.tasks.length ? record : null;
+            }
+            async available(key, record, callback) {
+                const owner = record.claimedBy || key;
+                if (owner === this.key) return callback();
+                if (this.protected && (!record.origin || record.origin === this.origin) && (record.protected || record.claimedBy || record.legacy)) {
+                    return this.locks.request(this.lockName(owner), {
+                        ifAvailable: true
+                    }, lock => lock ? callback() : null);
+                }
+                if ((!record.legacy || record.claimedBy) && Date.now() - (record.updatedAt || 0) < 12e4) return null;
+                return callback();
+            }
+            async candidates() {
+                await this.ready;
+                const keys = this.storage.keys().filter(key => key.startsWith("pendingTasks.session."));
+                keys.push("pendingTasks.legacy." + this.host);
+                const found = [];
+                for (const key of keys) {
+                    if (key === this.key) continue;
+                    const record = this.read(key);
+                    if (!record) continue;
+                    const owner = record.claimedBy && this.storage.get(record.claimedBy);
+                    if (owner?.transfers?.[key] === JSON.stringify(record.tasks)) continue;
+                    await this.available(key, record, () => {
+                        found.push({
+                            key: key,
+                            version: JSON.stringify(record),
+                            tasks: record.tasks.map((task, index) => ({
+                                ...task,
+                                taskId: task.taskId || key + ":" + index
+                            }))
+                        });
+                    });
+                }
+                return found;
+            }
+            async claim(refs, adopt, discard = false) {
+                await this.ready;
+                this.warnings = [];
+                let count = 0;
+                for (const ref of refs) {
+                    const record = this.read(ref.key);
+                    if (!record || JSON.stringify(record) !== ref.version) continue;
+                    await this.available(ref.key, record, async () => {
+                        const fresh = this.read(ref.key);
+                        if (!fresh || JSON.stringify(fresh) !== ref.version) return;
+                        const owner = fresh.claimedBy && this.storage.get(fresh.claimedBy);
+                        if (owner?.transfers?.[ref.key] === JSON.stringify(fresh.tasks)) return;
+                        const claimed = {
+                            ...record,
+                            claimedBy: this.key,
+                            updatedAt: Date.now()
+                        };
+                        this.storage.set(ref.key, claimed);
+                        if (!discard) this.transfers[ref.key] = JSON.stringify(record.tasks);
+                        try {
+                            if (!discard) await adopt(ref.tasks);
+                        } catch (error) {
+                            delete this.transfers[ref.key];
+                            this.storage.set(ref.key, record);
+                            throw error;
+                        }
+                        try {
+                            if (record.legacy) this.storage.set(ref.key, {
+                                consumed: record.fingerprint
+                            }); else this.storage.remove(ref.key);
+                            delete this.transfers[ref.key];
+                        } catch (error) {
+                            if (discard) {
+                                this.storage.set(ref.key, record);
+                                throw error;
+                            }
+                            this.warnings.push(error);
+                        }
+                        count += ref.tasks.length;
+                    });
+                }
+                return count;
+            }
+            close() {
+                this.closed = true;
+                this.release && this.release();
             }
         }
         var siteRules = __webpack_require__(872);
@@ -2844,7 +3178,7 @@ class="ten-mode-option-mark"></span><span><strong>压缩下载</strong>', '<smal
 class="ten-mode-option-mark"></span><span><strong>图片拼接</strong><small>输出连续长图</small></span></button></div></div></div><div class="ten-setting \
 ten-direct-flow-setting"><label>直接下载流程</label><div class="ten-direct-flow-options" role="group" aria-label="直接下载流程"><button type="button" \
 data-direct-flow="0"><strong>兼容流程</strong><small>GM_xmlhttpRequest → Blob → 保存；兼容性优先</small></button><button type="button" \
-data-direct-flow="1"><strong>快速直连</strong><small>GM_download → 直接保存；失败自动回退兼容流程</small></button></div></div><div class="ten-setting ten-setting-check \
+data-direct-flow="1"><strong>快速直连</strong><small>先校验图片 → GM_download 保存；失败回退兼容流程</small></button></div></div><div class="ten-setting ten-setting-check \
 ten-path-sanitize-setting"><div><label for="ten-sanitize-paths">自动清理文件夹和文件名</label><small>默认开启；修正系统和浏览器不兼容名称，仅影响保存路径</small></div><input id="ten-sanitize-paths" \
 type="checkbox"></div>' ].join(""), '<div class="ten-setting"><label for="ten-max-height">拼接最大高度</label><input id="ten-max-height" class="ten-input" type="number" min="10000" \
 max="65530"></div><div class="ten-setting"><label for="ten-digits">图片序号位数</label><input id="ten-digits" class="ten-input" type="number" min="1" \
@@ -3254,7 +3588,8 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                         const a = n.progress;
                         setStyle(a, "width", `${r}%`), setStyle(a, "--ten-energy-duration", `${energyFlowDuration(t.speedBps)}s`), 
                         a.classList.toggle("is-paused", Boolean(t.paused)), setText(n.stage, t.stage || "正在下载"), 
-                        setText(n.stats, `${t.successNum || 0}/${t.totalNumber || "?"} · ${r}%`), setText(n.speed, t.paused ? "已暂停" : formatSpeed(t.speedBps)), 
+                        setText(n.stats, `${t.processedNum ?? t.successNum ?? 0}/${t.totalNumber || "?"} · ${r}%`), 
+                        setText(n.results, formatTaskCounts(t)), setText(n.speed, t.paused ? "已暂停" : formatSpeed(t.speedBps)), 
                         setText(n.eta, t.paused ? "剩余 --" : formatEta(t.etaSeconds));
                         const i = t.status || (t.paused ? "paused" : "running"), o = e.dataset.taskStatus;
                         !o || o === i || "paused" !== i && "running" !== i || playStateAnimation(e, "paused" === i ? "pause" : "resume"), 
@@ -3420,7 +3755,7 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                 occurrences.set(base, occurrence + 1);
                 entries.push({
                     key: base + "|" + occurrence,
-                    signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
+                    signature: JSON.stringify([ record.id, record.downChapterName, record.status, record.hasError, record.flowUsed, record.durationMs, record.totalDurationMs, record.pausedDurationMs, record.completedAt, record.processedNum, record.successNum, record.failedNum, record.writtenNum, Array.isArray(record.failedImages) ? record.failedImages.filter(image => image && image.url).length : 0 ]),
                     render: () => historyCard(record)
                 });
             }
@@ -3429,6 +3764,7 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
         function taskCardNodes(e) {
             return {
                 title: one("[data-task-title]", e),
+                results: one("[data-task-results]", e),
                 progress: one("[data-task-progress]", e),
                 stage: one("[data-task-stage]", e),
                 stats: one("[data-task-stats]", e),
@@ -3446,6 +3782,10 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
         function formatSpeed(e) {
             const t = Number(e) || 0;
             return t <= 0 ? "速度计算中" : t < 1024 ? `${Math.round(t)} B/s` : t < 1048576 ? `${(t / 1024).toFixed(1)} KB/s` : `${(t / 1024 / 1024).toFixed(1)} MB/s`;
+        }
+        function formatTaskCounts(task) {
+            if (task.processedNum === undefined) return "";
+            return `成功取图 ${task.successNum || 0} · 失败 ${task.failedNum || 0} · 已保存 ${task.writtenNum || 0} 页`;
         }
         function energyFlowDuration(e) {
             const t = Math.max(0, Number(e) || 0), n = Math.log2(1 + t / 32768);
@@ -3510,7 +3850,7 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
         }
         function taskCard(e, t, n, r = 0, a = 0) {
             const i = Math.max(0, Math.min(100, Number(e.progress || 0))), o = "active" === t, s = "paused" === e.status, c = o ? `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-toggle data-task-action="${s ? "resume" : "pause"}" data-worker-index="${n}" title="${s ? "继续" : "暂停"}">${icon(s ? "play" : "pause")}</button><button class="ten-icon-btn" type="button" data-task-action="diagnostic" data-worker-index="${n}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel" data-worker-index="${n}" title="取消任务">${icon("close")}</button></div>` : `<div class="ten-task-actions"><button class="ten-icon-btn" type="button" data-task-action="waiting-up" data-waiting-index="${n}" title="提前一个位置" ${0 === r ? "disabled" : ""}>${icon("up")}</button><button class="ten-icon-btn" type="button" data-task-action="waiting-down" data-waiting-index="${n}" title="延后一个位置" ${r === a - 1 ? "disabled" : ""}>${icon("down")}</button><button class="ten-icon-btn is-danger" type="button" data-task-action="cancel-waiting" data-waiting-index="${n}" title="移出队列">${icon("close")}</button></div>`;
-            return `<div class="ten-list-item ten-task-card"${o ? ` data-worker-card="${n}"` : ""}><div class="ten-name"><div class="ten-task-title"${o ? " data-task-title" : ""}>${escapeHtml(e.downChapterName || e.chapterName || "未命名章节")}</div>${o ? `<div class="ten-progress"><i data-task-progress${e.paused ? ' class="is-paused"' : ""} style="width:${i}%;--ten-energy-duration:${energyFlowDuration(e.speedBps)}s"></i></div><div class="ten-task-meta"><span data-task-stage>${escapeHtml(e.stage || "正在下载")}</span><span data-task-stats>${e.successNum || 0}/${e.totalNumber || "?"} · ${i}%</span></div><div class="ten-task-performance"><span data-task-speed>${formatSpeed(e.speedBps)}</span><span data-task-eta>${formatEta(e.etaSeconds)}</span></div>` : '<div class="ten-meta">等待开始</div>'}</div>${c}</div>`;
+            return `<div class="ten-list-item ten-task-card"${o ? ` data-worker-card="${n}"` : ""}><div class="ten-name"><div class="ten-task-title"${o ? " data-task-title" : ""}>${escapeHtml(e.downChapterName || e.chapterName || "未命名章节")}</div>${o ? `<div class="ten-progress"><i data-task-progress${e.paused ? ' class="is-paused"' : ""} style="width:${i}%;--ten-energy-duration:${energyFlowDuration(e.speedBps)}s"></i></div><div class="ten-task-meta"><span data-task-stage>${escapeHtml(e.stage || "正在下载")}</span><span data-task-stats>${e.processedNum ?? e.successNum ?? 0}/${e.totalNumber || "?"} · ${i}%</span></div><div class="ten-task-performance"><span data-task-speed>${formatSpeed(e.speedBps)}</span><span data-task-eta>${formatEta(e.etaSeconds)}</span></div><div class="ten-meta" data-task-results>${formatTaskCounts(e)}</div>` : '<div class="ten-meta">等待开始</div>'}</div>${c}</div>`;
         }
         function historyCard(e) {
             const t = {
@@ -3519,7 +3859,7 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                 failed: "失败",
                 cancelled: "已取消"
             }[e.status] || (e.hasError ? "存在错误" : "已完成"), n = Array.isArray(e.failedImages) ? e.failedImages.filter(e => e && e.url) : [];
-            return `<div class="ten-list-item ten-history-card"><div class="ten-name"><div class="ten-task-title">${escapeHtml(e.downChapterName || "未命名章节")}</div><div class="ten-task-meta"><span>${formatHistoryTiming(e)}</span><span>${escapeHtml(e.flowUsed || "流程未记录")}</span><span class="ten-task-state is-${escapeAttr(e.status || (e.hasError ? "failed" : "completed"))}">${t}</span></div></div><div class="ten-task-actions">${n.length ? `<button class="ten-icon-btn" type="button" data-retry-history="${e.id}" title="仅重试 ${n.length} 张失败图片">${icon("refresh")}</button><button class="ten-icon-btn" type="button" data-copy-failures="${e.id}" title="复制失败清单">${icon("copy")}</button>` : ""}<button class="ten-icon-btn" type="button" data-diagnostic-history="${e.id}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn" type="button" data-delete-history="${e.id}" title="删除记录">${icon("trash")}</button></div></div>`;
+            return `<div class="ten-list-item ten-history-card"><div class="ten-name"><div class="ten-task-title">${escapeHtml(e.downChapterName || "未命名章节")}</div><div class="ten-task-meta"><span>${formatHistoryTiming(e)}</span><span>${escapeHtml(e.flowUsed || "流程未记录")}</span><span class="ten-task-state is-${escapeAttr(e.status || (e.hasError ? "failed" : "completed"))}">${t}</span></div>${e.processedNum !== undefined ? `<div class="ten-meta">${formatTaskCounts(e)}</div>` : ""}</div><div class="ten-task-actions">${n.length ? `<button class="ten-icon-btn" type="button" data-retry-history="${e.id}" title="仅重试 ${n.length} 张失败图片">${icon("refresh")}</button><button class="ten-icon-btn" type="button" data-copy-failures="${e.id}" title="复制失败清单">${icon("copy")}</button>` : ""}<button class="ten-icon-btn" type="button" data-diagnostic-history="${e.id}" title="诊断信息">${icon("info")}</button><button class="ten-icon-btn" type="button" data-delete-history="${e.id}" title="删除记录">${icon("trash")}</button></div></div>`;
         }
         function handleHistoryFilter(e) {
             const t = e.target.closest("[data-history-filter]");
@@ -3543,7 +3883,14 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
             renderTasks());
         }
         function readHistory() {
-            const e = localStorage.getItem("ylComicDownHistory") || "[]";
+            let e;
+            const fallback = state.queue?.historyFallback || state.historyVolatile;
+            try {
+                e = fallback ? JSON.stringify(fallback) : localStorage.getItem("ylComicDownHistory") || "[]";
+            } catch (error) {
+                reportTaskStorageError(error);
+                return state.historyCache;
+            }
             if (e === state.historyRaw) return state.historyCache;
             try {
                 const t = JSON.parse(e);
@@ -3554,19 +3901,32 @@ type="button" data-effect-level="2">标准</button></div></div>\n        </secti
                     e && void 0 === e.id && (e.id = r - t, n = !0);
                 });
                 const a = new Set, i = t.filter(e => {
-                    const t = `${e.comicName || ""}\0${e.downChapterName || ""}`;
+                    const t = DownloadQueue.historyKey(e);
                     return !a.has(t) && (a.add(t), !0);
                 }).slice(0, state.settings ? state.settings.historyLimit : boundedNumber(safeGet("historyLimit", 100), 100, 10, 500)), o = n || i.length !== t.length ? JSON.stringify(i) : e;
-                return o !== e && localStorage.setItem("ylComicDownHistory", o), state.historyRaw = o, 
-                state.historyCache = i, i;
+                if (o !== e && !fallback) try {
+                    localStorage.setItem("ylComicDownHistory", o);
+                } catch (error) {
+                    state.historyVolatile = i;
+                    reportTaskStorageError(error);
+                }
+                return state.historyRaw = o, state.historyCache = i, i;
             } catch (t) {
                 return state.historyRaw = e, state.historyCache = [], state.historyCache;
             }
         }
         function writeHistory(e) {
             const t = Array.isArray(e) ? e : [], n = JSON.stringify(t);
-            return localStorage.setItem("ylComicDownHistory", n), state.historyRaw = n, state.historyCache = t, 
-            state.historyRenderKey = "", t;
+            try {
+                localStorage.setItem("ylComicDownHistory", n);
+                state.historyVolatile = null;
+                if (state.queue) state.queue.historyFallback = null;
+            } catch (error) {
+                if (state.queue) state.queue.historyFallback = t, state.historyVolatile = null; else state.historyVolatile = t;
+                reportTaskStorageError(error);
+            }
+            return state.historyRaw = n, state.historyCache = t, state.historyRenderKey = "", 
+            t;
         }
         async function handleHistoryClick(e) {
             const t = e.target.closest("[data-diagnostic-history]"), n = e.target.closest("[data-retry-history]"), r = e.target.closest("[data-copy-failures]"), a = e.target.closest("[data-delete-history]"), i = readHistory();
@@ -5144,11 +5504,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
                 } catch (e) {
                     byId("ten-dir-name").textContent = "请重新选择目录";
                 }
-            }(), state.ready = !0, function() {
-                const e = safeGet(PENDING_TASKS_KEY, []), t = window.location.hostname.toLowerCase();
-                state.recoveryTasks = uniqueTaskSnapshots(Array.isArray(e) ? e : []).filter(e => taskHost(e) === t), 
-                renderRecoveryTasks();
-            }(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
+            }(), state.ready = !0, initializeTaskRecovery(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
         }
         function icon(e) {
             return `<svg class="ten-icon" aria-hidden="true"><use href="#ten-i-${e}"></use></svg>`;
@@ -5354,7 +5710,34 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
                 heavyCanvasExport: Boolean(siteRules.Po.heavyCanvasExport)
             } ]), state.optionsOpen = !1, byId("ten-options").classList.remove("is-open")) : toast("请输入漫画名和章节名");
         }
-        async function enqueueDownloads(e) {
+        function enqueueDownloads(e, options = {}) {
+            const pending = (state.enqueueChain || Promise.resolve()).then(() => enqueueDownloadBatch(e, options));
+            state.enqueueChain = pending.catch(error => {
+                console.error("10漫画：加入队列失败。", error);
+                toast(error.message || "加入下载队列失败");
+            });
+            return pending;
+        }
+        async function enqueueDownloadBatch(e, options = {}) {
+            e = e.map(task => ({
+                ...task,
+                taskId: options.recovery && task.taskId ? task.taskId : newTaskId(),
+                imageRange: task.imageRange || state.settings.imageRange.slice()
+            }));
+            const active = state.queue ? [ ...state.queue.list, ...state.queue.worker.filter(worker => worker && !worker.cancelled).map(worker => worker.task) ] : [];
+            const completed = readHistory().filter(record => record.status === "completed" && !record.hasError && record.task && !record.task.retryImages?.length).map(record => record.task);
+            const keys = new Set(active.concat(completed).map(DownloadQueue.taskKey)), unique = [], duplicates = [];
+            for (const task of e) {
+                const key = DownloadQueue.taskKey(task);
+                if (keys.has(key)) duplicates.push(task); else unique.push(task);
+                keys.add(key);
+            }
+            let allowDuplicates = false;
+            if (!options.recovery && duplicates.length) {
+                allowDuplicates = await showConfirm("检测到重复下载", `${duplicates.length} 个章节已在队列、已完成或在本次选择中重复。可跳过重复章节，也可仍然下载；下载记录不代表文件仍在磁盘。`, "仍然下载", "跳过重复");
+                if (!allowDuplicates) e = unique;
+            }
+            if (!e.length) return toast("已跳过重复章节"), false;
             siteRules.Po && void 0 !== siteRules.Po.batchDelay && e.forEach(e => {
                 void 0 === e.batchDelay && (e.batchDelay = siteRules.Po.batchDelay);
             }), e.forEach(e => {
@@ -5367,9 +5750,19 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
                 getHistoryData: renderTasks,
                 $forceUpdate: scheduleTaskRender,
                 persistTasks: scheduleTaskPersist,
+                storageError: reportTaskStorageError,
                 notifyTask: notifyDownloadTask
-            })), state.queue, state.queue.addList(e), state.queue.run(), activateTab("tasks"), 
-            renderTasks();
+            })), state.historyVolatile && (state.queue.historyFallback = state.historyVolatile, 
+            state.historyVolatile = null), state.queue.addList(e, allowDuplicates), state.queue.run(), 
+            activateTab("tasks"), renderTasks();
+            return true;
+        }
+        function reportTaskStorageError(error) {
+            console.warn("10漫画：任务记录保存失败。", error);
+            if (!state.storageWarning) state.storageWarning = true, toast("记录保存失败，任务仍会继续；本次记录暂存于当前页面，请及时备份诊断信息");
+        }
+        function newTaskId() {
+            return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
         }
         function taskHost(e) {
             if (e && e.originHost) return String(e.originHost).toLowerCase();
@@ -5383,7 +5776,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             const t = new Set;
             return e.filter(e => {
                 if (!e || !e.url) return !1;
-                const n = JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url ]);
+                const n = e.taskId || JSON.stringify([ taskHost(e), e.comicName || "", e.downChapterName || e.chapterName || "", e.url, e.downType || 0, e.imageRange || [ 1, -1 ], e.retryImages || [] ]);
                 return !t.has(n) && (t.add(n), !0);
             });
         }
@@ -5392,22 +5785,85 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             byId("ten-recovery-count").textContent = state.recoveryTasks.length ? `${state.recoveryTasks.length} 个任务可恢复` : "");
         }
         async function restorePendingTasks() {
-            const e = state.recoveryTasks.slice();
-            e.length && (state.recoveryTasks = [], renderRecoveryTasks(), await enqueueDownloads(e), 
-            toast(`已恢复 ${e.length} 个任务`));
+            if (!state.recoveryStore || state.recoveryBusy) return;
+            state.recoveryBusy = true;
+            try {
+                await state.recoveryStore.claim(state.recoveryRefs || [], async tasks => {
+                    const previous = state.recoveryStaging || [];
+                    state.recoveryStaging = uniqueTaskSnapshots(previous.concat(tasks));
+                    if (!persistQueueState()) {
+                        state.recoveryStaging = previous;
+                        throw new Error("恢复记录保存失败，未移除原记录");
+                    }
+                });
+                for (const error of state.recoveryStore.warnings || []) reportTaskStorageError(error);
+                const tasks = (state.recoveryStaging || []).slice();
+                if (tasks.length && await enqueueDownloads(tasks, {
+                    recovery: true
+                })) {
+                    state.recoveryStaging = [], persistQueueState(), toast(`已恢复 ${tasks.length} 个任务`);
+                }
+            } catch (error) {
+                reportTaskStorageError(error);
+            } finally {
+                state.recoveryBusy = false;
+                await refreshRecoveryTasks();
+            }
         }
         async function discardPendingTasks() {
-            state.recoveryTasks.length && await showConfirm("放弃未完成任务", `将删除当前站点的 ${state.recoveryTasks.length} 个恢复点。`, "放弃任务") && (state.recoveryTasks = [], 
-            persistQueueState(), renderRecoveryTasks(), toast("未完成任务已放弃"));
+            if (!state.recoveryTasks.length || state.recoveryBusy || !await showConfirm("放弃未完成任务", `将删除当前显示的 ${state.recoveryTasks.length} 个恢复点，其他标签页的活动任务保留。`, "放弃任务")) return;
+            state.recoveryBusy = true;
+            try {
+                await state.recoveryStore.claim(state.recoveryRefs || [], async () => {}, true);
+                state.recoveryStaging = [], persistQueueState(), toast("未完成任务已放弃");
+            } catch (error) {
+                reportTaskStorageError(error);
+            } finally {
+                state.recoveryBusy = false;
+                await refreshRecoveryTasks();
+            }
+        }
+        function initializeTaskRecovery() {
+            if (!state.recoveryStore) state.recoveryStore = new RecoveryStore({
+                get: key => GM_getValue(key),
+                set: (key, value) => GM_setValue(key, value),
+                remove: key => GM_deleteValue(key),
+                keys: () => typeof GM_listValues === "function" ? GM_listValues() : []
+            }, {
+                id: newTaskId(),
+                host: window.location.hostname.toLowerCase(),
+                origin: window.location.origin,
+                locks: navigator.locks
+            });
+            if (!state.recoveryHeartbeat) state.recoveryHeartbeat = setInterval(() => {
+                if (state.queue || state.recoveryStaging?.length) persistQueueState();
+                if (!state.recoveryBusy) refreshRecoveryTasks();
+            }, 3e4);
+            refreshRecoveryTasks();
+        }
+        async function refreshRecoveryTasks() {
+            if (!state.recoveryStore || state.recoveryBusy) return;
+            try {
+                state.recoveryRefs = await state.recoveryStore.candidates();
+                state.recoveryTasks = uniqueTaskSnapshots((state.recoveryStaging || []).concat(state.recoveryRefs.flatMap(ref => ref.tasks)));
+                renderRecoveryTasks();
+            } catch (error) {
+                reportTaskStorageError(error);
+            }
         }
         function scheduleTaskPersist() {
             null === state.persistTimer && (state.persistTimer = setTimeout(persistQueueState, 750));
         }
         function persistQueueState() {
             clearTimeout(state.persistTimer), state.persistTimer = null;
-            const e = window.location.hostname.toLowerCase(), t = safeGet(PENDING_TASKS_KEY, []), n = (Array.isArray(t) ? t : []).filter(t => taskHost(t) !== e), a = state.queue ? state.queue.pendingTasks() : state.recoveryTasks;
-            const snapshots = uniqueTaskSnapshots(n.concat(a));
-            JSON.stringify(t) !== JSON.stringify(snapshots) && (0, configModule.po)(PENDING_TASKS_KEY, snapshots);
+            try {
+                const tasks = state.queue ? state.queue.pendingTasks() : [];
+                state.recoveryStore?.persist(uniqueTaskSnapshots(tasks.concat(state.recoveryStaging || [])));
+                return Boolean(state.recoveryStore);
+            } catch (error) {
+                reportTaskStorageError(error);
+                return false;
+            }
         }
         function handlePageHide() {
             (state.queue || state.recoveryTasks.length) && persistQueueState();
@@ -5444,9 +5900,10 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
                 }
             }();
         }();
-        function showConfirm(e, t, n = "确认") {
+        function showConfirm(e, t, n = "确认", cancelText = "取消") {
             state.confirmResolve && closeConfirm(!1), byId("ten-confirm-title").textContent = e, 
             byId("ten-confirm-message").textContent = t, byId("ten-confirm-ok").textContent = n;
+            byId("ten-confirm-cancel").textContent = cancelText;
             const r = byId("ten-confirm");
             return r.classList.add("is-open"), r.setAttribute("aria-hidden", "false"), activateModalFocus(r.id, "#ten-confirm-cancel"), 
             new Promise(e => {
@@ -5608,6 +6065,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         function refreshQueueOnVisibility() {
             byId(ROOT_ID)?.classList.toggle("is-page-hidden", document.hidden);
             document.hidden || state.queue && state.queue.refresh();
+            if (!document.hidden) refreshRecoveryTasks();
         }
         async function resetSettings() {
             await showConfirm("重置全部设置", "界面、下载和规则设置都将恢复默认值。", "确认重置") && (await (0, configModule.zU)(), 

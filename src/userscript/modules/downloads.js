@@ -195,25 +195,43 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
       const t = typeof e;
       return "object" !== t ? t : Object.prototype.toString.call(e).replace(/^\[object (\S+)\]$/, "$1");
     },
-    getFrameContent = async (e, t) => new Promise((n, r) => {
+    getFrameContent = async (e, t, signal) => new Promise((n, r) => {
       const a = document.createElement("iframe");
       a.id = e, a.className = "ten-comic-frame", a.style.cssText = "position:fixed;left:-10000px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;";
+      const finish = (error, html) => {
+        clearTimeout(i), signal?.removeEventListener?.("abort", abort);
+        a.onload = null, a.onerror = null;
+        if (error) a.remove(), r(error); else n(html);
+      }, abort = () => finish(new Error("下载已取消"));
       const i = setTimeout(() => {
-        a.remove(), r(new Error("iframe 加载超时"));
+        finish(new Error("iframe 加载超时"));
       }, 45e3);
+      if (signal && signal.aborted) return abort();
+      signal?.addEventListener?.("abort", abort, { once: true });
       a.onload = function () {
-        clearTimeout(i);
         try {
-          n(a.contentDocument.body.outerHTML);
+          finish(null, a.contentDocument.body.outerHTML);
         } catch (e) {
-          a.remove(), r(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
+          finish(new Error("阅读页无法读取，可能已跳转到登录或授权页面，请先确认该章节可正常阅读"));
         }
       }, a.onerror = function () {
-        clearTimeout(i), a.remove(), r(new Error("iframe 加载失败"));
+        finish(new Error("iframe 加载失败"));
       }, a.src = t, document.body.appendChild(a);
     }),
     getImage = async e => {
+      let ownedFrame = null, abort, retainFrame = false;
+      const signal = e.signal;
+      if (signal && signal.aborted) throw new Error("下载已取消");
+      const cancelled = new Promise((resolve, reject) => {
+        abort = () => {
+          ownedFrame && ownedFrame.remove();
+          try { e.otherData && typeof e.otherData.cleanup === "function" && e.otherData.cleanup(); } catch (ignored) {}
+          reject(new Error("下载已取消"));
+        };
+        signal?.addEventListener?.("abort", abort, { once: true });
+      });
       try {
+        const parse = async () => {
         const t = e.url;
         let n = "";
         if (shouldLoadFrame(siteRules.Po, e)) {
@@ -221,7 +239,10 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
             a = Math.round(25 * Math.random()) + 0,
             i = Math.round(25 * Math.random()) + 0,
             o = "ifr" + new Date().getTime() + r[a] + r[i];
-          n = await getFrameContent(o, t), e.frameId = o;
+          e.frameId = o;
+          const loading = getFrameContent(o, t, signal);
+          ownedFrame = document.getElementById(o);
+          n = await loading;
         } else if (siteRules.Po.useFrame || "manhuagui" === siteRules.Po.readerTabMode) n = "";else {
           const r = await request({
             method: "get",
@@ -232,12 +253,24 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
           if (!r || "object" != typeof r) throw new Error("章节页面请求失败");
           n = r.response;
         }
-        const r = await siteRules.Po.getImgs(n, e);
-        return new Promise((e, t) => {
-          e(r);
-        });
+        if (signal && signal.aborted) throw new Error("下载已取消");
+        const parsed = await siteRules.Po.getImgs(n, e);
+        if (signal && signal.aborted) {
+          try { parsed?.otherData?.cleanup?.(); } catch (ignored) {}
+          for (const url of (Array.isArray(parsed) ? parsed : parsed?.imgUrlArr || [])) if (typeof url === "string" && url.startsWith("blob:")) URL.revokeObjectURL(url);
+          throw new Error("下载已取消");
+        }
+        return parsed;
+        };
+        const parsed = await Promise.race([parse(), cancelled]);
+        retainFrame = Boolean(siteRules.Po.reuseParsedImages && parsed?.otherData && typeof parsed.otherData.cleanup === "function");
+        return parsed;
       } catch (e) {
+        !retainFrame && ownedFrame && ownedFrame.remove();
         throw console.log("getImageError: ", e), e;
+      } finally {
+        signal?.removeEventListener?.("abort", abort);
+        !retainFrame && ownedFrame && ownedFrame.remove();
       }
     },
     shouldLoadFrame = function (e, t) {

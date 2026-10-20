@@ -27,6 +27,7 @@ async function openComic(browser, options = {}) {
     window.GM_getValue = (key, fallback) => key in values ? values[key] : fallback
     window.GM_setValue = (key, value) => { values[key] = value }
     window.GM_deleteValue = key => { delete values[key] }
+    window.GM_listValues = () => Object.keys(values)
     window.GM_registerMenuCommand = (label, action) => { window.__menus.push({ label, action }) }
     window.GM_info = { script: { version: 'test' } }
     window.GM_addStyle = css => { const style = document.createElement('style'); style.textContent = css; document.documentElement.append(style) }

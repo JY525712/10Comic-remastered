@@ -9,13 +9,35 @@ module.exports = class DownloadQueue {
     for (; this.worker.length < this.workerLen;) this.worker.push(void 0), this.workerDownInfo.push(void 0);
     this.run(), this.refresh();
   }
-  addList(list) {
-    for (const t of list) this.list.unshift(t);
-    list.length && (this.waitingRevision = (this.waitingRevision || 0) + 1);
+  static taskKey(item) {
+    let url = String(item.url || "");
+    try { const value = new URL(url, window.location.href); value.hash = ""; url = value.href; } catch (ignored) {}
+    const retry = Array.isArray(item.retryImages) ? item.retryImages.map(image => [image.imgIndex, image.url]).sort((a,b) => String(a).localeCompare(String(b))) : [];
+    return JSON.stringify([url, item.comicName || "", Number(item.downType) || 0, item.imageRange || [1,-1], retry]);
+  }
+  static historyKey(record) {
+    const identity = record.task?.url ? DownloadQueue.taskKey(record.task) : JSON.stringify([record.comicName || "", record.downChapterName || ""]);
+    const completed = !record.hasError && (record.status === "completed" || !record.status);
+    return JSON.stringify([identity, completed ? "completed" : "attempt"]);
+  }
+  addList(list, allowDuplicates = false) {
+    const keys = new Set([...this.list, ...this.worker.filter(Boolean).map(worker => worker.task)].map(DownloadQueue.taskKey));
+    let added = 0;
+    for (const t of list) {
+      const key = DownloadQueue.taskKey(t);
+      if (!allowDuplicates && keys.has(key)) continue;
+      keys.add(key), this.list.unshift(t), added++;
+    }
+    added && (this.waitingRevision = (this.waitingRevision || 0) + 1);
     this.refresh();
+    return added;
   }
   refresh() {
-    this.Vue && (!document.hidden && this.Vue.$forceUpdate(), "function" == typeof this.Vue.persistTasks && this.Vue.persistTasks());
+    if (!this.Vue) return;
+    for (const callback of [!document.hidden && this.Vue.$forceUpdate, this.Vue.persistTasks]) if (typeof callback === "function") try { callback(); } catch (error) { this.reportStorageError(error); }
+  }
+  reportStorageError(error) {
+    try { this.Vue && this.Vue.storageError && this.Vue.storageError(error); } catch (ignored) {}
   }
   moveWaiting(index, direction) {
     const n = "up" === direction ? index + 1 : index - 1;
@@ -51,6 +73,7 @@ module.exports = class DownloadQueue {
     }
     return {
       comicName: item.comicName,
+      taskId: item.taskId,
       chapterName: item.chapterName,
       downChapterName: item.downChapterName,
       url: item.url,
@@ -65,19 +88,20 @@ module.exports = class DownloadQueue {
       useDirectory: item.useDirectory,
       heavyCanvasExport: Boolean(item.heavyCanvasExport),
       retryImages: item.retryImages,
+      imageRange: item.imageRange,
       originHost: t
     };
   }
   snapshotWorker(worker) {
     const t = this.snapshotTask(worker.task),
       n = this.taskTiming(worker);
-    return t.resumeElapsedMs = n.activeMs, t.resumeWallStartedAt = worker.wallStartedAt, t.resumePaused = Boolean(worker.paused), worker.retryOnly ? t.retryImages = [...worker.inFlight, ...worker.retryPending].map(e => ({
+    return t.resumeElapsedMs = n.activeMs, t.resumeWallStartedAt = worker.wallStartedAt, t.resumePaused = Boolean(worker.paused), t.resumeProcessed = worker.processedNum, t.resumeSucceeded = worker.successNum, t.resumeFailed = worker.failedNum, t.resumeWritten = worker.writtenNum, worker.retryOnly ? t.retryImages = [...worker.inFlight, ...worker.retryPending].map(e => ({
       url: e.url,
       imgIndex: e.imgIndex
     })) : 0 === Number(worker.downType) && 1 === Number(worker.readtype) && worker.totalNumber > 0 && (t.resumeImages = [...worker.inFlight, ...worker.imgs].map(e => ({
       url: e.url,
       imgIndex: e.imgIndex
-    })), t.resumeTotal = worker.totalNumber, t.resumeCompleted = worker.successNum, t.resumeFailures = worker.failures.map(e => ({
+    })), t.resumeTotal = worker.totalNumber, t.resumeCompleted = worker.processedNum, t.resumeFailures = worker.failures.map(e => ({
       ...e
     })), t.resumeDiagnostics = worker.diagnostics.map(e => ({
       ...e
@@ -97,6 +121,7 @@ module.exports = class DownloadQueue {
       n = Array.isArray(item.resumeImages) ? item.resumeImages.filter(e => e && e.url) : [],
       r = {
         comicName: item.comicName,
+        taskId: item.taskId,
         chapterName: item.chapterName,
         downChapterName: item.downChapterName,
         url: item.url,
@@ -109,19 +134,27 @@ module.exports = class DownloadQueue {
         directRemoteDownload: item.directRemoteDownload,
         useDirectory: item.useDirectory,
         heavyCanvasExport: Boolean(item.heavyCanvasExport),
-        retryImages: t
+        retryImages: t,
+        imageRange: item.imageRange
       };
+    const processed = n.length ? Math.max(0, Number(item.resumeProcessed ?? item.resumeCompleted) || 0) : 0;
+    const failed = n.length ? Math.min(processed, Math.max(0, Number(item.resumeFailed ?? (item.resumeFailures || []).length) || 0)) : 0;
+    const succeeded = n.length ? Math.min(processed, Math.max(0, Number(item.resumeSucceeded ?? (processed - failed)) || 0)) : 0;
     return {
       ...r,
       imgIndex: 0,
-      successNum: n.length ? Math.max(0, Number(item.resumeCompleted) || 0) : 0,
+      processedNum: processed,
+      successNum: succeeded,
+      failedNum: failed,
+      writtenNum: n.length ? Math.max(0, Number(item.resumeWritten ?? succeeded) || 0) : 0,
+      outputFiles: 0,
       totalNumber: n.length ? Math.max(n.length, Number(item.resumeTotal) || 0) : t.length,
       imgs: n.map(e => ({
         url: e.url,
         imgIndex: Number(e.imgIndex) || 0
       })),
       inFlight: [],
-      progress: n.length && Number(item.resumeTotal) > 0 ? Math.min(100, Math.round((Number(item.resumeCompleted) || 0) / Number(item.resumeTotal) * 100)) : 0,
+      progress: n.length && Number(item.resumeTotal) > 0 ? Math.min(100, Math.round(processed / Number(item.resumeTotal) * 100)) : 0,
       downloadedBytes: 0,
       byteImageCount: 0,
       directRemoteCount: 0,
@@ -234,12 +267,14 @@ module.exports = class DownloadQueue {
       bytes: worker.downloadedBytes
     }];
   }
-  advance(index, imgurl, imgIndex, bytes = 0) {
+  advance(index, imgurl, imgIndex, bytes = 0, succeeded = false, written = false) {
     const a = this.worker[index];
     if (!a) return;
     a.inFlight = a.inFlight.filter(e => e.imgIndex !== imgIndex || e.url !== imgurl);
     const i = Math.max(0, Number(bytes) || 0);
-    i && (a.downloadedBytes += i, a.byteImageCount += 1), a.successNum += 1, a.progress = a.totalNumber > 0 ? Math.min(100, Math.round(a.successNum / a.totalNumber * 100)) : 0;
+    i && (a.downloadedBytes += i, a.byteImageCount += 1);
+    a.processedNum += 1, a.successNum += succeeded ? 1 : 0, a.failedNum += succeeded ? 0 : 1, a.writtenNum += written ? 1 : 0;
+    a.progress = a.totalNumber > 0 ? Math.min(100, Math.round(a.processedNum / a.totalNumber * 100)) : 0;
     const o = Date.now();
     for (a.speedSamples.push({
       time: o,
@@ -249,7 +284,7 @@ module.exports = class DownloadQueue {
       c = (o - s.time) / 1e3,
       d = c >= .2 ? (a.downloadedBytes - s.bytes) / c : 0;
     d > 0 && (a.speedBps = a.speedBps > 0 ? .65 * a.speedBps + .35 * d : d);
-    const l = Math.max(0, a.totalNumber - a.successNum),
+    const l = Math.max(0, a.totalNumber - a.processedNum),
       u = a.byteImageCount ? a.downloadedBytes / a.byteImageCount : 0;
     a.etaSeconds = a.speedBps > 0 && u > 0 ? Math.ceil(l * u / a.speedBps) : null, this.refresh();
   }
@@ -269,7 +304,7 @@ module.exports = class DownloadQueue {
           throw this.addDiagnostic(index, "章节解析", t), new Error("未能解析章节图片，请检查站点规则或网络状态");
         }
         if (this.assertActive(index), !Array.isArray(a) || !a.length) throw this.addDiagnostic(index, "章节解析", "规则没有返回图片地址"), new Error("章节中没有可下载的图片");
-        const i = (0, configModule.cF)("imgDownRange"),
+        const i = t.imageRange || (0, configModule.cF)("imgDownRange"),
           o = Array.isArray(i) ? Math.max(1, parseInt(i[0]) || 1) : 1,
           s = Array.isArray(i) ? parseInt(i[1]) : -1;
         if (t.imgs = (-1 === s ? a.slice(o - 1) : a.slice(o - 1, s)).map((e, t) => ({
@@ -372,23 +407,29 @@ module.exports = class DownloadQueue {
     const o = this.assertActive(index);
     if (await this.waitUntilRunnable(index), !imgurl) return this.addFailure(index, imgurl, imgIndex, "图片地址为空"), this.advance(index, imgurl, imgIndex), !1;
     const d = (0, downloadUtils.pN)(o.comicName) + "\\" + (0, downloadUtils.pN)(o.downChapterName) + "\\" + (0, downloadUtils.xo)(imgIndex, this.imgIndexBitNum) + ".";
+    let verifiedResponse;
     if (1 === Number(o.directFlow) && o.directRemoteDownload && !o.useDirectory && /^https?:\/\//i.test(String(imgurl))) {
+      verifiedResponse = await (0, downloadUtils.WY)({ method: "get", url: imgurl, responseType: "blob", headers: newHeaders || { referer: o.url }, timeout: 6e4, signal: o.abortController.signal });
+      const failure = await this.requestFailure(verifiedResponse);
+      this.assertActive(index);
+      if (!failure) {
       const s = await (0, downloadUtils.zd)({
-        url: imgurl,
-        name: d + this.getSuffix(imgurl, {}),
+        url: verifiedResponse.response,
+        name: d + this.getSuffix(imgurl, verifiedResponse),
         headers: newHeaders || {
           referer: o.url
         },
         signal: o.abortController.signal
       });
-      if (this.assertActive(index), s) return o.directRemoteCount = (Number(o.directRemoteCount) || 0) + 1, this.advance(index, imgurl, imgIndex), !0;
+      if (this.assertActive(index), s) return o.directRemoteCount = (Number(o.directRemoteCount) || 0) + 1, this.advance(index, imgurl, imgIndex, verifiedResponse.response.size, true, true), !0;
       this.addDiagnostic(index, "快速直连", "直接保存失败，已回退兼容流程", {
         url: imgurl,
         imgIndex: imgIndex
       });
+      }
     }
     0 === retryTimes && (o.compatDownloadCount = (Number(o.compatDownloadCount) || 0) + 1);
-    const s = await (0, downloadUtils.WY)({
+    const s = verifiedResponse || await (0, downloadUtils.WY)({
       method: "get",
       url: imgurl,
       responseType: "blob",
@@ -399,7 +440,8 @@ module.exports = class DownloadQueue {
       signal: o.abortController.signal
     });
     this.assertActive(index);
-    const c = this.requestFailure(s);
+    const c = await this.requestFailure(s);
+    this.assertActive(index);
     if ((0, downloadUtils.sR)(imgurl, c, retryTimes)) return await this.controlledDelay(index, 500 * (retryTimes + 1)), this.addImgDownPromise(index, imgurl, imgIndex, newHeaders, retryTimes + 1);
     let l, u;
     c ? (String(imgurl || "").startsWith("blob:") ? (o.hasError = !0, this.addDiagnostic(index, "图片下载", c, {
@@ -408,8 +450,9 @@ module.exports = class DownloadQueue {
     })) : this.addFailure(index, imgurl, imgIndex, c), l = new Blob([imgurl], {
       type: "text/plain"
     }), u = "txt") : (l = s.response, u = this.getSuffix(s.finalUrl || imgurl, s)), await this.waitUntilRunnable(index);
-    const p = await (0, downloadUtils.zd)(l, d + u);
-    return p || c || this.addFailure(index, imgurl, imgIndex, "文件写入失败，请检查目录权限"), this.advance(index, imgurl, imgIndex, c ? 0 : Number(s.response && s.response.size)), p && !c;
+    const p = await (0, downloadUtils.zd)({ url: l, name: d + u, signal: o.abortController.signal });
+    this.assertActive(index);
+    return p || c || this.addFailure(index, imgurl, imgIndex, "文件写入失败，请检查目录权限"), this.advance(index, imgurl, imgIndex, c ? 0 : Number(s.response && s.response.size), Boolean(p && !c), Boolean(p && !c)), p && !c;
   }
   async addImgPromise(index, imgurl, newHeaders, retryTimes = 0, imgIndex = 0) {
     const o = this.assertActive(index);
@@ -430,7 +473,8 @@ module.exports = class DownloadQueue {
       signal: o.abortController.signal
     });
     this.assertActive(index);
-    const c = this.requestFailure(s);
+    const c = await this.requestFailure(s);
+    this.assertActive(index);
     return (0, downloadUtils.sR)(imgurl, c, retryTimes) ? (await this.controlledDelay(index, 500 * (retryTimes + 1)), this.addImgPromise(index, imgurl, newHeaders, retryTimes + 1, imgIndex)) : c ? (String(imgurl || "").startsWith("blob:") ? (o.hasError = !0, this.addDiagnostic(index, "图片下载", c, {
       url: "临时画布图片",
       imgIndex: imgIndex
@@ -439,17 +483,35 @@ module.exports = class DownloadQueue {
       imgurl: imgurl,
       suffix: "",
       imgIndex: imgIndex
-    }) : (this.advance(index, imgurl, imgIndex, Number(s.response && s.response.size)), {
+    }) : (this.advance(index, imgurl, imgIndex, Number(s.response && s.response.size), true), {
       blob: s.response,
       imgurl: imgurl,
       suffix: this.getSuffix(s.finalUrl || imgurl, s),
       imgIndex: imgIndex
     });
   }
-  requestFailure(response) {
-    return "abort" === response ? "请求已取消" : "timeout" === response ? "图片请求超时" : "onerror" !== response && response && "object" == typeof response ? Number(response.status) >= 400 ? "图片请求返回 HTTP " + response.status : response.response instanceof Blob ? "" : "图片响应不是有效文件" : "图片请求失败";
+  async requestFailure(response) {
+    const failure = "abort" === response ? "请求已取消" : "timeout" === response ? "图片请求超时" : "onerror" !== response && response && "object" == typeof response ? Number(response.status) >= 400 ? "图片请求返回 HTTP " + response.status : response.response instanceof Blob ? "" : "图片响应不是有效文件" : "图片请求失败";
+    if (failure) return failure;
+    const blob = response.response;
+    if (!blob.size) return "图片响应为空文件";
+    const bytes = new Uint8Array(await blob.slice(0, 512).arrayBuffer());
+    const ascii = (start, length) => String.fromCharCode(...bytes.slice(start, start + length));
+    const starts = values => values.every((value, index) => bytes[index] === value);
+    let suffix = starts([137,80,78,71,13,10,26,10]) ? "png" : starts([255,216,255]) ? "jpg" : /^GIF8[79]a/.test(ascii(0,6)) ? "gif" : ascii(0,4) === "RIFF" && ascii(8,4) === "WEBP" ? "webp" : ascii(0,2) === "BM" ? "bmp" : ["II*\0", "MM\0*"].includes(ascii(0,4)) ? "tiff" : starts([0,0,1,0]) ? "ico" : "";
+    if (!suffix && ascii(4,4) === "ftyp") {
+      const brands = ascii(8, Math.min(56, bytes.length - 8));
+      if (/avif|avis/.test(brands)) suffix = "avif";
+      else if (/heic|heix|hevc|hevx|mif1/.test(brands)) suffix = "heic";
+    }
+    const text = new TextDecoder().decode(bytes).replace(/^\uFEFF/, "").trimStart();
+    if (!suffix && /^(?:<\?xml[^>]*>\s*)?<svg(?:\s|>)/i.test(text)) suffix = "svg";
+    if (!suffix) return "图片响应不是有效图片，可能是登录页、错误页或损坏文件";
+    response.imageSuffix = suffix;
+    return "";
   }
   getSuffix(url, response) {
+    if (response && response.imageSuffix) return response.imageSuffix;
     const n = String(response && response.response && response.response.type || "").toLowerCase(),
       r = {
         "image/jpeg": "jpg",
@@ -475,6 +537,7 @@ module.exports = class DownloadQueue {
       if (!(await (0, downloadUtils.zM)((0, downloadUtils.pN)(t.comicName) + "\\" + (0, downloadUtils.pN)(t.downChapterName) + ".zip", r, this.imgIndexBitNum, (e, n) => {
         t.stage = "正在打包 " + e + "/" + n, this.refresh();
       }, t.abortController && t.abortController.signal))) throw new Error("压缩下载需要先选择保存目录；请重新选择目录或改用原图下载");
+      t.writtenNum = t.successNum, t.outputFiles = 1, this.refresh();
       await yieldToBrowser(0), await this.waitUntilRunnable(workerId);
     } finally {
       r.forEach(e => {
@@ -489,7 +552,7 @@ module.exports = class DownloadQueue {
     let s = null,
       c = 0,
       f = null,
-      g = new Set();
+      g = new Set(), savedPages = new Set();
     const d = async e => {
         if ("function" == typeof createImageBitmap) try {
           return await createImageBitmap(e);
@@ -521,6 +584,9 @@ module.exports = class DownloadQueue {
           }),
           u = (0, downloadUtils.pN)(t.comicName) + "\\" + (0, downloadUtils.pN)(t.downChapterName) + "\\" + (0, downloadUtils.xo)(++c, this.imgIndexBitNum) + ".jpg";
         if (!(await (0, downloadUtils.zd)(l, u))) throw new Error("拼接图 " + c + " 写入失败");
+        this.assertActive(workerId);
+        for (const part of s.parts) if (part.endsPage) savedPages.add(part.imgIndex);
+        t.writtenNum = savedPages.size, t.outputFiles = c, this.refresh();
         for (const e of s.resources) e !== r && "function" == typeof e.close && e.close();
         a.width = 1, a.height = 1, s = null, await yieldToBrowser(0);
       },
@@ -532,7 +598,7 @@ module.exports = class DownloadQueue {
           a = await Promise.all(r.map(async (r, a) => {
             const i = y + a,
               o = r.imgIndex || i + 1;
-            if (!r.blob || 1 === r.blob || 0 === r.blob || !String(r.blob.type || "").includes("image")) return {
+            if (!r.blob || 1 === r.blob || 0 === r.blob) return {
               item: r,
               imgIndex: o,
               invalid: !0
@@ -565,6 +631,7 @@ module.exports = class DownloadQueue {
             continue;
           }
           if (v.error) {
+            t.successNum = Math.max(0, t.successNum - 1), t.failedNum++;
             this.addFailure(workerId, r.imgurl, a, v.error.message);
             continue;
           }
@@ -573,6 +640,7 @@ module.exports = class DownloadQueue {
           const p = i.width,
             h = i.height;
           if (!p || !h) {
+            t.successNum = Math.max(0, t.successNum - 1), t.failedNum++;
             this.addFailure(workerId, r.imgurl, a, "图片尺寸无效"), "function" == typeof i.close && i.close(), f = null;
             continue;
           }
@@ -588,6 +656,8 @@ module.exports = class DownloadQueue {
             const e = o(p),
               t = Math.min(h - m, e - s.height);
             s.parts.push({
+              imgIndex: a,
+              endsPage: m + t === h,
               image: i,
               sourceY: m,
               width: p,
@@ -622,18 +692,31 @@ module.exports = class DownloadQueue {
   }
   async finishWorker(index) {
     const t = this.assertActive(index);
-    t.status = t.hasError ? "partial" : "completed", t.stage = t.hasError ? "下载完成，部分图片失败" : t.retryOnly ? "失败图片补下载完成" : "下载完成", this.saveHistory(t), this.Vue && "function" == typeof this.Vue.notifyTask && this.Vue.notifyTask(t), this.worker[index] = void 0, this.workerDownInfo[index] = void 0, this.refresh(), setTimeout(() => this.run(), 350);
+    t.status = t.hasError ? "partial" : "completed", t.stage = t.hasError ? "下载完成，部分图片失败" : t.retryOnly ? "失败图片补下载完成" : "下载完成";
+    this.completeWorker(index, t, true);
   }
   failWorker(index, error) {
     const n = this.worker[index];
     if (!n) return;
     const r = n.cancelled || error instanceof TaskCancelledError;
-    r || (n.hasError = !0, this.addDiagnostic(index, n.stage || "下载任务", error), console.error("10漫画：下载任务异常终止。", error)), n.status = r ? "cancelled" : "failed", n.stage = r ? "任务已取消" : "任务失败", this.saveHistory(n), !r && this.Vue && "function" == typeof this.Vue.notifyTask && this.Vue.notifyTask(n), this.worker[index] = void 0, this.workerDownInfo[index] = void 0, this.refresh(), setTimeout(() => this.run(), 350);
+    r || (n.hasError = !0, this.addDiagnostic(index, n.stage || "下载任务", error), console.error("10漫画：下载任务异常终止。", error)), n.status = r ? "cancelled" : "failed", n.stage = r ? "任务已取消" : "任务失败";
+    this.completeWorker(index, n, !r);
+  }
+  completeWorker(index, worker, notify) {
+    try {
+      this.saveHistory(worker);
+      if (notify && this.Vue && typeof this.Vue.notifyTask === "function") try { this.Vue.notifyTask(worker); } catch (error) { console.warn("10漫画：完成通知失败。", error); }
+    } finally {
+      for (const entry of this.workerDownInfo[index] || []) entry.blob = null;
+      this.worker[index] = void 0, this.workerDownInfo[index] = void 0;
+      this.refresh();
+      setTimeout(() => this.run(), 350);
+    }
   }
   saveHistory(worker) {
     let t = [];
     try {
-      t = JSON.parse(localStorage.getItem("ylComicDownHistory") || "[]"), Array.isArray(t) || (t = []);
+      t = this.historyFallback || JSON.parse(localStorage.getItem("ylComicDownHistory") || "[]"), Array.isArray(t) || (t = []);
     } catch (e) {
       t = [];
     }
@@ -655,19 +738,27 @@ module.exports = class DownloadQueue {
         comicPageUrl: window.location.href,
         hasError: worker.hasError || "failed" === worker.status,
         status: worker.status,
+        processedNum: worker.processedNum,
+        successNum: worker.successNum,
+        failedNum: worker.failedNum,
+        writtenNum: worker.writtenNum,
+        outputFiles: worker.outputFiles,
         stage: worker.stage,
         durationMs: timing.activeMs,
         totalDurationMs: timing.totalMs,
         pausedDurationMs: timing.pausedMs,
         completedAt: completedAt,
         directFlow: Number(worker.directFlow) || 0,
-        flowUsed: Number(worker.directRemoteCount) > 0 ? Number(worker.compatDownloadCount) > 0 ? "混合流程" : "快速直连" : "兼容流程",
+        flowUsed: Number(worker.directRemoteCount) > 0 ? Number(worker.compatDownloadCount) > 0 ? "混合流程" : "校验后直存" : "兼容流程",
         failedImages: n,
         diagnostics: worker.diagnostics,
         task: worker.task
       };
-    t = t.filter(e => e.comicName !== a.comicName || e.downChapterName !== a.downChapterName), t.unshift(a);
+    t = t.filter(e => DownloadQueue.historyKey(e) !== DownloadQueue.historyKey(a)), t.unshift(a);
     const i = Math.max(10, Math.min(500, Number((0, configModule.cF)("historyLimit")) || 100));
-    t = t.slice(0, i), localStorage.setItem("ylComicDownHistory", JSON.stringify(t)), this.Vue && this.Vue.getHistoryData();
+    t = t.slice(0, i);
+    try { localStorage.setItem("ylComicDownHistory", JSON.stringify(t)); this.historyFallback = null; }
+    catch (error) { this.historyFallback = t; this.reportStorageError(error); }
+    try { this.Vue && this.Vue.getHistoryData(); } catch (error) { this.reportStorageError(error); }
   }
 };

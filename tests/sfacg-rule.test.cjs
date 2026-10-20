@@ -167,6 +167,7 @@ test('the complete iframe download flow reports login redirects with an actionab
     module: { exports: {} }, setTimeout, clearTimeout, console: { log() {} },
     document: {
       createElement: () => frame,
+      getElementById: () => frame,
       body: { appendChild: element => queueMicrotask(() => element.onload()) }
     }
   })

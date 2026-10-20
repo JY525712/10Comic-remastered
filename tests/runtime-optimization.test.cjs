@@ -142,10 +142,13 @@ function persistenceHarness() {
   let now = 0, id = 0, progress = 0
   const timers = new Map(), writes = [], store = { pendingTasks: [] }
   const state = { persistTimer: null, queue: { pendingTasks: () => [{ url: 'https://comic.test/1', comicName: '漫画', chapterName: '章节', resumeCompleted: progress }] }, recoveryTasks: [] }
+  const Store = vm.runInNewContext(fs.readFileSync(path.join(root, 'src/userscript/modules/recovery.js'), 'utf8') + ';module.exports', { module: { exports: {} }, Date, Math, JSON, Promise, Error, Set, Map, URL })
+  state.recoveryStore = new Store({ get: key => structuredClone(store[key]), set: (key, value) => { store[key] = structuredClone(value); writes.push(structuredClone(value.tasks)) }, remove: key => { delete store[key] }, keys: () => Object.keys(store) }, { id: 'test', host: 'comic.test', origin: 'https://comic.test' })
   const api = functions('src/userscript/modules/ui.js', ['taskHost', 'uniqueTaskSnapshots', 'scheduleTaskPersist', 'persistQueueState', 'handlePageHide'], {
     state, PENDING_TASKS_KEY: 'pendingTasks', URL, window: { location: { hostname: 'comic.test', href: 'https://comic.test/1' } },
     safeGet: key => structuredClone(store[key]),
     configModule: { po(key, value) { store[key] = structuredClone(value); writes.push(structuredClone(value)) } },
+    reportTaskStorageError: error => { throw error },
     setTimeout(callback, wait) { timers.set(++id, { callback, deadline: now + wait }); return id },
     clearTimeout(timer) { timers.delete(timer) }
   })

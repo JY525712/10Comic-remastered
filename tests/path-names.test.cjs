@@ -136,6 +136,7 @@ test('the cleanup checkbox actually switches the next download between raw and c
         await page.locator('#ten-current-comic').fill('短~名')
         await page.locator('#ten-current-chapter').fill('第1话~')
         await page.locator('#ten-download-current').click()
+        if (enabled) { await page.locator('#ten-confirm').waitFor({ state: 'visible' }); await page.locator('#ten-confirm-ok').click() }
         await page.waitForFunction(count => window.__saved.length === count, enabled ? 4 : 2)
       }
       const names = await page.evaluate(() => window.__saved.map(file => file.name))

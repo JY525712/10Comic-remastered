@@ -1463,6 +1463,98 @@
         },
         624: (__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
             "use strict";
+            const imageRetryPolicy = (() => {
+                "use strict";
+                const MAX_RETRIES = 2;
+                const MAX_AUTO_WAIT_MS = 10 * 60 * 1e3;
+                const TEMPORARY_STATUSES = new Set([ 408, 425, 429, 500, 502, 503, 504 ]);
+                function headerValue(headers, name) {
+                    if (!headers) return "";
+                    if (typeof headers.get === "function") return String(headers.get(name) || "").trim();
+                    if (typeof headers === "object") {
+                        const key = Object.keys(headers).find(key => key.toLowerCase() === name.toLowerCase());
+                        return key ? String(headers[key]).trim() : "";
+                    }
+                    const match = String(headers).match(new RegExp("(?:^|\\r?\\n)" + name + "\\s*:\\s*([^\\r\\n]*)", "i"));
+                    return match ? match[1].trim() : "";
+                }
+                function retryAfterMilliseconds(headers, now) {
+                    const instruction = headerValue(headers, "retry-after");
+                    if (!instruction) return null;
+                    if (/^\d+$/.test(instruction)) return Math.min(Number.MAX_SAFE_INTEGER, Number(instruction) * 1e3);
+                    if (!/^[A-Za-z]{3,9},?\s/.test(instruction) || !/\bGMT$/i.test(instruction)) return null;
+                    const retryDate = Date.parse(instruction);
+                    if (!Number.isFinite(retryDate)) return null;
+                    const serverDate = Date.parse(headerValue(headers, "date"));
+                    return Math.max(0, retryDate - (Number.isFinite(serverDate) ? serverDate : now));
+                }
+                /** Pure retry decision; no request, timer, storage or UI side effects. */                function decide({url: url, response: response, failure: failure, attempt: attempt = 0, now: now = Date.now(), random: random = Math.random}) {
+                    const result = {
+                        retry: false,
+                        delayMs: 0,
+                        cooldownMs: 0,
+                        category: "permanent",
+                        reason: ""
+                    };
+                    if (!failure) return {
+                        ...result,
+                        category: "success"
+                    };
+                    if (response === "abort") return {
+                        ...result,
+                        category: "cancelled"
+                    };
+                    if (String(url || "").startsWith("blob:")) return {
+                        ...result,
+                        category: "temporary-data"
+                    };
+                    const status = Number(response && response.status) || 0;
+                    const networkFailure = response === "timeout" || response === "onerror" || !response || status === 0;
+                    if (!networkFailure && !TEMPORARY_STATUSES.has(status)) return result;
+                    const rateLimited = status === 429 || status === 503;
+                    const headerDelay = retryAfterMilliseconds(response && response.responseHeaders, now);
+                    const backoff = (rateLimited ? 1e3 : 500) * Math.pow(2, Math.min(2, Math.max(0, attempt)));
+                    const minimumDelay = headerDelay === null ? backoff : headerDelay;
+                    const jitter = Math.min(Math.max(0, MAX_AUTO_WAIT_MS - minimumDelay), Math.floor(Math.max(0, Math.min(1, Number(random()) || 0)) * Math.min(250, minimumDelay * .25)));
+                    const delayMs = minimumDelay + jitter;
+                    const cooldownMs = rateLimited || headerDelay !== null ? delayMs : 0;
+                    if (minimumDelay > MAX_AUTO_WAIT_MS) return {
+                        ...result,
+                        cooldownMs: cooldownMs,
+                        category: rateLimited ? "rate-limit" : "temporary",
+                        reason: `服务器要求等待约 ${Math.ceil(minimumDelay / 1e3)} 秒，超出自动等待上限，请稍后手动重试`
+                    };
+                    return {
+                        retry: attempt < MAX_RETRIES,
+                        delayMs: delayMs,
+                        cooldownMs: cooldownMs,
+                        category: rateLimited ? "rate-limit" : "temporary",
+                        reason: ""
+                    };
+                }
+                function sleep(milliseconds, signal) {
+                    return new Promise((resolve, reject) => {
+                        if (signal && signal.aborted) return reject(new Error("下载已取消"));
+                        let timer;
+                        const finish = error => {
+                            clearTimeout(timer);
+                            signal?.removeEventListener?.("abort", abort);
+                            if (error) reject(error); else resolve();
+                        };
+                        const abort = () => finish(new Error("下载已取消"));
+                        timer = setTimeout(() => finish(), Math.max(0, milliseconds));
+                        signal?.addEventListener?.("abort", abort, {
+                            once: true
+                        });
+                    });
+                }
+                return {
+                    decide: decide,
+                    sleep: sleep,
+                    MAX_RETRIES: MAX_RETRIES,
+                    MAX_AUTO_WAIT_MS: MAX_AUTO_WAIT_MS
+                };
+            })();
             __webpack_require__.d(__webpack_exports__, {
                 D: () => funstrToData,
                 IJ: () => selectDownloadDirectory,
@@ -1477,6 +1569,7 @@
                 pN: () => pathName,
                 pP: () => sanitizeDownloadPath,
                 sR: () => shouldRetryImageRequest,
+                retryPolicy: () => imageRetryPolicy,
                 xo: () => addZeroForNum,
                 zM: () => writeStoreZipToDirectoryV2,
                 zd: () => downFile
@@ -1743,8 +1836,19 @@
                         URL.revokeObjectURL(e);
                     } catch (e) {}
                 }
-            }, shouldRetryImageRequest = function(e, t, n) {
-                return Boolean(t) && n < 2 && !String(e || "").startsWith("blob:");
+            }, shouldRetryImageRequest = function(imageUrl, failure, attempt, response) {
+                if (response === undefined && typeof failure === "string") {
+                    const status = failure.match(/HTTP\s+(\d{3})/);
+                    if (status) response = {
+                        status: Number(status[1])
+                    }; else if (/取消/.test(failure)) response = "abort";
+                }
+                return imageRetryPolicy.decide({
+                    url: imageUrl,
+                    response: response,
+                    failure: failure,
+                    attempt: attempt
+                }).retry;
             }, request = async function(...e) {
                 let t, n, r, a, i, o, s, c, d, l, u, p, h;
                 1 === e.length ? (({method: t, url: n, data: r, headers: a, responseType: i, timeout: o, useCookie: s, onload: d, onerror: l, ontimeout: u, signal: p} = e[0]), 
@@ -2002,12 +2106,53 @@
             }, t.port2.postMessage(0);
         }) : Promise.resolve();
         class DownloadQueue {
-            // The build inserts this class into ui.js. It uses that module's
-            // downloadUtils, configModule, yieldToBrowser and TaskCancelledError bindings.
-            constructor(workerLen, maxPictureNum, imgIndexBitNum, vue) {
-                this.workerLen = workerLen || 3, this.pictureNum = maxPictureNum || 2, this.list = [], 
-                this.worker = new Array(this.workerLen), this.workerDownInfo = new Array(this.workerLen), 
-                this.imgIndexBitNum = imgIndexBitNum, this.historySequence = 0, this.Vue = vue;
+            /**
+   * Services can be injected for independent queue tests or other UI hosts.
+   * callbacks: onChange/onPersist/onHistory/onComplete/onStorageError.
+   * Legacy callback names remain accepted for existing integrations.
+   */
+            constructor(workerLen, maxPictureNum, imgIndexBitNum, callbacks, services = {}) {
+                this.workerLen = workerLen || 3;
+                this.pictureNum = maxPictureNum || 2;
+                this.list = [];
+                this.worker = new Array(this.workerLen);
+                this.workerDownInfo = new Array(this.workerLen);
+                this.imgIndexBitNum = imgIndexBitNum;
+                this.historySequence = 0;
+                const events = callbacks || {};
+                const bindEvent = (name, legacyName) => {
+                    const callback = events[name] || events[legacyName];
+                    return typeof callback === "function" ? callback.bind(events) : undefined;
+                };
+                this.events = {
+                    onChange: bindEvent("onChange", "$forceUpdate"),
+                    onPersist: bindEvent("onPersist", "persistTasks"),
+                    onHistory: bindEvent("onHistory", "getHistoryData"),
+                    onComplete: bindEvent("onComplete", "notifyTask"),
+                    onStorageError: bindEvent("onStorageError", "storageError")
+                };
+                this.downloads = services.downloads || downloadUtils;
+                this.config = services.config || (typeof configModule !== "undefined" ? configModule : null);
+                this.yieldToBrowser = services.yieldToBrowser || (typeof yieldToBrowser === "function" ? yieldToBrowser : async () => {});
+                this.CancelledError = services.CancelledError || (typeof TaskCancelledError === "function" ? TaskCancelledError : class extends Error {
+                    constructor() {
+                        super("下载任务已取消");
+                        this.name = "TaskCancelledError";
+                    }
+                });
+                this.retryPolicy = services.retryPolicy || this.downloads.retryPolicy;
+                this.now = services.now || (() => typeof performance !== "undefined" ? performance.now() : Date.now());
+                this.wallNow = services.wallNow || Date.now;
+                this.sleep = services.sleep || this.retryPolicy?.sleep;
+                this.imageCooldowns = new Map;
+                this.location = services.location || (typeof window !== "undefined" ? window.location : {
+                    href: "",
+                    hostname: ""
+                });
+                this.historyStorage = services.historyStorage || (typeof localStorage !== "undefined" ? localStorage : null);
+                this.schedule = services.schedule || ((callback, milliseconds) => setTimeout(callback, milliseconds));
+                this.isPageHidden = services.isPageHidden || (() => typeof document !== "undefined" && document.hidden);
+                this.isSettingsVisible = services.isSettingsVisible || (() => typeof document !== "undefined" && Boolean(document.querySelector('#ten-panel.is-open .ten-view.is-active[data-view="settings"]')));
             }
             updateLimits(maxChapters, maxImages, digits) {
                 this.workerLen = Math.max(1, Math.min(3, Number(maxChapters) || this.workerLen)), 
@@ -2018,7 +2163,7 @@
             static taskKey(item) {
                 let url = String(item.url || "");
                 try {
-                    const value = new URL(url, window.location.href);
+                    const value = new URL(url, typeof window !== "undefined" ? window.location.href : undefined);
                     value.hash = "";
                     url = value.href;
                 } catch (ignored) {}
@@ -2043,16 +2188,17 @@
                 return added;
             }
             refresh() {
-                if (!this.Vue) return;
-                for (const callback of [ !document.hidden && this.Vue.$forceUpdate, this.Vue.persistTasks ]) if (typeof callback === "function") try {
-                    callback();
-                } catch (error) {
-                    this.reportStorageError(error);
+                for (const callback of [ !this.isPageHidden() && this.events.onChange, this.events.onPersist ]) {
+                    if (typeof callback === "function") try {
+                        callback();
+                    } catch (error) {
+                        this.reportStorageError(error);
+                    }
                 }
             }
             reportStorageError(error) {
                 try {
-                    this.Vue && this.Vue.storageError && this.Vue.storageError(error);
+                    this.events.onStorageError?.(error);
                 } catch (ignored) {}
             }
             moveWaiting(index, direction) {
@@ -2089,9 +2235,9 @@
             snapshotTask(item) {
                 let t = item.originHost || "";
                 try {
-                    t = t || new URL(item.url, window.location.href).hostname;
+                    t = t || new URL(item.url, this.location.href).hostname;
                 } catch (e) {
-                    t = window.location.hostname;
+                    t = this.location.hostname;
                 }
                 return {
                     comicName: item.comicName,
@@ -2245,13 +2391,13 @@
             }
             async waitUntilRunnable(index) {
                 let t = this.worker[index];
-                if (!t || t.cancelled) throw new TaskCancelledError;
+                if (!t || t.cancelled) throw new this.CancelledError("下载任务已取消");
                 for (;t.paused; ) if (await new Promise(e => t.pauseWaiters.push(e)), t = this.worker[index], 
-                !t || t.cancelled) throw new TaskCancelledError;
+                !t || t.cancelled) throw new this.CancelledError("下载任务已取消");
             }
             assertActive(index) {
                 const t = this.worker[index];
-                if (!t || t.cancelled) throw new TaskCancelledError;
+                if (!t || t.cancelled) throw new this.CancelledError("下载任务已取消");
                 return t;
             }
             setStage(index, stage) {
@@ -2320,7 +2466,7 @@
                         let a;
                         this.setStage(index, "正在解析章节图片");
                         try {
-                            a = await (0, downloadUtils.gJ)({
+                            a = await (0, this.downloads.gJ)({
                                 url: t.url,
                                 isPay: t.isPay,
                                 signal: t.abortController.signal
@@ -2330,7 +2476,7 @@
                         }
                         if (this.assertActive(index), !Array.isArray(a) || !a.length) throw this.addDiagnostic(index, "章节解析", "规则没有返回图片地址"), 
                         new Error("章节中没有可下载的图片");
-                        const i = t.imageRange || (0, configModule.cF)("imgDownRange"), o = Array.isArray(i) ? Math.max(1, parseInt(i[0]) || 1) : 1, s = Array.isArray(i) ? parseInt(i[1]) : -1;
+                        const i = t.imageRange || (0, this.config.cF)("imgDownRange"), o = Array.isArray(i) ? Math.max(1, parseInt(i[0]) || 1) : 1, s = Array.isArray(i) ? parseInt(i[1]) : -1;
                         if (t.imgs = (-1 === s ? a.slice(o - 1) : a.slice(o - 1, s)).map((e, t) => ({
                             url: e,
                             imgIndex: o + t
@@ -2354,7 +2500,7 @@
                     if (t.imgs.length) {
                         const o = Number(t.batchDelay);
                         if (Number.isFinite(o) && o >= 0) {
-                            const s = document.hidden ? 0 : Math.max(0, o - (Date.now() - a));
+                            const s = this.isPageHidden() ? 0 : Math.max(0, o - (Date.now() - a));
                             await this.controlledDelay(workerId, s);
                         } else await this.controlledDelay(workerId, 1e3);
                     }
@@ -2368,13 +2514,13 @@
                     for (;r; ) {
                         const d = Date.now();
                         await this.waitUntilRunnable(workerId), this.setStage(workerId, "正在解析下一页图片");
-                        const a = await (0, downloadUtils.gJ)({
+                        const a = await (0, this.downloads.gJ)({
                             url: t.url,
                             imgIndex: t.imgIndex,
                             totalNumber: t.totalNumber,
                             isPay: t.isPay,
                             otherData: t.otherData,
-                            batchSize: !document.hidden && t.heavyCanvasExport && document.querySelector('#ten-panel.is-open .ten-view.is-active[data-view="settings"]') ? 1 : this.pictureNum,
+                            batchSize: !this.isPageHidden() && t.heavyCanvasExport && this.isSettingsVisible() ? 1 : this.pictureNum,
                             signal: t.abortController.signal
                         });
                         const i = Array.isArray(a && a.imgUrlArr) ? a.imgUrlArr.slice() : [], h = Number(a && a.imgIndexStart);
@@ -2403,7 +2549,7 @@
                                 URL.revokeObjectURL(e);
                             } catch (e) {}
                         }
-                        const o = a && a.nextPageUrl, s = Number(a && a.nextPageDelay), c = Number.isFinite(s) && s >= 0 ? s : 1e3, l = a && a.adaptivePageDelay ? document.hidden ? 0 : Math.max(0, c - (Date.now() - d)) : c;
+                        const o = a && a.nextPageUrl, s = Number(a && a.nextPageDelay), c = Number.isFinite(s) && s >= 0 ? s : 1e3, l = a && a.adaptivePageDelay ? this.isPageHidden() ? 0 : Math.max(0, c - (Date.now() - d)) : c;
                         r = Boolean(o && t.imgIndex < t.totalNumber), r && (t.url = o, await this.controlledDelay(workerId, l));
                     }
                     await this.finalizeOutput(workerId);
@@ -2424,117 +2570,188 @@
                     t.inFlight = [], this.refresh(), n.length && await this.controlledDelay(workerId, 500);
                 }
             }
-            async addImgDownPromise(index, imgurl, imgIndex, newHeaders, retryTimes = 0) {
-                const o = this.assertActive(index);
-                if (await this.waitUntilRunnable(index), !imgurl) return this.addFailure(index, imgurl, imgIndex, "图片地址为空"), 
-                this.advance(index, imgurl, imgIndex), !1;
-                const d = (0, downloadUtils.pN)(o.comicName) + "\\" + (0, downloadUtils.pN)(o.downChapterName) + "\\" + (0, 
-                downloadUtils.xo)(imgIndex, this.imgIndexBitNum) + ".";
-                let verifiedResponse;
-                if (1 === Number(o.directFlow) && o.directRemoteDownload && !o.useDirectory && /^https?:\/\//i.test(String(imgurl))) {
-                    verifiedResponse = await (0, downloadUtils.WY)({
-                        method: "get",
-                        url: imgurl,
-                        responseType: "blob",
-                        headers: newHeaders || {
-                            referer: o.url
-                        },
-                        timeout: 6e4,
-                        signal: o.abortController.signal
-                    });
-                    const failure = await this.requestFailure(verifiedResponse);
-                    this.assertActive(index);
-                    if (!failure) {
-                        const s = await (0, downloadUtils.zd)({
-                            url: verifiedResponse.response,
-                            name: d + this.getSuffix(imgurl, verifiedResponse),
-                            headers: newHeaders || {
-                                referer: o.url
+            imageOrigin(imageUrl) {
+                try {
+                    const url = new URL(imageUrl);
+                    return url.protocol === "https:" || url.protocol === "http:" ? url.origin : "";
+                } catch (error) {
+                    return "";
+                }
+            }
+            async waitForImageDelay(workerId, deadline, label) {
+                for (;;) {
+                    await this.waitUntilRunnable(workerId);
+                    const remaining = deadline - this.now();
+                    if (remaining <= 0) return;
+                    this.setStage(workerId, `${label}，约 ${Math.ceil(remaining / 1e3)} 秒后继续`);
+                    await this.sleep(Math.min(1e3, remaining), this.assertActive(workerId).abortController.signal);
+                }
+            }
+            async waitForImageOrigin(workerId, origin) {
+                for (;;) {
+                    const cooldown = this.imageCooldowns.get(origin);
+                    if (!cooldown) return "";
+                    const remaining = cooldown.until - this.now();
+                    if (remaining <= 0) {
+                        this.imageCooldowns.delete(origin);
+                        return "";
+                    }
+                    if (remaining > (this.retryPolicy?.MAX_AUTO_WAIT_MS || 6e5)) return `服务器要求等待约 ${Math.ceil(remaining / 1e3)} 秒，超出自动等待上限，请稍后手动重试`;
+                    await this.waitForImageDelay(workerId, cooldown.until, "正在等待服务器恢复");
+                }
+            }
+            async fetchValidatedImage(workerId, imageUrl, headers, firstAttempt = 0, imageIndex = 0) {
+                const worker = this.assertActive(workerId);
+                const origin = this.imageOrigin(imageUrl);
+                let attempt = Math.max(0, Number(firstAttempt) || 0);
+                for (;;) {
+                    await this.waitUntilRunnable(workerId);
+                    const blocked = await this.waitForImageOrigin(workerId, origin);
+                    if (blocked) return {
+                        response: null,
+                        failure: blocked
+                    };
+                    await this.waitUntilRunnable(workerId);
+                    const admittedWorker = this.assertActive(workerId);
+                    if (admittedWorker.paused || (this.imageCooldowns.get(origin)?.until || 0) > this.now()) continue;
+                    this.setStage(workerId, attempt > firstAttempt ? `正在重试图片（${attempt}/${this.retryPolicy.MAX_RETRIES}）` : worker.downType ? "正在获取图片数据" : "正在保存图片");
+                    let response;
+                    try {
+                        response = await this.downloads.WY({
+                            method: "get",
+                            url: imageUrl,
+                            responseType: "blob",
+                            headers: headers || {
+                                referer: worker.url
                             },
-                            signal: o.abortController.signal
+                            timeout: 6e4,
+                            signal: worker.abortController.signal
                         });
-                        if (this.assertActive(index), s) return o.directRemoteCount = (Number(o.directRemoteCount) || 0) + 1, 
-                        this.advance(index, imgurl, imgIndex, verifiedResponse.response.size, true, true), 
-                        !0;
-                        this.addDiagnostic(index, "快速直连", "直接保存失败，已回退兼容流程", {
-                            url: imgurl,
-                            imgIndex: imgIndex
+                    } catch (error) {
+                        this.assertActive(workerId);
+                        response = "onerror";
+                        this.addDiagnostic(workerId, "图片请求", error, {
+                            imgIndex: imageIndex,
+                            url: imageUrl
                         });
                     }
+                    this.assertActive(workerId);
+                    const failure = await this.requestFailure(response);
+                    this.assertActive(workerId);
+                    if (!failure) return {
+                        response: response,
+                        failure: ""
+                    };
+                    const decision = this.retryPolicy?.decide({
+                        url: imageUrl,
+                        response: response,
+                        failure: failure,
+                        attempt: attempt,
+                        now: this.wallNow()
+                    }) || {
+                        retry: false,
+                        cooldownMs: 0
+                    };
+                    if (origin && decision.cooldownMs > 0) {
+                        const previous = this.imageCooldowns.get(origin);
+                        this.imageCooldowns.set(origin, {
+                            until: Math.max(previous?.until || 0, this.now() + decision.cooldownMs)
+                        });
+                    }
+                    if (!decision.retry) return {
+                        response: response,
+                        failure: decision.reason ? `${failure}；${decision.reason}` : failure
+                    };
+                    this.addDiagnostic(workerId, "图片重试", `${failure}；第 ${attempt + 1}/${this.retryPolicy.MAX_RETRIES} 次重试`, {
+                        imgIndex: imageIndex,
+                        url: imageUrl,
+                        category: decision.category,
+                        delayMs: decision.delayMs
+                    });
+                    await this.waitForImageDelay(workerId, this.now() + decision.delayMs, `等待第 ${attempt + 1} 次重试`);
+                    attempt++;
                 }
-                0 === retryTimes && (o.compatDownloadCount = (Number(o.compatDownloadCount) || 0) + 1);
-                const s = verifiedResponse || await (0, downloadUtils.WY)({
-                    method: "get",
-                    url: imgurl,
-                    responseType: "blob",
-                    headers: newHeaders || {
-                        referer: o.url
-                    },
-                    timeout: 6e4,
-                    signal: o.abortController.signal
-                });
-                this.assertActive(index);
-                const c = await this.requestFailure(s);
-                this.assertActive(index);
-                if ((0, downloadUtils.sR)(imgurl, c, retryTimes)) return await this.controlledDelay(index, 500 * (retryTimes + 1)), 
-                this.addImgDownPromise(index, imgurl, imgIndex, newHeaders, retryTimes + 1);
-                let l, u;
-                c ? (String(imgurl || "").startsWith("blob:") ? (o.hasError = !0, this.addDiagnostic(index, "图片下载", c, {
-                    url: "临时画布图片",
-                    imgIndex: imgIndex
-                })) : this.addFailure(index, imgurl, imgIndex, c), l = new Blob([ imgurl ], {
-                    type: "text/plain"
-                }), u = "txt") : (l = s.response, u = this.getSuffix(s.finalUrl || imgurl, s)), 
-                await this.waitUntilRunnable(index);
-                const p = await (0, downloadUtils.zd)({
-                    url: l,
-                    name: d + u,
-                    signal: o.abortController.signal
-                });
-                this.assertActive(index);
-                return p || c || this.addFailure(index, imgurl, imgIndex, "文件写入失败，请检查目录权限"), this.advance(index, imgurl, imgIndex, c ? 0 : Number(s.response && s.response.size), Boolean(p && !c), Boolean(p && !c)), 
-                p && !c;
             }
-            async addImgPromise(index, imgurl, newHeaders, retryTimes = 0, imgIndex = 0) {
-                const o = this.assertActive(index);
-                if (await this.waitUntilRunnable(index), !imgurl) return this.addFailure(index, imgurl, imgIndex, "图片地址为空"), 
-                this.advance(index, imgurl, imgIndex), {
-                    blob: 1,
-                    imgurl: imgurl,
-                    suffix: "",
-                    imgIndex: imgIndex
+            async addImgDownPromise(workerId, imageUrl, imageIndex, headers, firstAttempt = 0) {
+                const worker = this.assertActive(workerId);
+                await this.waitUntilRunnable(workerId);
+                if (!imageUrl) {
+                    this.addFailure(workerId, imageUrl, imageIndex, "图片地址为空");
+                    this.advance(workerId, imageUrl, imageIndex);
+                    return false;
+                }
+                const pathPrefix = this.downloads.pN(worker.comicName) + "\\" + this.downloads.pN(worker.downChapterName) + "\\" + this.downloads.xo(imageIndex, this.imgIndexBitNum) + ".";
+                const {response: response, failure: failure} = await this.fetchValidatedImage(workerId, imageUrl, headers, firstAttempt, imageIndex);
+                const directSave = worker.directFlow === 1 && worker.directRemoteDownload && !worker.useDirectory && /^https?:\/\//i.test(String(imageUrl));
+                if (!failure && directSave) {
+                    const saved = await this.downloads.zd({
+                        url: response.response,
+                        name: pathPrefix + this.getSuffix(imageUrl, response),
+                        headers: headers || {
+                            referer: worker.url
+                        },
+                        signal: worker.abortController.signal
+                    });
+                    this.assertActive(workerId);
+                    if (saved) {
+                        worker.directRemoteCount++;
+                        this.advance(workerId, imageUrl, imageIndex, response.response.size, true, true);
+                        return true;
+                    }
+                    this.addDiagnostic(workerId, "快速直连", "直接保存失败，已回退兼容流程", {
+                        url: imageUrl,
+                        imgIndex: imageIndex
+                    });
+                }
+                worker.compatDownloadCount++;
+                if (failure) this.addFailure(workerId, imageUrl, imageIndex, failure);
+                const data = failure ? new Blob([ imageUrl ], {
+                    type: "text/plain"
+                }) : response.response;
+                const suffix = failure ? "txt" : this.getSuffix(response.finalUrl || imageUrl, response);
+                await this.waitUntilRunnable(workerId);
+                const saved = await this.downloads.zd({
+                    url: data,
+                    name: pathPrefix + suffix,
+                    signal: worker.abortController.signal
+                });
+                this.assertActive(workerId);
+                if (!saved && !failure) this.addFailure(workerId, imageUrl, imageIndex, "文件写入失败，请检查目录权限");
+                const succeeded = Boolean(saved && !failure);
+                this.advance(workerId, imageUrl, imageIndex, failure ? 0 : data.size, succeeded, succeeded);
+                return succeeded;
+            }
+            async addImgPromise(workerId, imageUrl, headers, firstAttempt = 0, imageIndex = 0) {
+                this.assertActive(workerId);
+                await this.waitUntilRunnable(workerId);
+                if (!imageUrl) {
+                    this.addFailure(workerId, imageUrl, imageIndex, "图片地址为空");
+                    this.advance(workerId, imageUrl, imageIndex);
+                    return {
+                        blob: 1,
+                        imgurl: imageUrl,
+                        suffix: "",
+                        imgIndex: imageIndex
+                    };
+                }
+                const {response: response, failure: failure} = await this.fetchValidatedImage(workerId, imageUrl, headers, firstAttempt, imageIndex);
+                if (failure) {
+                    this.addFailure(workerId, imageUrl, imageIndex, failure);
+                    this.advance(workerId, imageUrl, imageIndex);
+                    return {
+                        blob: 1,
+                        imgurl: imageUrl,
+                        suffix: "",
+                        imgIndex: imageIndex
+                    };
+                }
+                this.advance(workerId, imageUrl, imageIndex, response.response.size, true);
+                return {
+                    blob: response.response,
+                    imgurl: imageUrl,
+                    suffix: this.getSuffix(response.finalUrl || imageUrl, response),
+                    imgIndex: imageIndex
                 };
-                const s = await (0, downloadUtils.WY)({
-                    method: "get",
-                    url: imgurl,
-                    responseType: "blob",
-                    headers: newHeaders || {
-                        referer: o.url
-                    },
-                    timeout: 6e4,
-                    signal: o.abortController.signal
-                });
-                this.assertActive(index);
-                const c = await this.requestFailure(s);
-                this.assertActive(index);
-                return (0, downloadUtils.sR)(imgurl, c, retryTimes) ? (await this.controlledDelay(index, 500 * (retryTimes + 1)), 
-                this.addImgPromise(index, imgurl, newHeaders, retryTimes + 1, imgIndex)) : c ? (String(imgurl || "").startsWith("blob:") ? (o.hasError = !0, 
-                this.addDiagnostic(index, "图片下载", c, {
-                    url: "临时画布图片",
-                    imgIndex: imgIndex
-                })) : this.addFailure(index, imgurl, imgIndex, c), this.advance(index, imgurl, imgIndex), 
-                {
-                    blob: 1,
-                    imgurl: imgurl,
-                    suffix: "",
-                    imgIndex: imgIndex
-                }) : (this.advance(index, imgurl, imgIndex, Number(s.response && s.response.size), true), 
-                {
-                    blob: s.response,
-                    imgurl: imgurl,
-                    suffix: this.getSuffix(s.finalUrl || imgurl, s),
-                    imgIndex: imgIndex
-                });
             }
             async requestFailure(response) {
                 const failure = "abort" === response ? "请求已取消" : "timeout" === response ? "图片请求超时" : "onerror" !== response && response && "object" == typeof response ? Number(response.status) >= 400 ? "图片请求返回 HTTP " + response.status : response.response instanceof Blob ? "" : "图片响应不是有效文件" : "图片请求失败";
@@ -2577,12 +2794,12 @@
                 const t = this.assertActive(workerId), r = this.workerDownInfo[workerId];
                 this.setStage(workerId, "正在打包章节");
                 try {
-                    if (!await (0, downloadUtils.zM)((0, downloadUtils.pN)(t.comicName) + "\\" + (0, 
-                    downloadUtils.pN)(t.downChapterName) + ".zip", r, this.imgIndexBitNum, (e, n) => {
+                    if (!await (0, this.downloads.zM)((0, this.downloads.pN)(t.comicName) + "\\" + (0, 
+                    this.downloads.pN)(t.downChapterName) + ".zip", r, this.imgIndexBitNum, (e, n) => {
                         t.stage = "正在打包 " + e + "/" + n, this.refresh();
                     }, t.abortController && t.abortController.signal)) throw new Error("压缩下载需要先选择保存目录；请重新选择目录或改用原图下载");
                     t.writtenNum = t.successNum, t.outputFiles = 1, this.refresh();
-                    await yieldToBrowser(0), await this.waitUntilRunnable(workerId);
+                    await this.yieldToBrowser(0), await this.waitUntilRunnable(workerId);
                 } finally {
                     r.forEach(e => {
                         e.blob = null;
@@ -2590,7 +2807,7 @@
                 }
             }
             async combineImages(workerId) {
-                const t = this.assertActive(workerId), a = Number((0, configModule.cF)("maxSplicingHeight")) || 2e4, o = e => Math.max(1, Math.min(a, 32760, Math.floor(4e7 / Math.max(1, e))));
+                const t = this.assertActive(workerId), a = Number((0, this.config.cF)("maxSplicingHeight")) || 2e4, o = e => Math.max(1, Math.min(a, 32760, Math.floor(4e7 / Math.max(1, e))));
                 let s = null, c = 0, f = null, g = new Set, savedPages = new Set;
                 const d = async e => {
                     if ("function" == typeof createImageBitmap) try {
@@ -2619,14 +2836,14 @@
                     d += e.height;
                     const l = await new Promise((e, t) => {
                         a.toBlob(n => n ? e(n) : t(new Error("画布导出失败")), "image/jpeg", .88);
-                    }), u = (0, downloadUtils.pN)(t.comicName) + "\\" + (0, downloadUtils.pN)(t.downChapterName) + "\\" + (0, 
-                    downloadUtils.xo)(++c, this.imgIndexBitNum) + ".jpg";
-                    if (!await (0, downloadUtils.zd)(l, u)) throw new Error("拼接图 " + c + " 写入失败");
+                    }), u = (0, this.downloads.pN)(t.comicName) + "\\" + (0, this.downloads.pN)(t.downChapterName) + "\\" + (0, 
+                    this.downloads.xo)(++c, this.imgIndexBitNum) + ".jpg";
+                    if (!await (0, this.downloads.zd)(l, u)) throw new Error("拼接图 " + c + " 写入失败");
                     this.assertActive(workerId);
                     for (const part of s.parts) if (part.endsPage) savedPages.add(part.imgIndex);
                     t.writtenNum = savedPages.size, t.outputFiles = c, this.refresh();
                     for (const e of s.resources) e !== r && "function" == typeof e.close && e.close();
-                    a.width = 1, a.height = 1, s = null, await yieldToBrowser(0);
+                    a.width = 1, a.height = 1, s = null, await this.yieldToBrowser(0);
                 }, u = this.workerDownInfo[workerId];
                 try {
                     for (let y = 0; y < u.length; y += this.pictureNum) {
@@ -2659,10 +2876,10 @@
                             await this.waitUntilRunnable(workerId);
                             const r = v.item, a = v.imgIndex;
                             if (v.invalid) {
-                                this.addFailure(workerId, r.imgurl, a, "图片数据无效，无法参与拼接"), await (0, downloadUtils.zd)(new Blob([ r.imgurl || "" ], {
+                                this.addFailure(workerId, r.imgurl, a, "图片数据无效，无法参与拼接"), await (0, this.downloads.zd)(new Blob([ r.imgurl || "" ], {
                                     type: "text/plain"
-                                }), (0, downloadUtils.pN)(t.comicName) + "\\" + (0, downloadUtils.pN)(t.downChapterName) + "\\error_" + (0, 
-                                downloadUtils.xo)(a, this.imgIndexBitNum) + ".txt"), r.blob = null;
+                                }), (0, this.downloads.pN)(t.comicName) + "\\" + (0, this.downloads.pN)(t.downChapterName) + "\\error_" + (0, 
+                                this.downloads.xo)(a, this.imgIndexBitNum) + ".txt"), r.blob = null;
                                 continue;
                             }
                             if (v.error) {
@@ -2722,7 +2939,7 @@
                 }
             }
             async controlledDelay(index, milliseconds) {
-                await yieldToBrowser(milliseconds), await this.waitUntilRunnable(index);
+                await this.yieldToBrowser(milliseconds), await this.waitUntilRunnable(index);
             }
             async finishWorker(index) {
                 const t = this.assertActive(index);
@@ -2732,7 +2949,7 @@
             failWorker(index, error) {
                 const n = this.worker[index];
                 if (!n) return;
-                const r = n.cancelled || error instanceof TaskCancelledError;
+                const r = n.cancelled || error instanceof this.CancelledError;
                 r || (n.hasError = !0, this.addDiagnostic(index, n.stage || "下载任务", error), console.error("10漫画：下载任务异常终止。", error)), 
                 n.status = r ? "cancelled" : "failed", n.stage = r ? "任务已取消" : "任务失败";
                 this.completeWorker(index, n, !r);
@@ -2740,8 +2957,8 @@
             completeWorker(index, worker, notify) {
                 try {
                     this.saveHistory(worker);
-                    if (notify && this.Vue && typeof this.Vue.notifyTask === "function") try {
-                        this.Vue.notifyTask(worker);
+                    if (notify && typeof this.events.onComplete === "function") try {
+                        this.events.onComplete(worker);
                     } catch (error) {
                         console.warn("10漫画：完成通知失败。", error);
                     }
@@ -2749,13 +2966,13 @@
                     for (const entry of this.workerDownInfo[index] || []) entry.blob = null;
                     this.worker[index] = void 0, this.workerDownInfo[index] = void 0;
                     this.refresh();
-                    setTimeout(() => this.run(), 350);
+                    this.schedule(() => this.run(), 350);
                 }
             }
             saveHistory(worker) {
                 let t = [];
                 try {
-                    t = this.historyFallback || JSON.parse(localStorage.getItem("ylComicDownHistory") || "[]"), 
+                    t = this.historyFallback || JSON.parse(this.historyStorage.getItem("ylComicDownHistory") || "[]"), 
                     Array.isArray(t) || (t = []);
                 } catch (e) {
                     t = [];
@@ -2768,7 +2985,7 @@
                     id: 100 * Date.now() + this.historySequence++ % 100,
                     comicName: worker.comicName,
                     downChapterName: worker.downChapterName,
-                    comicPageUrl: window.location.href,
+                    comicPageUrl: this.location.href,
                     hasError: worker.hasError || "failed" === worker.status,
                     status: worker.status,
                     processedNum: worker.processedNum,
@@ -2789,17 +3006,17 @@
                 };
                 t = t.filter(e => DownloadQueue.historyKey(e) !== DownloadQueue.historyKey(a)), 
                 t.unshift(a);
-                const i = Math.max(10, Math.min(500, Number((0, configModule.cF)("historyLimit")) || 100));
+                const i = Math.max(10, Math.min(500, Number((0, this.config.cF)("historyLimit")) || 100));
                 t = t.slice(0, i);
                 try {
-                    localStorage.setItem("ylComicDownHistory", JSON.stringify(t));
+                    this.historyStorage.setItem("ylComicDownHistory", JSON.stringify(t));
                     this.historyFallback = null;
                 } catch (error) {
                     this.historyFallback = t;
                     this.reportStorageError(error);
                 }
                 try {
-                    this.Vue && this.Vue.getHistoryData();
+                    this.events.onHistory?.();
                 } catch (error) {
                     this.reportStorageError(error);
                 }
@@ -5747,11 +5964,21 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             e.forEach(e => {
                 e.useDirectory = Boolean(window.__tenComicDirectoryHandle || window.__ylDirectoryHandle);
             }), state.queue || (state.queue = new DownloadQueue(state.settings.maxChapters, state.settings.concurrentImages, state.settings.digits, {
-                getHistoryData: renderTasks,
-                $forceUpdate: scheduleTaskRender,
-                persistTasks: scheduleTaskPersist,
-                storageError: reportTaskStorageError,
-                notifyTask: notifyDownloadTask
+                onHistory: renderTasks,
+                onChange: scheduleTaskRender,
+                onPersist: scheduleTaskPersist,
+                onStorageError: reportTaskStorageError,
+                onComplete: notifyDownloadTask
+            }, {
+                downloads: downloadUtils,
+                config: configModule,
+                yieldToBrowser: yieldToBrowser,
+                CancelledError: TaskCancelledError,
+                location: window.location,
+                historyStorage: localStorage,
+                isPageHidden: () => document.hidden,
+                isSettingsVisible: () => Boolean(one('#ten-panel.is-open .ten-view.is-active[data-view="settings"]')),
+                schedule: (callback, milliseconds) => setTimeout(callback, milliseconds)
             })), state.historyVolatile && (state.queue.historyFallback = state.historyVolatile, 
             state.historyVolatile = null), state.queue.addList(e, allowDuplicates), state.queue.run(), 
             activateTab("tasks"), renderTasks();

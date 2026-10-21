@@ -14,13 +14,34 @@ function preservedParts(source, sfacgDescription) {
   const ast = parser.parse(source)
   // Explicitly approved reliability changes have behavior tests. Keep the
   // remaining adapters, download helpers and queue operations byte-for-byte AST equivalent.
-  const reliabilityMethods = new Set(['taskKey', 'historyKey', 'addList', 'refresh', 'reportStorageError', 'snapshotTask', 'snapshotWorker', 'createWorker', 'advance', 'exeDown', 'addImgDownPromise', 'addImgPromise', 'requestFailure', 'getSuffix', 'makeZip', 'combineImages', 'finishWorker', 'failWorker', 'completeWorker', 'saveHistory'])
+  const reliabilityMethods = new Set(['constructor', 'taskKey', 'historyKey', 'addList', 'refresh', 'reportStorageError', 'snapshotTask', 'snapshotWorker', 'createWorker', 'advance', 'exeDown', 'addImgDownPromise', 'addImgPromise', 'requestFailure', 'getSuffix', 'makeZip', 'combineImages', 'finishWorker', 'failWorker', 'completeWorker', 'saveHistory', 'imageOrigin', 'waitForImageDelay', 'waitForImageOrigin', 'fetchValidatedImage'])
   const revisionOnly = node => {
     if (node?.type !== 'AssignmentExpression' || node.left.type !== 'MemberExpression' || node.left.object.type !== 'ThisExpression' || node.left.property.name !== 'waitingRevision') return false
     assert.equal(generate(node, { compact: true }).code, 'this.waitingRevision=(this.waitingRevision||0)+1', 'only a structural revision increment may be excluded')
     return true
   }
-  traverse(ast, { ObjectExpression(path) {
+  traverse(ast, { StringLiteral(path) {
+    delete path.node.extra
+  }, ObjectProperty(path) {
+    if (path.node.key.name === 'retryPolicy' && path.node.value.type === 'ArrowFunctionExpression' && path.node.value.body.name === 'imageRetryPolicy') path.remove()
+  }, MemberExpression(path) {
+    if (path.node.object.type !== 'ThisExpression') return
+    const aliases = { downloads: 'downloadUtils', config: 'configModule', yieldToBrowser: 'yieldToBrowser', historyStorage: 'localStorage', schedule: 'setTimeout', CancelledError: 'TaskCancelledError' }
+    const alias = aliases[path.node.property.name]
+    if (alias) path.replaceWith({ type: 'Identifier', name: alias })
+    else if (path.node.property.name === 'location') path.replaceWith(parser.parseExpression('window.location'))
+  }, CallExpression(path) {
+    const callee = path.node.callee
+    if (callee.type !== 'MemberExpression' || callee.object.type !== 'ThisExpression' || path.node.arguments.length) return
+    if (callee.property.name === 'isPageHidden') path.replaceWith(parser.parseExpression('document.hidden'))
+    else if (callee.property.name === 'isSettingsVisible') path.replaceWith(parser.parseExpression('document.querySelector(\'#ten-panel.is-open .ten-view.is-active[data-view="settings"]\')'))
+  }, NewExpression(path) {
+    const callee = path.node.callee
+    if (callee.type === 'MemberExpression' && callee.object.type === 'ThisExpression' && callee.property.name === 'CancelledError') {
+      assert.equal(path.node.arguments[0]?.value, '下载任务已取消')
+      path.node.arguments = []
+    }
+  }, ObjectExpression(path) {
     const property = name => path.node.properties.find(node => node.type === 'ObjectProperty' && (node.key.name || node.key.value) === name)
     if (property('domain')?.value.value !== 'manhua.sfacg.com') return
     const description = property('webDesc')
@@ -29,7 +50,8 @@ function preservedParts(source, sfacgDescription) {
   }, ClassDeclaration(path) {
     if (path.node.id?.name === 'DownloadQueue') path.node.body.body = path.node.body.body.filter(method => !reliabilityMethods.has(method.key.name))
   }, VariableDeclarator(path) {
-    if (['getFrameContent', 'getImage'].includes(path.node.id?.name)) path.node.init = { type: 'NullLiteral' }
+    if (path.node.id?.name === 'imageRetryPolicy') path.remove()
+    else if (['getFrameContent', 'getImage', 'shouldRetryImageRequest'].includes(path.node.id?.name)) path.node.init = { type: 'NullLiteral' }
   }, FunctionDeclaration(path) {
     if (['sanitizePathName', 'writeStoreZipToDirectoryV2'].includes(path.node.id?.name)) path.node.body.body = []
   }, ExpressionStatement(path) {

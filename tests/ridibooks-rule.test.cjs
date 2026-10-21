@@ -2,14 +2,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { loadAdapters } = require("./helpers/adapters.cjs");
 
 const userscriptPath = process.env.USERSCRIPT_PATH || path.resolve(__dirname, "../10漫画—重制版.user.js");
 const source = fs.readFileSync(userscriptPath, "utf8");
-
-const ruleStart = source.indexOf('{domain:"ridibooks.com"');
-assert.notEqual(ruleStart, -1, "RidiBooks 内置规则不存在");
-const ruleEnd = source.indexOf('},{domain:"www.webtoons.com"', ruleStart);
-assert.notEqual(ruleEnd, -1, "无法定位 RidiBooks 规则结尾");
 
 const storage = new Map([["unrelated", "keep"]]);
 let openedUrl = "";
@@ -37,9 +33,9 @@ const ruleContext = {
     openedOptions = options;
     return { close() { tabClosed = true; } };
   },
-  _utils_index__WEBPACK_IMPORTED_MODULE_0__: { async gw(seconds) { assert.equal(seconds, 0.25); } },
+  downloads: { async gw(seconds) { assert.equal(seconds, 0.25); } },
 };
-const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, ruleContext);
+const rule = loadAdapters({ globals: ruleContext, downloads: { gw: ruleContext.downloads.gw } }).rules.find(rule => rule.domain === "ridibooks.com");
 
 (async () => {
   assert.equal(rule.webName, "RidiBooks");
@@ -81,7 +77,7 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, rul
       },
     },
   };
-  const catalogRule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, catalogContext);
+  const catalogRule = loadAdapters({ globals: catalogContext, downloads: { gw: catalogContext.downloads.gw } }).rules.find(rule => rule.domain === "ridibooks.com");
   assert.deepEqual(JSON.parse(JSON.stringify(await catalogRule.getComicInfo.call(catalogRule))), [
     {
       comicName: "테스트 작품",

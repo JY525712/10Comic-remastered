@@ -2,14 +2,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { loadAdapters } = require("./helpers/adapters.cjs");
 
 const userscriptPath = process.env.USERSCRIPT_PATH || path.resolve(__dirname, "../10漫画—重制版.user.js");
 const source = fs.readFileSync(userscriptPath, "utf8");
-
-const ruleStart = source.indexOf('{domain:"page.kakao.com"');
-assert.notEqual(ruleStart, -1, "KakaoPage 内置规则不存在");
-const ruleEnd = source.indexOf('},{domain:"manga.bilibili.com"', ruleStart);
-assert.notEqual(ruleEnd, -1, "无法定位 KakaoPage 规则结尾");
 
 function episode({ href, labels, text }) {
   return {
@@ -63,10 +59,10 @@ const context = {
   GM_setValue() {},
   GM_deleteValue() {},
   GM_openInTab() {},
-  _utils_index__WEBPACK_IMPORTED_MODULE_0__: { async gw() {} },
+  downloads: { async gw() {} },
 };
 
-const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, context);
+const rule = loadAdapters({ globals: context, downloads: { gw: context.downloads.gw } }).rules.find(rule => rule.domain === "page.kakao.com");
 
 (async () => {
   assert.equal(rule.webName, "KakaoPage");
@@ -188,7 +184,7 @@ const rule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, con
       return { close() { tabClosed = true; } };
     },
   };
-  const handoffRule = vm.runInNewContext(`(${source.slice(ruleStart, ruleEnd + 1)})`, handoffContext);
+  const handoffRule = loadAdapters({ globals: handoffContext, downloads: { gw: handoffContext.downloads.gw } }).rules.find(rule => rule.domain === "page.kakao.com");
   const images = await handoffRule.getImgs.call(handoffRule, "", {
     url: "https://page.kakao.com/content/60910969/viewer/60914608/",
     signal: { aborted: false },

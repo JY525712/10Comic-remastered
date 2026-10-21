@@ -1,5 +1,6 @@
 module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
   "use strict";
+  const imageRetryPolicy = /*__IMAGE_RETRY_POLICY__*/ null;
 
   __webpack_require__.d(__webpack_exports__, {
     D: () => funstrToData,
@@ -15,6 +16,7 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
     pN: () => pathName,
     pP: () => sanitizeDownloadPath,
     sR: () => shouldRetryImageRequest,
+    retryPolicy: () => imageRetryPolicy,
     xo: () => addZeroForNum,
     zM: () => writeStoreZipToDirectoryV2,
     zd: () => downFile
@@ -299,8 +301,13 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
         } catch (e) {}
       }
     },
-    shouldRetryImageRequest = function (e, t, n) {
-      return Boolean(t) && n < 2 && !String(e || "").startsWith("blob:");
+    shouldRetryImageRequest = function (imageUrl, failure, attempt, response) {
+      if (response === undefined && typeof failure === "string") {
+        const status = failure.match(/HTTP\s+(\d{3})/);
+        if (status) response = { status: Number(status[1]) };
+        else if (/取消/.test(failure)) response = "abort";
+      }
+      return imageRetryPolicy.decide({ url: imageUrl, response, failure, attempt }).retry;
     },
     request = async function (...e) {
       let t, n, r, a, i, o, s, c, d, l, u, p, h;

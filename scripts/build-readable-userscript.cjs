@@ -40,7 +40,7 @@ async function buildReadableUserscript() {
   const modules = {
     390: moduleSource('config'),
     872: replaceOne(moduleSource('comics'), siteMarker, sites),
-    624: moduleSource('downloads')
+    624: replaceOne(moduleSource('downloads'), '/*__IMAGE_RETRY_POLICY__*/ null', moduleSource('retry-policy'))
   }
   for (const [id, body] of Object.entries(modules)) {
     core = replaceOne(core, `/*__MODULE_${id}__*/(()=>{})`, `(${body})`)

@@ -512,11 +512,17 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         e.forEach(e => {
             e.useDirectory = Boolean(window.__tenComicDirectoryHandle || window.__ylDirectoryHandle);
         }), state.queue || (state.queue = new DownloadQueue(state.settings.maxChapters, state.settings.concurrentImages, state.settings.digits, {
-            getHistoryData: renderTasks,
-            $forceUpdate: scheduleTaskRender,
-            persistTasks: scheduleTaskPersist,
-            storageError: reportTaskStorageError,
-            notifyTask: notifyDownloadTask
+            onHistory: renderTasks,
+            onChange: scheduleTaskRender,
+            onPersist: scheduleTaskPersist,
+            onStorageError: reportTaskStorageError,
+            onComplete: notifyDownloadTask
+        }, {
+            downloads: downloadUtils, config: configModule, yieldToBrowser, CancelledError: TaskCancelledError,
+            location: window.location, historyStorage: localStorage,
+            isPageHidden: () => document.hidden,
+            isSettingsVisible: () => Boolean(one('#ten-panel.is-open .ten-view.is-active[data-view="settings"]')),
+            schedule: (callback, milliseconds) => setTimeout(callback, milliseconds)
         })), state.historyVolatile && (state.queue.historyFallback = state.historyVolatile, state.historyVolatile = null), state.queue.addList(e, allowDuplicates), state.queue.run(), activateTab("tasks"), 
         renderTasks();
         return true;

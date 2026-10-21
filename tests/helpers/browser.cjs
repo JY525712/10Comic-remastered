@@ -44,7 +44,7 @@ async function openComic(browser, options = {}) {
         const value = request.responseType === 'blob' ? await response.blob() : request.responseType === 'arraybuffer' ? await response.arrayBuffer() : await response.text()
         if (requestDelay === -1) await requestGate
         else if (requestDelay) await new Promise(resolve => setTimeout(resolve, requestDelay))
-        request.onload?.({ status: response.status, response: value, responseText: typeof value === 'string' ? value : '', finalUrl: request.url, responseHeaders: 'content-type: image/png' })
+        request.onload?.({ status: response.status, response: value, responseText: typeof value === 'string' ? value : '', finalUrl: request.url, responseHeaders: [...response.headers].map(([name,value]) => name + ': ' + value).join('\r\n') })
       }).catch(error => request.onerror?.(error))
       return { abort: () => controller.abort() }
     }

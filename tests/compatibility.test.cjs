@@ -23,7 +23,10 @@ function preservedParts(source, sfacgDescription) {
   traverse(ast, { StringLiteral(path) {
     delete path.node.extra
   }, ObjectProperty(path) {
-    if (path.node.key.name === 'retryPolicy' && path.node.value.type === 'ArrowFunctionExpression' && path.node.value.body.name === 'imageRetryPolicy') path.remove()
+    if (path.node.key.name === 'retryPolicy' && path.node.value.type === 'ArrowFunctionExpression' && path.node.value.body.name === 'imageRetryPolicy') return path.remove()
+    if (path.node.key.name === 'adapter' && path.findParent(node=>node.isClassMethod() && node.node.key.name==='down2')) {
+      assert.equal(generate(path.node.value,{compact:true}).code,'t.adapter');path.remove()
+    }
   }, MemberExpression(path) {
     if (path.node.object.type !== 'ThisExpression') return
     const aliases = { downloads: 'downloadUtils', config: 'configModule', yieldToBrowser: 'yieldToBrowser', historyStorage: 'localStorage', schedule: 'setTimeout', CancelledError: 'TaskCancelledError' }
@@ -50,8 +53,8 @@ function preservedParts(source, sfacgDescription) {
   }, ClassDeclaration(path) {
     if (path.node.id?.name === 'DownloadQueue') path.node.body.body = path.node.body.body.filter(method => !reliabilityMethods.has(method.key.name))
   }, VariableDeclarator(path) {
-    if (path.node.id?.name === 'imageRetryPolicy') path.remove()
-    else if (['getFrameContent', 'getImage', 'shouldRetryImageRequest'].includes(path.node.id?.name)) path.node.init = { type: 'NullLiteral' }
+    if (['imageRetryPolicy','customRuleModel'].includes(path.node.id?.name)) path.remove()
+    else if (['getFrameContent', 'getImage', 'shouldRetryImageRequest','matchWeb'].includes(path.node.id?.name)) path.node.init = { type: 'NullLiteral' }
   }, FunctionDeclaration(path) {
     if (['sanitizePathName', 'writeStoreZipToDirectoryV2'].includes(path.node.id?.name)) path.node.body.body = []
   }, ExpressionStatement(path) {

@@ -12,6 +12,7 @@ function detectComicInfo(e = 0) {
 }
 
 function updateChapterStatus(e) {
+    refreshRuleMatchStatus();
     const t = byId("ten-chapter-status");
     t && (t.textContent = e || `${state.webName} · ${state.comicName}`, t.classList.toggle("is-ready", Boolean(siteRules.Po && "------" !== state.comicName)), 
     byId("ten-info-site").textContent = state.webName, byId("ten-info-comic").textContent = state.comicName);
@@ -44,6 +45,9 @@ async function loadChapters() {
 function collectFromSelector(e, t, r) {
     document.querySelectorAll(e).forEach(e => {
         e.querySelectorAll("a").forEach(e => {
+            if (e.closest("#ten-comic-root")) return;
+            if (siteRules.Po.chapterUrlIncludes && !e.href.includes(siteRules.Po.chapterUrlIncludes)) return;
+            if (siteRules.Po.chapterUrlExcludes && e.href.includes(siteRules.Po.chapterUrlExcludes)) return;
             let a = "";
             try {
                 a = siteRules.Po.chapterNameReg ? (e.outerHTML.match(siteRules.Po.chapterNameReg) || [])[1] : e.innerText, 

@@ -14,6 +14,8 @@ module.exports = () => {
     }) : Promise.resolve();
     /*__QUEUE_CLASS__*/    class DownloadQueue {}
     /*__RECOVERY_STORE__*/ class RecoveryStore {}
+    /*__RULE_STORE__*/ class RuleRepository {}
+    const ruleModel = __webpack_require__(516);
     var siteRules = __webpack_require__(872);
     const ROOT_ID = "ten-comic-root", PANEL_ID = "ten-panel", LAUNCHER_ID = "ten-comic-launcher", PENDING_TASKS_KEY = "pendingTasks", BACKUP_KEYS = [ "appLoadDefault", "maxChapterNum", "maxPictureNum", "downType", "directDownloadFlow", "sanitizePathNames", "maxSplicingHeight", "imgIndexBitNum", "imgSplicingFlag", "imgDownRange", "historyLimit", "downloadNotification", "effectLevel", "themePreset", "appearanceAxes" ], THEMES = {
         aurora: [ "极光流银", "冰透流光 · 银蓝折射" ],
@@ -142,11 +144,14 @@ module.exports = () => {
     /*__UI_CHAPTERS__*/
     /*__UI_TASKS__*/
     /*__UI_RULES__*/
+    /*__UI_RULE-WORKBENCH__*/
+    /*__UI_RULE-MANAGEMENT__*/
     /*__UI_ACCESSIBILITY__*/
     function injectStyle() {
         if (!document.body) return;
         const e = document.getElementById(ROOT_ID);
         if (e && state.ready) return;
+        flushRuleDraft(); stopRulePreview(true); clearRuleHighlights();
         resetModalFocus();
         e && e.remove(), function() {
             if (document.getElementById("ten-comic-style")) return;
@@ -177,13 +182,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             document.addEventListener("click", handleRulePickClick, !0), document.addEventListener("keydown", handleRulePickKey, !0), 
             window.addEventListener("scroll", refreshRulePickBox, !0), window.addEventListener("resize", refreshRulePickBox, !0), 
             syncMiniTaskBar();
-        }(e.dataset.rulePick))), all("[data-rule-template]").forEach(e => e.addEventListener("click", () => function(e) {
-            const t = RULE_TEMPLATES[e];
-            t && (t.imageCss && (byId("ten-rule-image-selector").value = t.imageCss), byId("ten-rule-use-frame").checked = t.useFrame, 
-            setRuleReadType(t.readtype), byId("ten-rule-advanced").open = 0 === t.readtype || t.useFrame, 
-            all("[data-rule-template]").forEach(t => t.classList.toggle("is-active", t.dataset.ruleTemplate === e)), 
-            toast(0 === t.readtype ? "已应用翻页模板，请在高级设置填写图片解析函数" : `已应用${t.name}模板`));
-        }(e.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
+        }(e.dataset.rulePick))), all("[data-rule-template]").forEach(button => button.addEventListener("click", () => applyRuleTemplate(button.dataset.ruleTemplate))), byId(ROOT_ID).addEventListener("pointerover", scheduleIconTooltip), 
         byId(ROOT_ID).addEventListener("pointerout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("focusin", showIconTooltip), 
         byId(ROOT_ID).addEventListener("focusout", handleIconTooltipLeave), byId(ROOT_ID).addEventListener("click", hideIconTooltip), 
         window.addEventListener("scroll", hideIconTooltip, !0), window.addEventListener("resize", handleLayoutResize), 
@@ -267,7 +266,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             state.settings.sanitizePaths = e.target.checked, (0, configModule.po)("sanitizePathNames", state.settings.sanitizePaths);
         }), byId("ten-choose-dir").addEventListener("click", chooseDirectory), all("[data-rule-readtype]").forEach(e => e.addEventListener("click", () => setRuleReadType(Number(e.dataset.ruleReadtype)))), 
         byId("ten-rule-test").addEventListener("click", testRuleEditor), byId("ten-rule-save").addEventListener("click", saveRuleEditor), 
-        byId("ten-rule-cancel-edit").addEventListener("click", resetRuleEditor), byId("ten-import-rules").addEventListener("click", importRules), 
+        byId("ten-rule-cancel-edit").addEventListener("click", startNewRule), byId("ten-import-rules").addEventListener("click", importRules), 
         byId("ten-backup-export").addEventListener("click", exportSettingsBackup), byId("ten-backup-import").addEventListener("click", () => byId("ten-backup-file").click()), 
         byId("ten-backup-file").addEventListener("change", importSettingsBackup), byId("ten-reset").addEventListener("click", resetSettings), 
         byId(ROOT_ID).addEventListener("click", addRipple), applySettingsToUI(), detectComicInfo(), 
@@ -281,7 +280,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             } catch (e) {
                 byId("ten-dir-name").textContent = "请重新选择目录";
             }
-        }(), state.ready = !0, initializeTaskRecovery(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
+        }(), state.ready = !0, initializeRuleTools(), initializeTaskRecovery(), activateTab(state.activeTab), state.settings.autoOpen ? showUI() : state.pendingLauncher && showLauncher();
     }
     function icon(e) {
         return `<svg class="ten-icon" aria-hidden="true"><use href="#ten-i-${e}"></use></svg>`;
@@ -371,6 +370,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         syncMiniTaskBar(), refreshQueueOnVisibility(), state.recoveryTasks.length && toast(`发现 ${state.recoveryTasks.length} 个未完成任务`));
     }
     function hideUI() {
+        flushRuleDraft(); stopRulePreview(true); clearRuleHighlights();
         state.ready && (state.rulePicking && finishRulePicking(), state.visible = !1, byId(PANEL_ID).inert = true, 
         byId(PANEL_ID).classList.remove("is-open"), byId(PANEL_ID).setAttribute("aria-hidden", "true"), 
         byId(LAUNCHER_ID).classList.toggle("is-hidden", !state.launcherVisible), closeSearchPanel(), 
@@ -389,6 +389,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
     }
     function activateTab(e) {
         if (!TAB_ORDER.includes(e)) return;
+        if (state.activeTab === "settings" && e !== "settings") { flushRuleDraft(); stopRulePreview(); clearRuleHighlights(); }
         state.activeTab = e, all(".ten-view").forEach(t => t.classList.toggle("is-active", t.dataset.view === e)), 
         all(".ten-tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === e));
         const t = TAB_ORDER.indexOf(e);
@@ -488,7 +489,8 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         return pending;
     }
     async function enqueueDownloadBatch(e, options = {}) {
-        e = e.map(task => ({ ...task, taskId: options.recovery && task.taskId ? task.taskId : newTaskId(), imageRange: task.imageRange || state.settings.imageRange.slice() }));
+        const selectedAdapter = siteRules.Po ? { ...siteRules.Po } : null;
+        e = e.map(task => ({ ...task, adapter: selectedAdapter, taskId: options.recovery && task.taskId ? task.taskId : newTaskId(), imageRange: task.imageRange || state.settings.imageRange.slice() }));
         const active = state.queue ? [...state.queue.list, ...state.queue.worker.filter(worker => worker && !worker.cancelled).map(worker => worker.task)] : [];
         const completed = readHistory().filter(record => record.status === "completed" && !record.hasError && record.task && !record.task.retryImages?.length).map(record => record.task);
         const keys = new Set(active.concat(completed).map(DownloadQueue.taskKey)), unique = [], duplicates = [];
@@ -611,6 +613,7 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
         } catch (error) { reportTaskStorageError(error); return false; }
     }
     function handlePageHide() {
+        flushRuleDraft(); stopRulePreview(); clearRuleHighlights();
         (state.queue || state.recoveryTasks.length) && persistQueueState();
     }
     function initializeAppStorage() {
@@ -774,25 +777,18 @@ role="group" aria-label="可视化规则选择"><button type="button" data-rule-
             } catch (e) {
                 o();
             }
-        }(new Blob([ JSON.stringify(n, null, 2) ], {
+        }(new Blob([ ruleModel.serialize(n) ], {
             type: "application/json"
         }), `10Comic-设置与规则备份-${r}.json`);
     }
-    async function importSettingsBackup(e) {
-        const t = e.target.files && e.target.files[0];
-        if (e.target.value = "", t) try {
-            const e = JSON.parse(await t.text());
-            if (!e || "10Comic-settings-backup" !== e.format || !e.settings || !Array.isArray(e.rules)) throw new Error("不是有效的 10漫画备份文件");
-            const n = e => (Array.isArray(e) ? e : [ e ]).some(e => String(e || "").trim());
-            if (e.rules.some(e => !e || !n(e.domain))) throw new Error("备份中的规则域名无效");
-            if (!await showConfirm("导入设置与规则", `将使用备份中的设置和 ${e.rules.length} 条规则覆盖当前配置。`, "确认导入")) return;
-            BACKUP_KEYS.forEach(t => {
-                void 0 !== e.settings[t] && null !== e.settings[t] && (0, configModule.po)(t, e.settings[t]);
-            }), (0, configModule.po)("userWebInfo", e.rules), state.settings = readSettings(), 
-            applySettingsToUI(), trimHistory(), renderSites(), toast(`备份已导入，共 ${e.rules.length} 条规则`);
-        } catch (e) {
-            toast(e.message || "备份文件读取失败");
-        }
+    async function importSettingsBackup(event) {
+        const file = event.target.files && event.target.files[0]; event.target.value = "";
+        if (!file) return;
+        try {
+            const data = ruleModel.deserialize(await file.text());
+            if (!data || data.format !== "10Comic-settings-backup" || !data.settings || typeof data.settings !== "object" || Array.isArray(data.settings) || !Array.isArray(data.rules) || data.rules.length > 500) throw new Error("不是有效的10漫画备份文件");
+            flushRuleDraft(); previewRuleImport(data.rules, {settings:data.settings});
+        } catch (error) { toast(error.message || "备份文件读取失败"); }
     }
     function applyPageSplicing() {
         let e = document.getElementById("ten-comic-page-style");

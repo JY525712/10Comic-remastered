@@ -9,6 +9,7 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
   });
   var downloadUtils = __webpack_require__(624),
     configModule = __webpack_require__(390);
+  const customRuleModel = __webpack_require__(516);
   const searchFunTemplate_1 = async (data, keyword) => {
       let {
         search_add_url: search_add_url,
@@ -944,12 +945,18 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
     } catch (e) {
       return null;
     }
-    if (currentComics = comicsWebInfo.find(e => matchesRuleDomain(e.domain, t)) || null, null === currentComics) {
-      const e = (0, configModule.cF)("userWebInfo"),
-        n = Array.isArray(e) ? e : [];
-      currentComics = n.find(e => matchesRuleDomain(e && e.domain, t)) || null;
+    const stored = (0, configModule.cF)("userWebInfo");
+    const resolution = customRuleModel.resolve(e || window.location.href, comicsWebInfo, stored);
+    currentComics = resolution.selected;
+    if (resolution.source === "custom" && currentComics) {
+      const result = customRuleModel.validate(currentComics);
+      if (result.errors.length) { console.warn("10漫画：自定义规则校验失败。", result.errors); currentComics = resolution.builtin; return currentComics; }
+      currentComics = customRuleModel.compile(result.rule, { request: downloadUtils.WY, trimSpecial: downloadUtils.Sc, funstrToData: downloadUtils.D });
+      if (typeof window !== "undefined") window.request = downloadUtils.WY;
     }
-    return null !== currentComics && "string" == typeof currentComics.getImgs && (window.request = downloadUtils.WY, currentComics.getImgs = funSplicing(currentComics.getImgs)), null !== currentComics && "string" == typeof currentComics.getComicInfo && (window.request = downloadUtils.WY, currentComics.getComicInfo = funSplicing(currentComics.getComicInfo)), currentComics;
+    if (currentComics && typeof currentComics.getImgs === "string") currentComics.getImgs = funSplicing(currentComics.getImgs);
+    if (currentComics && typeof currentComics.getComicInfo === "string") currentComics.getComicInfo = funSplicing(currentComics.getComicInfo);
+    return currentComics;
   };
   function matchesRuleDomain(e, t) {
     return ("Array" === (0, downloadUtils.oL)(e) ? e : [e]).some(e => {

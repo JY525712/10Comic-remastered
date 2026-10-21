@@ -1,6 +1,8 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const vm = require('node:vm')
+const createRuleModel = require('../../src/userscript/modules/rule-model.js')
+const acorn = require('acorn')
 const root = path.resolve(__dirname, '../..')
 
 // Load the actual source registry without extracting rules by text offsets.
@@ -13,7 +15,8 @@ function loadAdapters(options = {}) {
     ...options.downloads
   }
   const config = { cF: () => [], ...options.config }
-  const requireModule = id => { if (id === 624) return downloads; if (id === 390) return config; throw new Error('Unexpected adapter dependency: ' + id) }
+  const ruleModel = createRuleModel({parse:acorn.parse})
+  const requireModule = id => { if (id === 624) return downloads; if (id === 390) return config; if (id === 516) return ruleModel; throw new Error('Unexpected adapter dependency: ' + id) }
   requireModule.d = (exports, getters) => { for (const [name,get] of Object.entries(getters)) Object.defineProperty(exports,name,{get}) }
   const factory = vm.runInNewContext(source + ';module.exports', { module: { exports: {} }, URL, console, ...options.globals })
   const api = {}; factory({},api,requireModule)

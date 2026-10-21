@@ -8,7 +8,7 @@ async function main() {
   const directory = path.join(root, 'dist/verification')
   fs.mkdirSync(directory, { recursive: true })
   const browser = await chromium.launch({ headless: true })
-  const checks = []
+  const checks = [], ruleChecks = []
   try {
     for (const theme of ['aurora', 'mist', 'cloud', 'obsidian', 'carbon', 'titanium']) {
       for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 568 }]) {
@@ -34,6 +34,22 @@ async function main() {
           assert.equal(await page.locator('.ten-view.is-active').evaluate(view => view.scrollWidth <= view.clientWidth + 2), true)
           await page.screenshot({ animations: 'disabled', path: path.join(directory, `${theme}-${viewport.width}-presets.png`) })
           await page.locator('#ten-rule-editor-card > summary').click()
+          for (const id of ['ten-rule-common','ten-rule-advanced']) await page.locator(`#${id} > summary`).click()
+          if (await page.locator('#ten-mobile-drawer').evaluate(node=>node.classList.contains('is-open'))) {
+            assert.equal(await page.locator('#ten-mobile-drawer-content').evaluate(node=>node.scrollWidth<=node.clientWidth+2),true)
+            await page.screenshot({animations:'disabled',path:path.join(directory,`${theme}-${viewport.width}-rules-advanced.png`)})
+            await page.keyboard.press('Escape')
+          }
+          await page.locator('.ten-rule-json > summary').first().click()
+          await page.locator('#ten-rule-text').fill(JSON.stringify([{webName:'导入预览中的很长规则名称'.repeat(5),domain:'new.test',imageCss:'.reader img'}]))
+          await page.locator('#ten-import-rules').click()
+          assert.equal(await page.locator('.ten-view.is-active').evaluate(view=>view.scrollWidth<=view.clientWidth+2),true,`${theme} expanded rules overflow ${viewport.width}`)
+          await page.locator('#ten-rule-import-preview').screenshot({animations:'disabled',path:path.join(directory,`${theme}-${viewport.width}-rules-import.png`)})
+          await page.locator('[data-tab="sites"]').click();await page.locator('[data-source="1"]').click()
+          assert.equal(await page.locator('.ten-view.is-active').evaluate(view=>view.scrollWidth<=view.clientWidth+2),true,`${theme} managed rules overflow ${viewport.width}`)
+          await page.locator('#ten-site-list').screenshot({animations:'disabled',path:path.join(directory,`${theme}-${viewport.width}-rules-list.png`)})
+          ruleChecks.push({theme,viewport,expanded:true,importPreview:true,managed:true})
+          await page.locator('[data-tab="settings"]').click()
           await page.locator('#ten-rule-guide-open').click()
           await page.locator('.ten-rule-guide-dialog button').first().waitFor({ state: 'visible' })
           await page.screenshot({ animations: 'disabled', path: path.join(directory, `${theme}-${viewport.width}-guide.png`) })
@@ -57,7 +73,7 @@ async function main() {
     await preview.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:24px;box-sizing:border-box;background:#e8eef7;font-family:'Microsoft YaHei',sans-serif;color:#203451;display:flex;gap:24px;justify-content:center}section{width:430px}h2{font-size:21px;margin:0 0 6px}p{font-size:12px;color:#53647a;margin:0 0 15px}img{width:430px;display:block}</style>${panels}`)
     await preview.screenshot({ path: path.join(directory, 'selected-themes-preview.png') })
     await preview.close()
-    fs.writeFileSync(path.join(directory, 'themes-report.json'), JSON.stringify({ sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(root, '10漫画—重制版.user.js'))).digest('hex'), checks }, null, 2))
+    fs.writeFileSync(path.join(directory, 'themes-report.json'), JSON.stringify({ sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(root, '10漫画—重制版.user.js'))).digest('hex'), checks, ruleChecks }, null, 2))
     console.log(`PASS ${checks.length} theme viewport/view checks, plus preset and guide states`)
   } finally { await browser.close() }
 }

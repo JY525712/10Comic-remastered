@@ -24,6 +24,7 @@ async function main() {
   const themes = JSON.parse(fs.readFileSync(path.join(directory, 'themes-report.json')))
   assert.equal(themes.sha256, sha256, 'theme checks are for an earlier artifact')
   assert.equal(themes.checks.length, 72)
+  assert.equal(themes.ruleChecks.length, 18, 'expanded rules/import/management checks are missing')
   const filenames = JSON.parse(fs.readFileSync(path.join(directory, 'filename-compatibility.json')))
   assert.equal(filenames.sha256, sha256, 'native filename checks are for an earlier artifact')
   assert.ok(filenames.cases.length >= 100 && filenames.cases.every(row => row.result.directory === 'accepted' && row.result.file === 'accepted'), 'native filename checks failed')
@@ -45,12 +46,12 @@ async function main() {
     tests: { command: 'npm test', total, passed, failed },
     build: 'matches source; uniform LF; node --check verified separately',
     browser: { command: 'npm run verify:browser', checks: browser.checks.length },
-    themes: { command: 'npm run verify:themes', checks: themes.checks.length },
+    themes: { command: 'npm run verify:themes', checks: themes.checks.length, customRuleStates: themes.ruleChecks.length },
     filenames: { browser: filenames.browser, cases: filenames.cases.length, scope: 'Windows disk files and real Chromium directory/file handle name validation; download-mode writes use offline fixtures' },
     launchers: { command: 'npm run preview:launcher', themes: launchers.themes, frames: launchers.frames, controls: launchers.controls },
     benchmark: benchmark.summary,
     runtimeBenchmark: runtime,
-    scope: 'Offline Chromium fixtures, two-tab recovery with real Web Locks, storage-failure injection, parser cancellation, image signature validation, real browser ZIP stream writes and native handle filename checks; adapter/config/reader-worker compatibility retained; queue and download changes limited to approved reliability work; no live account or site availability claim'
+    scope: 'Offline Chromium fixtures, custom-rule model/store/editor/import/drafts/history, regex codec, preview resource ownership and hidden-reader blob lifetime, captured queue adapters; two-tab recovery with real Web Locks, storage-failure injection, parser cancellation, image signature validation, real browser ZIP stream writes and native handle filename checks; built-in adapters/config/reader workers preserved; no live account or site availability claim'
   }
   fs.writeFileSync(path.join(directory, 'release-report.json'), JSON.stringify(report, null, 2))
   fs.copyFileSync(path.join(root, '10漫画—重制版.user.js'), path.join(root, 'dist/10漫画—重制版.user.js'))

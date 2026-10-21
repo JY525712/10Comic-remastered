@@ -222,6 +222,8 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
     }),
     getImage = async e => {
       let ownedFrame = null, abort, retainFrame = false;
+      const adapter = e.adapter || siteRules.Po;
+      if (!adapter) throw new Error("当前页面没有可用规则");
       const signal = e.signal;
       if (signal && signal.aborted) throw new Error("下载已取消");
       const cancelled = new Promise((resolve, reject) => {
@@ -236,7 +238,8 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
         const parse = async () => {
         const t = e.url;
         let n = "";
-        if (shouldLoadFrame(siteRules.Po, e)) {
+        if (e.document) n = e.document.documentElement.outerHTML;
+        else if (shouldLoadFrame(adapter, e)) {
           const r = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "g", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
             a = Math.round(25 * Math.random()) + 0,
             i = Math.round(25 * Math.random()) + 0,
@@ -245,27 +248,33 @@ module.exports = (__unused_webpack_module, __webpack_exports__, __webpack_requir
           const loading = getFrameContent(o, t, signal);
           ownedFrame = document.getElementById(o);
           n = await loading;
-        } else if (siteRules.Po.useFrame || "manhuagui" === siteRules.Po.readerTabMode) n = "";else {
+        } else if (adapter.useFrame || "manhuagui" === adapter.readerTabMode) n = "";else {
           const r = await request({
             method: "get",
             url: t,
             useCookie: e.isPay,
+            headers: adapter.headers || {},
             signal: e.signal
           });
           if (!r || "object" != typeof r) throw new Error("章节页面请求失败");
           n = r.response;
         }
         if (signal && signal.aborted) throw new Error("下载已取消");
-        const parsed = await siteRules.Po.getImgs(n, e);
+        const parsed = await adapter.getImgs(n, e);
         if (signal && signal.aborted) {
           try { parsed?.otherData?.cleanup?.(); } catch (ignored) {}
-          for (const url of (Array.isArray(parsed) ? parsed : parsed?.imgUrlArr || [])) if (typeof url === "string" && url.startsWith("blob:")) URL.revokeObjectURL(url);
+            if (!e.preview) for (const url of (Array.isArray(parsed) ? parsed : parsed?.imgUrlArr || [])) if (typeof url === "string" && url.startsWith("blob:")) URL.revokeObjectURL(url);
           throw new Error("下载已取消");
         }
         return parsed;
         };
         const parsed = await Promise.race([parse(), cancelled]);
-        retainFrame = Boolean(siteRules.Po.reuseParsedImages && parsed?.otherData && typeof parsed.otherData.cleanup === "function");
+        retainFrame = Boolean(adapter.reuseParsedImages && parsed?.otherData && typeof parsed.otherData.cleanup === "function");
+          if (e.preview && ownedFrame && typeof e.retainPreviewFrame === "function") {
+            let released = false;
+            e.retainPreviewFrame(() => { if (!released) { released = true; ownedFrame.remove(); } });
+            retainFrame = true;
+          }
         return parsed;
       } catch (e) {
         !retainFrame && ownedFrame && ownedFrame.remove();

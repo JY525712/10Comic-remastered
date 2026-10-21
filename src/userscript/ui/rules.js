@@ -103,6 +103,12 @@ function normalizeRulePickTarget(e, t) {
 function buildRuleSelector(e, t) {
     if (!e) return "";
     if ("images" === t && e.matches("img")) {
+        let container = e.parentElement;
+        for (let depth = 0; container && depth < 5 && !container.matches("body,html"); depth++, container = container.parentElement) {
+            if (container.querySelectorAll("img").length < 2) continue;
+            const scope = uniqueRuleSelector(container);
+            if (scope) return `${scope} img`;
+        }
         const t = stableRuleClasses(e);
         for (const e of t) {
             const t = `img.${escapeCss(e)}`;
@@ -122,7 +128,13 @@ function uniqueRuleSelector(e) {
     if (!e || !e.tagName) return "";
     if (e.id) {
         const t = `#${escapeCss(e.id)}`;
-        if (1 === selectorCount(t)) return t;
+        if (!/\d{4,}/.test(e.id) && 1 === selectorCount(t)) return t;
+    }
+    for (const attribute of ["data-testid", "data-role", "itemprop", "role"]) {
+        const value = e.getAttribute(attribute);
+        if (!value || value.length > 64 || /\d{4,}/.test(value)) continue;
+        const selector = e.tagName.toLowerCase() + `[${attribute}=${JSON.stringify(value)}]`;
+        if (selectorCount(selector) === 1) return selector;
     }
     const t = e.tagName.toLowerCase(), n = stableRuleClasses(e);
     for (let e = 1; e <= Math.min(2, n.length); e++) {
@@ -149,7 +161,7 @@ function stableRuleClasses(e) {
 
 function selectorCount(e) {
     try {
-        return document.querySelectorAll(e).length;
+        return [...document.querySelectorAll(e)].filter(node => !node.closest("#ten-comic-root")).length;
     } catch (e) {
         return 0;
     }
@@ -165,126 +177,3 @@ function setRuleReadType(e) {
     t && t.style.setProperty("--rule-type", 1 === state.ruleReadType ? 0 : 1), all("[data-rule-readtype]").forEach(e => e.classList.toggle("is-active", Number(e.dataset.ruleReadtype) === state.ruleReadType));
 }
 
-function resetRuleEditor() {
-    state.editRuleIndex = -1, state.editRuleBase = null, state.ruleReadType = 1, [ "ten-rule-name", "ten-rule-domain", "ten-rule-homepage", "ten-rule-desc", "ten-rule-title-selector", "ten-rule-chapter-selector", "ten-rule-image-selector", "ten-rule-getimgs" ].forEach(e => {
-        byId(e) && (byId(e).value = "");
-    }), byId("ten-rule-use-frame") && (byId("ten-rule-use-frame").checked = !1), byId("ten-rule-advanced") && (byId("ten-rule-advanced").open = !1), 
-    byId("ten-rule-save") && (byId("ten-rule-save").textContent = "保存规则"), byId("ten-rule-cancel-edit") && (byId("ten-rule-cancel-edit").hidden = !0), 
-    byId("ten-rule-test-result") && (byId("ten-rule-test-result").hidden = !0), setRuleReadType(1);
-}
-
-function readRuleEditor() {
-    const e = byId("ten-rule-name").value.trim(), t = byId("ten-rule-domain").value.split(/[,，\s]+/).map(e => e.trim().toLowerCase().replace(/^https?:\/\//, "").split("/")[0].replace(/^\*\./, "")).filter(Boolean), n = byId("ten-rule-homepage").value.trim() || (t[0] ? `https://${t[0]}/` : ""), r = byId("ten-rule-image-selector").value.trim(), a = byId("ten-rule-getimgs").value.trim(), i = Boolean(r && !a), o = a || (r ? [ "function(context, processData) {\n    const frame = processData && processData.frameId ? document.getElementById(processData.frameId) : null\n    const root = \
-frame && frame.contentDocument ? frame.contentDocument : new DOMParser().parseFromString(String(context || ''), 'text/html')\n    const base = processData && \
-processData.url ? processData.url : location.h", "ref\n    const urls = Array.from(root.querySelectorAll(this.imageCss)).map(img => {\n      const srcset = img.getAttribute('srcset') || \
-img.getAttribute('data-srcset') || ''\n      return img.getAttribute('data-src') || img.getAttribute('data-original') || img.getAttribute('data-url') || \
-img.getAttribute('data-lazy-src') || img.currentSrc || (srcset.trim().spli", "t(/\\s*,\\s*/).pop() || '').trim().split(/\\s+/)[0] || img.getAttribute('src')\n    }).filter(Boolean).map(url => { try { return new URL(url, base).href } \
-catch (error) { return url } })\n    if (frame) frame.remove()\n    return [...new Set(urls)]\n  }" ].join("") : "");
-    if (!e || !t.length) throw new Error("请填写站点名称和域名");
-    if (!o) throw new Error("请填写章节图片选择器；复杂站点也可填写图片解析函数");
-    if (i && 0 === state.ruleReadType) throw new Error("翻页阅读需要在复杂站点设置中填写图片解析函数");
-    try {
-        new URL(n);
-    } catch (e) {
-        throw new Error("站点首页地址格式不正确");
-    }
-    if (!/^(async\s+)?function\s*\(/.test(o)) throw new Error("图片解析函数必须使用 function 或 async function 格式");
-    let s;
-    try {
-        s = Function(`"use strict";return (${o})`)();
-    } catch (e) {
-        throw new Error("图片解析函数存在语法错误");
-    }
-    if ("function" != typeof s) throw new Error("图片解析函数格式不正确");
-    if (r) try {
-        document.querySelector(r);
-    } catch (e) {
-        throw new Error("章节图片选择器格式不正确");
-    }
-    return {
-        ...state.editRuleBase || {},
-        webName: e,
-        domain: 1 === t.length ? t[0] : t,
-        homepage: n,
-        webDesc: byId("ten-rule-desc").value.trim(),
-        comicNameCss: byId("ten-rule-title-selector").value.trim(),
-        chapterCss: byId("ten-rule-chapter-selector").value.trim(),
-        readtype: state.ruleReadType,
-        useFrame: byId("ten-rule-use-frame").checked,
-        imageCss: r,
-        simpleRule: i,
-        getImgs: o
-    };
-}
-
-function testRuleEditor() {
-    const e = byId("ten-rule-test-result");
-    e.hidden = !1, e.classList.remove("is-success", "is-error");
-    try {
-        const t = readRuleEditor(), n = Array.isArray(t.domain) ? t.domain : [ t.domain ], r = window.location.hostname.toLowerCase(), a = [ "规则格式：通过", "域名匹配：" + (n.some(e => r === e.toLowerCase() || r.endsWith(`.${e.toLowerCase()}`)) ? "当前页面已匹配" : "当前页面不属于该规则，仅检查格式") ];
-        if (t.comicNameCss) {
-            let e;
-            try {
-                e = document.querySelector(t.comicNameCss);
-            } catch (e) {
-                throw new Error("漫画标题选择器格式不正确");
-            }
-            a.push(`漫画标题：${e ? String(e.textContent || "").trim().slice(0, 60) || "已找到节点" : "未找到"}`);
-        }
-        if (t.chapterCss) {
-            let e;
-            try {
-                e = [ ...document.querySelectorAll(t.chapterCss) ];
-            } catch (e) {
-                throw new Error("章节列表选择器格式不正确");
-            }
-            const n = e.reduce((e, t) => e + t.querySelectorAll("a").length, 0);
-            a.push(`章节列表：${e.length} 个容器，${n} 个链接`);
-        }
-        t.imageCss && a.push(`章节图片：当前页面找到 ${document.querySelectorAll(t.imageCss).length} 张（目录页为 0 属正常）`), 
-        a.push(t.simpleRule ? "图片解析：已自动生成" : "图片解析函数：语法通过（未执行网络下载）"), e.textContent = a.join("\n"), 
-        e.classList.add("is-success");
-    } catch (t) {
-        e.textContent = `测试失败：${t.message}`, e.classList.add("is-error");
-    }
-}
-
-function saveRuleEditor() {
-    try {
-        const e = readRuleEditor(), t = safeGet("userWebInfo", []), n = Array.isArray(t) ? t.slice() : [];
-        state.editRuleIndex >= 0 && n[state.editRuleIndex] ? n[state.editRuleIndex] = e : n.unshift(e), 
-        (0, configModule.po)("userWebInfo", n);
-        const a = state.editRuleIndex >= 0;
-        resetRuleEditor(), state.sourceMode = 1, renderSites(), activateTab("sites"), toast(a ? "规则已更新，刷新目标页面后生效" : "规则已保存，打开目标页面即可使用");
-    } catch (e) {
-        toast(e.message || "规则保存失败");
-    }
-}
-
-function importRules() {
-    const e = byId("ten-rule-text").value.trim();
-    if (!e) return toast("请先粘贴规则数组");
-    try {
-        const t = Function(`"use strict";return (${e})`)();
-        if (!Array.isArray(t)) throw new Error("规则必须是数组");
-        const n = e => (Array.isArray(e) ? e : [ e ]).some(e => String(e || "").trim());
-        if (t.some(e => !e || !n(e.domain))) throw new Error("规则域名不能为空");
-        const a = t.map(e => {
-            const t = {
-                ...e
-            };
-            return [ "getImgs", "getComicInfo" ].forEach(e => {
-                "function" == typeof t[e] && (t[e] = t[e].toString());
-            }), t;
-        }), i = safeGet("userWebInfo", []), o = Array.isArray(i) ? i : [];
-        (0, configModule.po)("userWebInfo", a.concat(o)), byId("ten-rule-text").value = "", 
-        state.sourceMode = 1, renderSites(), activateTab("sites"), toast(`已导入 ${t.length} 条规则`);
-    } catch (e) {
-        toast("规则格式不正确");
-    }
-}
-
-async function clearRules() {
-    await showConfirm("清空自定义规则", "将删除全部已导入规则，此操作无法撤销。", "全部清空") && ((0, configModule.po)("userWebInfo", []), 
-    renderSites(), toast("导入规则已清空"));
-}

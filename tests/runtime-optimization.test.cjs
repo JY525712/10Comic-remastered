@@ -146,6 +146,7 @@ function persistenceHarness() {
   state.recoveryStore = new Store({ get: key => structuredClone(store[key]), set: (key, value) => { store[key] = structuredClone(value); writes.push(structuredClone(value.tasks)) }, remove: key => { delete store[key] }, keys: () => Object.keys(store) }, { id: 'test', host: 'comic.test', origin: 'https://comic.test' })
   const api = functions('src/userscript/modules/ui.js', ['taskHost', 'uniqueTaskSnapshots', 'scheduleTaskPersist', 'persistQueueState', 'handlePageHide'], {
     state, PENDING_TASKS_KEY: 'pendingTasks', URL, window: { location: { hostname: 'comic.test', href: 'https://comic.test/1' } },
+    flushRuleDraft() {}, stopRulePreview() {}, clearRuleHighlights() {},
     safeGet: key => structuredClone(store[key]),
     configModule: { po(key, value) { store[key] = structuredClone(value); writes.push(structuredClone(value)) } },
     reportTaskStorageError: error => { throw error },

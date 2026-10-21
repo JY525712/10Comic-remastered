@@ -1,5 +1,5 @@
 function renderSites() {
-    const e = (0, siteRules.eT)(), t = Array.isArray(e.originalInfo) ? e.originalInfo.slice() : [], n = Array.isArray(e.userWebInfo) ? e.userWebInfo.slice() : [], r = 0 === state.sourceMode ? t : n;
+    const e = (0, siteRules.eT)(), t = Array.isArray(e.originalInfo) ? e.originalInfo.slice() : [], n = ruleRepository().read(), r = 0 === state.sourceMode ? t : n;
     one(".ten-source").style.setProperty("--source", state.sourceMode), all(".ten-source button").forEach(e => e.classList.toggle("is-active", Number(e.dataset.source) === state.sourceMode)), 
     byId("ten-rule-manage").hidden = 0 === state.sourceMode, byId("ten-rule-count").textContent = `已导入 ${n.length} 条规则 · 可逐条删除`, 
     function(e = []) {
@@ -12,36 +12,11 @@ function renderSites() {
         byId("ten-search-site-label").textContent = n, byId("ten-search-btn").disabled = 0 === t, 
         byId("ten-search-site-menu").innerHTML = [ `<button class="ten-search-site-option is-all is-selected" type="button" role="option" data-search-index="-1" ${t ? "" : "disabled"}><span>${n}</span><small>${t} 个可搜索</small></button>`, ...state.searchSites.map((e, t) => `<button class="ten-search-site-option" type="button" role="option" data-search-index="${t}" ${e.searchTemplate_1 ? "" : "disabled"}><span>${escapeHtml(e.webName)}</span><small>${e.searchTemplate_1 ? "可搜索" : "仅浏览"}</small></button>`) ].join(""), 
         closeSearchSiteMenu();
-    }(r), byId("ten-site-list").innerHTML = r.length ? r.map((e, t) => 0 === state.sourceMode ? `<button class="ten-list-item" type="button" data-url="${escapeAttr(e.homepage)}"><span class="ten-name">${escapeHtml(e.webName)}</span><span class="ten-site-kind">内置</span><span class="ten-meta">${escapeHtml(e.webDesc || "打开站点")}</span></button>` : `<div class="ten-rule-item"><button class="ten-list-item ten-rule-open" type="button" data-url="${escapeAttr(e.homepage)}"><span class="ten-name">${escapeHtml(e.webName)}</span><span class="ten-meta">${escapeHtml(e.webDesc || e.domain || "导入规则")}</span></button><button class="ten-icon-btn ten-rule-edit" type="button" data-edit-rule="${t}" title="编辑规则" aria-label="编辑 ${escapeAttr(e.webName)}">${icon("edit")}</button><button class="ten-icon-btn ten-rule-delete" type="button" data-delete-rule="${t}" title="删除规则" aria-label="删除 ${escapeAttr(e.webName)}">${icon("trash")}</button></div>`).join("") : empty("暂无导入规则");
+    }(r.filter(rule => rule.enabled !== false)), byId("ten-site-list").innerHTML = state.sourceMode === 1 ? renderManagedRuleList(r) : r.map(e => `<button class="ten-list-item" type="button" data-url="${escapeAttr(e.homepage)}"><span class="ten-name">${escapeHtml(e.webName)}</span><span class="ten-site-kind">内置</span><span class="ten-meta">${escapeHtml(e.webDesc || "打开站点")}</span></button>`).join("");
+    refreshRuleMatchStatus();
 }
 
-function deleteImportedRule(e) {
-    const t = e.target.closest("[data-edit-rule]");
-    if (t) return void function(e) {
-        const t = safeGet("userWebInfo", []), n = (Array.isArray(t) ? t : [])[e];
-        n && (state.editRuleIndex = e, state.editRuleBase = {
-            ...n
-        }, byId("ten-rule-name").value = n.webName || "", byId("ten-rule-domain").value = Array.isArray(n.domain) ? n.domain.join(", ") : n.domain || "", 
-        byId("ten-rule-homepage").value = n.homepage || "", byId("ten-rule-desc").value = n.webDesc || "", 
-        byId("ten-rule-title-selector").value = n.comicNameCss || "", byId("ten-rule-chapter-selector").value = n.chapterCss || "", 
-        byId("ten-rule-image-selector").value = n.imageCss || "", byId("ten-rule-use-frame").checked = Boolean(n.useFrame), 
-        byId("ten-rule-getimgs").value = n.simpleRule ? "" : "function" == typeof n.getImgs ? n.getImgs.toString() : n.getImgs || "", 
-        setRuleReadType(n.readtype), byId("ten-rule-advanced").open = !n.simpleRule, byId("ten-rule-save").textContent = "更新规则", 
-        byId("ten-rule-cancel-edit").hidden = !1, activateTab("settings"), expandRuleEditor(), 
-        setTimeout(() => byId("ten-rule-editor-card").scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        }), 80));
-    }(Number(t.dataset.editRule));
-    const n = e.target.closest("[data-delete-rule]");
-    if (n) return void async function(e) {
-        const t = safeGet("userWebInfo", []), n = Array.isArray(t) ? t.slice() : [];
-        n[e] && await showConfirm("删除自定义规则", `确认删除规则“${n[e].webName || n[e].domain || "未命名规则"}”？`, "删除") && (n.splice(e, 1), 
-        (0, configModule.po)("userWebInfo", n), renderSites(), toast("规则已删除"));
-    }(Number(n.dataset.deleteRule));
-    const a = e.target.closest("[data-url]");
-    a && a.dataset.url && window.open(a.dataset.url, "_blank");
-}
+function deleteImportedRule(event) { return handleManagedRuleAction(event); }
 
 async function searchComics() {
     const e = byId("ten-search-input").value.trim();

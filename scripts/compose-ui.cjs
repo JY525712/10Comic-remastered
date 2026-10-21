@@ -15,8 +15,9 @@ function composeUI(source, sourceRoot) {
   if (styles.split('/*__THEME_COMPONENT_STYLES__*/').length !== 2) throw new Error('Expected one theme component style slot')
   const themeStyles = ['light-themes.css', 'premium-themes.css', 'theme-menus.css', 'launcher-effects.css'].map(name => fs.readFileSync(path.join(directory, name), 'utf8')).join('\n')
   styles = styles.replace('/*__THEME_COMPONENT_STYLES__*/', () => themeStyles)
+  styles += '\n' + fs.readFileSync(path.join(directory, 'rule-workbench.css'), 'utf8')
   replace(styleSlot[0], JSON.stringify(styles))
-  for (const name of ['shell', 'sites', 'chapters', 'tasks', 'rules', 'accessibility']) {
+  for (const name of ['shell', 'sites', 'chapters', 'tasks', 'rules', 'rule-workbench', 'rule-management', 'accessibility']) {
     replace(`/*__UI_${name.toUpperCase()}__*/`, fs.readFileSync(path.join(directory, name + '.js'), 'utf8').trim())
   }
   return source

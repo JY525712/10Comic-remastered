@@ -98,7 +98,9 @@ test('an old settings backup imports and exports through the existing UI', async
     const rule = { domain: 'comic.test', homepage: 'https://comic.test/', webName: '旧规则', comicNameCss: '#fixture-title', chapterCss: '#fixture-chapters', readtype: 1, getImgs: 'async function(){return []}' }
     const oldBackup = { format: '10Comic-settings-backup', version: 1, settings: { themePreset: 'porcelain', maxPictureNum: 4, imgIndexBitNum: 5 }, rules: [rule] }
     await page.locator('#ten-backup-file').setInputFiles({ name: 'old-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(oldBackup)) })
-    await page.locator('#ten-confirm-ok').click()
+    await page.locator('#ten-rule-import-preview').waitFor({state:'visible'})
+    await page.locator('[data-import-action="0"]').selectOption('replace')
+    await page.locator('#ten-rule-import-apply').click()
     await page.waitForFunction(() => window.__gmValues.imgIndexBitNum === 5)
     assert.equal(await page.locator('#ten-concurrent-images').inputValue(), '4')
     assert.equal(await page.locator('#ten-comic-root').getAttribute('data-theme'), 'cloud')
@@ -108,7 +110,9 @@ test('an old settings backup imports and exports through the existing UI', async
     assert.equal(exported.format, '10Comic-settings-backup')
     assert.equal(exported.version, 1)
     assert.equal(exported.settings.imgIndexBitNum, 5)
-    assert.deepEqual(exported.rules, [rule])
+    assert.equal(exported.rules.length,1)
+    for(const [key,value] of Object.entries(rule)) assert.deepEqual(exported.rules[0][key],value)
+    assert.equal(exported.rules[0].schemaVersion,1)
   } finally { await context.close() }
 })
 

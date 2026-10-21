@@ -1,0 +1,35 @@
+#ten-comic-root .ten-rule-note { padding: 9px; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); color: var(--ten-muted); font-size: 10px; line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
+#ten-comic-root .ten-rule-toolbar, #ten-comic-root .ten-rule-preview-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 7px 0; min-width: 0; }
+#ten-comic-root .ten-rule-toolbar > select, #ten-comic-root .ten-rule-preview-controls > select { flex: 1 1 160px; min-width: 0; max-width: 100%; }
+#ten-comic-root .ten-rule-toolbar button, #ten-comic-root .ten-rule-preview-controls button { flex: 0 1 auto; }
+#ten-comic-root .ten-rule-field-error { display: block; margin-top: 4px; color: var(--ten-danger); font-size: 10px; overflow-wrap: anywhere; }
+#ten-comic-root [aria-invalid="true"] { border-color: var(--ten-danger); box-shadow: 0 0 0 1px var(--ten-danger-border); }
+#ten-comic-root .ten-rule-check { display: flex; align-items: center; gap: 7px; color: var(--ten-muted); font-size: 10px; line-height: 1.6; margin: 8px 0; }
+#ten-comic-root .ten-rule-check input { flex: 0 0 auto; width: 16px; height: 16px; accent-color: var(--ten-cyan); }
+#ten-comic-root .ten-rule-preview-result { font-size: 10px; color: var(--ten-muted); line-height: 1.65; overflow-wrap: anywhere; }
+#ten-comic-root .ten-rule-preview-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 7px; }
+#ten-comic-root .ten-rule-preview-grid figure { min-width: 0; margin: 0; border: 1px solid var(--ten-line); border-radius: 8px; overflow: hidden; background: var(--ten-list-bg); text-align: center; }
+#ten-comic-root .ten-rule-preview-grid img { display: block; width: 100%; height: 110px; object-fit: contain; }
+#ten-comic-root .ten-rule-preview-grid figcaption { padding: 2px 4px; }
+#ten-comic-root .ten-rule-import-preview { max-height: 360px; overflow: auto; min-width: 0; padding: 8px; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); color: var(--ten-text); font-size: 10px; }
+#ten-comic-root .ten-rule-import-row { display: grid; grid-template-columns: minmax(0,1fr); gap: 6px; padding: 9px 0; border-bottom: 1px solid var(--ten-line); overflow-wrap: anywhere; }
+#ten-comic-root .ten-rule-import-row select { min-width: 0; max-width: 100%; }
+#ten-comic-root .ten-rule-import-preview > .ten-rule-toolbar { position: sticky; bottom: 0; padding: 7px 0; background: var(--ten-popover-bg); }
+#ten-comic-root .ten-rule-item { display: grid; grid-template-columns: minmax(0,1fr); gap: 4px; margin: 8px 0; padding: 7px; border: 1px solid var(--ten-line); border-radius: var(--ten-radius-control); background: var(--ten-list-bg); }
+#ten-comic-root .ten-rule-item .ten-rule-open { border: 0; background: transparent; }
+#ten-comic-root .ten-rule-item .ten-meta { overflow-wrap: anywhere; }
+#ten-comic-root .ten-rule-item-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px; }
+#ten-comic-root .is-rule-disabled .ten-rule-open { opacity: .62; }
+#ten-comic-root #ten-managed-rule-list [hidden] { display: none !important; }
+#ten-comic-root .ten-rule-filter { display: grid; gap: 5px; color: var(--ten-muted); font-size: 10px; }
+#ten-comic-root select.ten-input { appearance: auto; color: var(--ten-text); }
+#ten-comic-root select.ten-input option { color: var(--ten-text); background-color: var(--ten-surface-strong); }
+#ten-comic-root:is([data-theme="aurora"],[data-theme="mist"],[data-theme="cloud"]) select.ten-input { color-scheme: light; }
+#ten-comic-root:is([data-theme="obsidian"],[data-theme="carbon"],[data-theme="titanium"]) select.ten-input { color-scheme: dark; }
+#ten-comic-root #ten-rule-match-layer { position: fixed; inset: 0; z-index: 2147483645; pointer-events: none; overflow: hidden; }
+#ten-comic-root .ten-rule-match-box { position: absolute; border: 2px solid var(--ten-cyan); background: color-mix(in srgb,var(--ten-cyan) 12%,transparent); border-radius: 4px; pointer-events: none; }
+@media (max-width: 600px) {
+  #ten-comic-root .ten-rule-preview-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  #ten-comic-root .ten-rule-item-actions button { min-height: 36px; }
+  #ten-comic-root .ten-rule-import-preview { max-height: 280px; }
+}

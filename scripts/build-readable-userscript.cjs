@@ -34,11 +34,16 @@ function moduleSource(name) {
 }
 
 async function buildReadableUserscript() {
-  const prefix = Buffer.concat(prefixFiles.map(name => fs.readFileSync(path.join(source, name))))
+  const acornPath = require.resolve('acorn');
+  const acornSource = fs.readFileSync(acornPath, 'utf8');
+  const acornLicense = fs.readFileSync(path.join(source, 'vendor', 'acorn.LICENSE'), 'utf8');
+  const vendor = await terser.minify(`/*! Acorn 8.18.0 — MIT\n${acornLicense}*/\nfunction __tenComicRuleSyntax(){if(!__tenComicRuleSyntax.parser){const module={exports:{}};const exports=module.exports;${acornSource}\n__tenComicRuleSyntax.parser=module.exports;}return __tenComicRuleSyntax.parser;}`, { compress: true, mangle: true, format: { comments: /^!/, max_line_len: 160 } });
+  const prefix = Buffer.concat([...prefixFiles.map(name => fs.readFileSync(path.join(source, name))), Buffer.from(vendor.code + '\n')])
   let core = fs.readFileSync(path.join(source, 'runtime.source.js'), 'utf8')
   const sites = fs.readFileSync(path.join(source, 'sites', 'edge-sites.source.js'), 'utf8')
   const modules = {
     390: moduleSource('config'),
+    516: `(module)=>{module.exports=(${moduleSource('rule-model')})({parse:(code,options)=>__tenComicRuleSyntax().parse(code,options)})}`,
     872: replaceOne(moduleSource('comics'), siteMarker, sites),
     624: replaceOne(moduleSource('downloads'), '/*__IMAGE_RETRY_POLICY__*/ null', moduleSource('retry-policy'))
   }
@@ -49,7 +54,10 @@ async function buildReadableUserscript() {
   const uiSource = composeUI(moduleSource('ui'), source)
   const queueSlot = uiSource.match(/\/\*__QUEUE_CLASS__\*\/\s*class DownloadQueue\s*\{\s*\}/)
   if (!queueSlot) throw new Error('Missing UI queue slot')
-  const ui = replaceOne(uiSource, queueSlot[0], moduleSource('queue'))
+  let ui = replaceOne(uiSource, queueSlot[0], moduleSource('queue'))
+  const storeSlot = ui.match(/\/\*__RULE_STORE__\*\/\s*class RuleRepository\s*\{\s*\}/)
+  if (!storeSlot) throw new Error('Missing rule store slot')
+  ui = replaceOne(ui, storeSlot[0], moduleSource('rule-store'))
   const recoverySlot = ui.match(/\/\*__RECOVERY_STORE__\*\/\s*class RecoveryStore\s*\{\s*\}/)
   if (!recoverySlot) throw new Error('Missing recovery store slot')
   core = replaceOne(core, '/*__ENTRY__*/(()=>{})()', `(${replaceOne(ui, recoverySlot[0], moduleSource('recovery'))})()`)

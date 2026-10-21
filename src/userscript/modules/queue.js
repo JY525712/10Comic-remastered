@@ -178,6 +178,7 @@ module.exports = class DownloadQueue {
     const succeeded = n.length ? Math.min(processed, Math.max(0, Number(item.resumeSucceeded ?? (processed - failed)) || 0)) : 0;
     return {
       ...r,
+      adapter: item.adapter,
       imgIndex: 0,
       processedNum: processed,
       successNum: succeeded,
@@ -332,6 +333,7 @@ module.exports = class DownloadQueue {
         this.setStage(index, "正在解析章节图片");
         try {
           a = await (0, this.downloads.gJ)({
+            adapter: t.adapter,
             url: t.url,
             isPay: t.isPay,
             signal: t.abortController.signal
@@ -381,6 +383,7 @@ module.exports = class DownloadQueue {
         const d = Date.now();
         await this.waitUntilRunnable(workerId), this.setStage(workerId, "正在解析下一页图片");
         const a = await (0, this.downloads.gJ)({
+          adapter: t.adapter,
           url: t.url,
           imgIndex: t.imgIndex,
           totalNumber: t.totalNumber,

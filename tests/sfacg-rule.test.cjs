@@ -10,7 +10,7 @@ const origin = 'https://manhua.sfacg.com'
 
 function rule(context = {}) {
   const rules = vm.runInNewContext(`const comicsWebInfo=[];${source};comicsWebInfo`, {
-    URL, setTimeout, location: { href: origin + '/mh/XJYQS/', origin }, ...context
+    URL, setTimeout, customRuleModel: require('../src/userscript/modules/rule-model.js')(), location: { href: origin + '/mh/XJYQS/', origin }, ...context
   })
   const found = rules.find(item => item.domain === 'manhua.sfacg.com')
   assert.ok(found, 'SF 菠萝包内置规则应匹配漫画站')

@@ -7,7 +7,7 @@ const vm = require('node:vm')
 const source = fs.readFileSync(path.resolve(__dirname, '../src/userscript/sites/edge-sites.source.js'), 'utf8')
 
 function rules(context) {
-  return vm.runInNewContext(`const comicsWebInfo=[];${source};comicsWebInfo`, { URL, ...context })
+  return vm.runInNewContext(`const comicsWebInfo=[];${source};comicsWebInfo`, { URL, customRuleModel: require('../src/userscript/modules/rule-model.js')(), ...context })
 }
 
 test('Zero uses the title after leading whitespace and returns ordered chapters', async () => {

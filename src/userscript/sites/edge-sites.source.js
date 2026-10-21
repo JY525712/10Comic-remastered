@@ -167,6 +167,21 @@
             });
             /* FOUR_SITE_ADDITIONS_END */
 
+// 瓜子漫画：沿用已实测的简单选择器，读取目录和阅读页正文图片。
+comicsWebInfo.push({
+    domain: "guazimanhua.com",
+    homepage: "https://www.guazimanhua.com/",
+    webName: "瓜子漫画",
+    webDesc: "打开站点",
+    comicNameCss: "#cinema-title",
+    chapterCss: "[data-chapter-list]",
+    imageCss: "[data-reader-images] img.reading-image",
+    chapterUrlIncludes: "/chapter.php?id=",
+    readtype: 1,
+    useFrame: false,
+    getImgs: customRuleModel.simpleImages
+});
+
 // SF 菠萝包：参考用户提供的下载脚本确认 picAy 数据形态；复用本站正常阅读流程。
 comicsWebInfo.push({
     domain: "manhua.sfacg.com",

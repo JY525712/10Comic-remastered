@@ -59,6 +59,10 @@ function preservedParts(source, sfacgDescription) {
     if (['sanitizePathName', 'writeStoreZipToDirectoryV2'].includes(path.node.id?.name)) path.node.body.body = []
   }, ExpressionStatement(path) {
     const value = path.node.expression
+    if (value.type === 'CallExpression' && value.callee.type === 'MemberExpression' && value.callee.object.name === 'comicsWebInfo' && value.callee.property.name === 'push' && value.arguments.length === 1) {
+      const rule = value.arguments[0]
+      if (rule.type === 'ObjectExpression' && rule.properties.some(property => property.key.name === 'domain' && property.value.value === 'guazimanhua.com')) return path.remove()
+    }
     if (revisionOnly(value) || value.type === 'LogicalExpression' && revisionOnly(value.right)) path.remove()
   }, SequenceExpression(path) {
     path.node.expressions = path.node.expressions.filter(node => !revisionOnly(node))

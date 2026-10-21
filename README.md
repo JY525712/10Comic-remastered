@@ -63,6 +63,7 @@ npm run verify:browser
 | RidiBooks | https://ridibooks.com/webtoon/recommendation | 免费或已授权章节 |
 | 拷贝漫画 | https://www.mangacopy.com/ | 仅下载页面正常加载的漫画图片 |
 | SF菠萝包漫画 | https://manhua.sfacg.com/ | 作品页或阅读页加载目录；免费或当前账号可正常阅读的章节 |
+| 瓜子漫画 | https://www.guazimanhua.com/ | 作品页加载目录，读取阅读页正文图片；无需导入规则 |
 
 ## 哔哩哔哩漫画声明
 
